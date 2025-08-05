@@ -16,8 +16,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
-    <!-- ADICIONADO: Biblioteca para ler os arquivos de produtos -->
-    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    
+    <!-- Decap CMS -->
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
     
     <!-- ======================================================= -->
     <!-- INÍCIO DO CÓDIGO CSS -->
@@ -344,7 +345,7 @@
     <div id="welcome-popup-overlay" class="welcome-popup-overlay"><div class="welcome-popup"><button id="close-popup" class="close-popup-btn"><i class="ph ph-x"></i></button><i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i><h2 class="section-title text-2xl mb-2">Um presente para você!</h2><p class="text-gray-600 mb-6">É sua primeira vez aqui? Ganhe <strong>5% de desconto</strong> no seu primeiro pedido!</p><a href="https://wa.me/5522998802545?text=Olá!%20Vim%20pelo%20site%20e%20quero%20meu%20cupom%20de%205%25%20OFF%20de%20boas-vindas!" target="_blank" id="claim-coupon-btn" class="btn btn-buy py-3"><i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>Resgatar Cupom</a></div></div>
 
     <!-- ======================================================= -->
-    <!-- INÍCIO DO CÓDIGO JAVASCRIPT (VERSÃO MODIFICADA) -->
+    <!-- INÍCIO DO CÓDIGO JAVASCRIPT -->
     <!-- ======================================================= -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -362,11 +363,32 @@
                 };
             }
 
-            // MODIFICADO: A lista de produtos agora começa vazia e será preenchida dinamicamente.
-            let allProducts = [];
-
+            let allProducts = []; // Lista de produtos agora está vazia
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
             const UIElements = { productGrid: get('#product-grid'), cartDropdown: get('#cart-dropdown'), favoritesDropdown: get('#favorites-dropdown'), floatingCartBtn: get('#floating-cart-btn'), floatingFavoritesBtn: get('#floating-favorites-btn'), productDetailModal: get('#product-detail-modal'), shippingInfoModal: get('#shipping-info-modal'), modalOverlay: get('#modal-overlay'), searchInput: get('#search-input'), clearSearchBtn: get('#clear-search-btn'), searchIcon: get('#search-icon'), searchSuggestions: get('#search-suggestions'), noProductsMessage: get('#no-products-message'), loadingOverlay: get('.loading-overlay'), sortDropdownContainer: get('#sort-dropdown-container'), sortOptions: get('#sort-options'), sortCaret: get('#sort-caret'), cartFeedbackToast: get('#cart-feedback-toast'), favoritesFeedbackToast: get('#favorites-feedback-toast'), activityToast: get('#activity-toast'), welcomePopupOverlay: get('#welcome-popup-overlay'), hamburgerButton: get('#hamburger-button'), mobileNav: get('#mobile-nav'), mainHeader: get('#main-header'), floatingButtonsContainer: get('#floating-buttons-container'), scrollObserverTarget: get('#contato') };
+
+            // NOVA FUNÇÃO para buscar produtos
+            async function fetchProducts() {
+                try {
+                    const response = await fetch('/.netlify/functions/get-products');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const products = await response.json();
+                    
+                    // Converte os campos para os tipos corretos (ex: preço para número)
+                    return products.map(p => ({
+                        ...p,
+                        price: parseFloat(p.price) || 0,
+                        originalPrice: parseFloat(p.originalPrice) || 0,
+                    }));
+
+                } catch (error) {
+                    console.error("Falha ao buscar produtos:", error);
+                    UIElements.productGrid.innerHTML = `<div class='text-center text-red-500 col-span-full'>Erro ao carregar os produtos. Tente recarregar a página.</div>`;
+                    return [];
+                }
+            }
 
             const saveState = () => { localStorage.setItem('estiloChicCart', JSON.stringify(cart)); localStorage.setItem('estiloChicFavorites', JSON.stringify(favorites)); };
             const loadState = () => { try { const sc = localStorage.getItem('estiloChicCart'); if (sc) cart = JSON.parse(sc) || {}; const sf = localStorage.getItem('estiloChicFavorites'); if (sf) favorites = JSON.parse(sf) || []; } catch { cart = {}; favorites = []; } };
@@ -443,7 +465,7 @@
                 <div class="product flex flex-col group ${isNew ? 'new-since-last-visit' : ''}" data-id="${product.id}" tabindex="0">
                     <div class="relative overflow-hidden">
                         <img loading="lazy" src="${product.image}" alt="${product.name}" class="product-image w-full h-48 sm:h-64 object-cover">
-                        ${product.badge ? `<div class="product-badge">${product.badge.text}</div>` : ''}
+                        ${product.badge && product.badge.text ? `<div class="product-badge">${product.badge.text}</div>` : ''}
                         <div class="absolute top-3 right-3">
                             <button class="toggle-favorite-btn w-10 h-10 rounded-full flex items-center justify-center" data-id="${product.id}">
                                 <i class="heart-icon ph-fill ph-heart text-2xl pointer-events-none"></i>
@@ -485,33 +507,17 @@
 
             const setupActivityNotifications = () => {
                 const toast = UIElements.activityToast;
-                if (!toast || allProducts.length === 0) return;
+                if (!toast) return;
                 const names = ['Ana', 'Mariana', 'Júlia', 'Beatriz', 'Larissa', 'Maria', 'Alice', 'Helena', 'Laura', 'Manuela', 'Valentina', 'Sophia', 'Isabella', 'Lívia', 'Giovanna', 'Yasmin', 'Eloá', 'Clara', 'Cecília', 'Liz', 'Maitê', 'Antonella', 'Elisa', 'Gabriela', 'Luiza', 'Amanda', 'Bruna', 'Camila', 'Fernanda', 'Patrícia', 'Sandra', 'Jéssica', 'Letícia', 'Aline'];
-                const cities = [
-                    'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes',
-                    'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes',
-                    'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes',
-                    'Macaé', 'Itaperuna', 'Rio de Janeiro'
-                ];
-                const actions = [
-                    { verb: 'acabou de comprar', icon: 'ph-fill ph-shopping-cart-simple', color: 'var(--purple-dark)' },
-                    { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' }
-                ];
+                const cities = [ 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'Macaé', 'Itaperuna', 'Rio de Janeiro' ];
+                const actions = [ { verb: 'acabou de comprar', icon: 'ph-fill ph-shopping-cart-simple', color: 'var(--purple-dark)' }, { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' } ];
                 const showRandom = () => {
-                    if (document.hidden) return;
+                    if (document.hidden || allProducts.length === 0) return;
                     const name = names[Math.floor(Math.random() * names.length)];
                     const city = cities[Math.floor(Math.random() * cities.length)];
                     const action = actions[Math.floor(Math.random() * actions.length)];
                     const product = allProducts[Math.floor(Math.random() * allProducts.length)];
-                    toast.innerHTML = `
-                        <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full animate-icon-pulse" style="background-color: ${action.color};">
-                            <i class="${action.icon} text-white text-xl"></i>
-                        </div>
-                        <div>
-                            <p><strong>${name}</strong> de ${city}</p>
-                            <p class="text-sm" style="color: var(--text-secondary);">${action.verb} um(a) <strong>${product.name}</strong></p>
-                        </div>
-                    `;
+                    toast.innerHTML = ` <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full animate-icon-pulse" style="background-color: ${action.color};"> <i class="${action.icon} text-white text-xl"></i> </div> <div> <p><strong>${name}</strong> de ${city}</p> <p class="text-sm" style="color: var(--text-secondary);">${action.verb} um(a) <strong>${product.name}</strong></p> </div> `;
                     toast.classList.add('show');
                     setTimeout(() => { toast.classList.remove('show'); }, 5000);
                 };
@@ -574,72 +580,30 @@
                 getAll('.sort-option').forEach(o => o.addEventListener('click', (e) => { e.preventDefault(); get('#sort-button-text').textContent = `Ordenar: ${o.textContent}`; activeSort = o.dataset.value; getAll('.sort-option').forEach(opt => opt.classList.remove('font-bold')); o.classList.add('font-bold'); UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); renderProducts(); }));
             }
 
-            // NOVO: Função para carregar dinamicamente os produtos
-            async function loadProducts() {
-                try {
-                    // Nomes dos arquivos de produtos que criamos.
-                    const productFiles = [
-                        '01-saia-de-brilho.md', '02-body.md', '03-colar-de-perola.md',
-                        '04-cordao-com-inicial.md', '05-salto-bloco.md', '06-blusa-tricot.md',
-                        '07-batom-matte.md', '08-delineador.md', '09-lapis-preto.md',
-                        '10-rimel.md', '11-iluminador.md', '12-oculos-dourado.md',
-                        '13-oculos-preto.md', '14-corretivo.md', '15-cinto.md'
-                    ];
-
-                    const productPromises = productFiles.map(file => 
-                        fetch(`/_products/${file}`)
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error(`Não foi possível carregar o produto: ${file}`);
-                                }
-                                return response.text();
-                            })
-                            .then(text => {
-                                // Separa os dados (frontmatter) do conteúdo.
-                                const match = text.match(/---([\s\S]*?)---/);
-                                if (match && match[1]) {
-                                    // Usa a biblioteca js-yaml para converter o texto em um objeto.
-                                    return jsyaml.load(match[1]);
-                                }
-                                return null;
-                            })
-                    );
-
-                    const loadedProducts = await Promise.all(productPromises);
-                    allProducts = loadedProducts.filter(p => p !== null); // Filtra qualquer arquivo que não pôde ser lido.
-
-                } catch (error) {
-                    console.error("Erro ao carregar os produtos:", error);
-                    UIElements.noProductsMessage.innerHTML = `<p>Ocorreu um erro ao carregar os produtos. Tente novamente mais tarde.</p>`;
-                    UIElements.noProductsMessage.classList.remove('hidden');
-                }
-            }
-
             async function init() {
                 lastVisit = localStorage.getItem('estiloChicLastVisit');
                 localStorage.setItem('estiloChicLastVisit', new Date().getTime());
                 
                 loadState();
                 
-                // MODIFICADO: Chama a nova função para carregar os produtos
-                await loadProducts();
-                
-                allProducts.forEach(p => p.viewing = 0);
-                fuse = new Fuse(allProducts, { keys: ['name', 'category', 'description'], threshold: 0.4 });
-                
-                setupEventListeners();
-                setupObservers();
-                
-                get('#filter-buttons button[data-category="all"]').classList.add('filter-active');
-                get('.sort-option[data-value="default"]').classList.add('font-bold');
-                
-                renderProducts();
-                updateApp();
-                checkButtonsVisibility();
-                setupWelcomePopup();
-                setupActivityNotifications();
-                
-                setInterval(updateVisuals, 4000);
+                allProducts = await fetchProducts();
+                if (allProducts.length > 0) {
+                    allProducts.forEach(p => p.viewing = 0);
+                    fuse = new Fuse(allProducts, { keys: ['name', 'category', 'description'], threshold: 0.4 });
+                    
+                    setupEventListeners();
+                    setupObservers();
+                    
+                    get('#filter-buttons button[data-category="all"]').classList.add('filter-active');
+                    get('.sort-option[data-value="default"]').classList.add('font-bold');
+                    
+                    renderProducts();
+                    updateApp();
+                    checkButtonsVisibility();
+                    setupWelcomePopup();
+                    setupActivityNotifications();
+                    setInterval(updateVisuals, 4000);
+                }
                 
                 UIElements.loadingOverlay.classList.add('hidden');
             }
