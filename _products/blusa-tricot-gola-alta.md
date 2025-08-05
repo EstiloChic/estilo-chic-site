@@ -11,6 +11,7 @@ badge:
   text: Promoção
 dateAdded: 2025-07-27T09:30:00.000Z
 layout: "produto.njk"
+tags: products
 ---
 
 Blusa de tricot canelado com gola alta, uma peça essencial para os dias mais frios.

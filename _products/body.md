@@ -9,6 +9,7 @@ category: roupas
 size: Tamanho único
 dateAdded: 2025-07-28T11:00:00.000Z
 layout: "produto.njk"
+tags: products
 ---
 
 Body versátil de alças finas, ideal para compor looks casuais ou mais elaborados.

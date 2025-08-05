@@ -9,6 +9,7 @@ category: acessorios
 size: Tamanho 37/38
 dateAdded: 2025-07-25T14:00:00.000Z
 layout: "produto.njk"
+tags: products
 ---
 
-Sandália de salto baixo em bloco, oferecendo o equilíbrio perfeito entre elegância e conforto.
+Sandália de salto baixo em bloco, oferecendo o equilíbrio perfeito entre elegância e conforto.```

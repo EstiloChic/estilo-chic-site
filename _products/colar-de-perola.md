@@ -10,6 +10,7 @@ badge:
   text: Novidade
 dateAdded: 2025-07-30T12:00:00.000Z
 layout: "produto.njk"
+tags: products
 ---
 
 Colar de pérolas clássico e atemporal. Um acessório elegante que adiciona um toque de sofisticação.

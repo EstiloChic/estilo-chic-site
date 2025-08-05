@@ -10,6 +10,7 @@ badge:
   text: Novidade
 dateAdded: 2025-07-30T14:00:00.000Z
 layout: "produto.njk"
+tags: products
 ---
 
 Óculos de sol com armação metálica dourada e design moderno. Lentes com proteção UV400.

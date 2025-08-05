@@ -10,6 +10,7 @@ badge:
   text: Mais Vendido
 dateAdded: 2025-07-28T17:00:00.000Z
 layout: "produto.njk"
+tags: products
 ---
 
 Máscara de cílios que proporciona volume e alongamento incríveis.

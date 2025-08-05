@@ -11,6 +11,7 @@ badge:
   text: Mais Vendido
 dateAdded: 2025-07-30T10:00:00.000Z
 layout: "produto.njk"
+tags: products
 ---
 
 Saia curta deslumbrante com acabamento em brilho, perfeita para eventos noturnos e festas.

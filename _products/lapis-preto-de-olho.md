@@ -10,6 +10,7 @@ badge:
   text: Promoção
 dateAdded: 2025-07-22T15:00:00.000Z
 layout: "produto.njk"
+tags: products
 ---
 
 Lápis de olho com textura macia e cor intensa para um olhar marcante.
