@@ -1,17 +1,22 @@
+# ADICIONADO: Configurações de tradução e personalização
+locale: 'pt' # Traduz a interface para o Português
+logo_url: https://i.postimg.cc/ZqP5v2Cj/ES-2.png # Adiciona o seu logo
+site_url: https://estilocichicsite.netlify.app/ # Link para o seu site (opcional)
+
 backend:
   name: git-gateway
-  branch: main # ou master, dependendo do nome do seu branch principal
+  branch: main # ou master
 
-media_folder: "assets/uploads" # Onde as imagens serão salvas
-public_folder: "/assets/uploads" # Como o site irá acessar as imagens
+media_folder: "assets/uploads" 
+public_folder: "/assets/uploads"
 
 collections:
-  - name: "products" # Nome da coleção
-    label: "Produtos" # Rótulo que aparece no painel
-    folder: "_products" # A pasta onde os arquivos de produto estão
-    create: true # Permitir a criação de novos produtos
-    slug: "{{name}}" # Gera o nome do arquivo a partir do nome do produto
-    fields: # Os campos de cada produto
+  - name: "products"
+    label: "Produtos" 
+    folder: "_products" 
+    create: true 
+    slug: "{{name}}" 
+    fields: 
       - { label: "ID do Produto", name: "id", widget: "string" }
       - { label: "Nome do Produto", name: "name", widget: "string" }
       - { label: "Preço", name: "price", widget: "number", value_type: "float" }

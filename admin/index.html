@@ -10,11 +10,19 @@
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <!-- Script principal do Decap CMS -->
+  <!-- Inclua o script do Decap CMS -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   <script>
-    // Inicializa o CMS apontando para o arquivo de configuração
-    CMS.init({ config: { load_config_file: "/admin/config.yml" } });
+    // CORREÇÃO: Garante que o usuário seja redirecionado para o painel após o login
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on("init", user => {
+        if (!user) {
+          window.netlifyIdentity.on("login", () => {
+            document.location.href = "/admin/";
+          });
+        }
+      });
+    }
   </script>
 </body>
 </html>
