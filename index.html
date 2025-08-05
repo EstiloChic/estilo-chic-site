@@ -256,8 +256,7 @@
         <!-- ÁREA DOS PRODUTOS ATUALIZADA - INÍCIO -->
         <!-- ====================================================================== -->
         <section class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4" id="product-grid">
-            
-            {# Este é um loop do Eleventy. Ele vai repetir o código abaixo para cada produto na coleção 'products'. #}
+
             {%- for product in collections.products | reverse -%}
                 <div class="product flex flex-col group" data-id="{{ product.data.id }}" data-category="{{ product.data.category }}" tabindex="0" style="opacity: 1;">
                     <div class="relative overflow-hidden">
@@ -278,7 +277,11 @@
                         <a href="{{ product.url | url }}">
                             <h3 class="text-base font-semibold text-gray-800 truncate mb-1">{{ product.data.name }}</h3>
                         </a>
-                        <p class="text-xs text-gray-500 min-h-[16px] mb-3">{{ product.data.size or '' }}</p>
+                        {% if product.data.size %}
+                            <p class="text-xs text-gray-500 min-h-[16px] mb-3">{{ product.data.size }}</p>
+                        {% else %}
+                            <p class="text-xs text-gray-500 min-h-[16px] mb-3">&nbsp;</p>
+                        {% endif %}
                         <div class="mt-auto">
                             <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
                                 <span class="text-gray-500 line-through whitespace-nowrap">R$ {{ product.data.originalPrice | formatPrice }}</span>
