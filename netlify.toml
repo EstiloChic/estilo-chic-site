@@ -1,8 +1,6 @@
-# Define o diretório de publicação como a raiz do seu projeto
 [build]
   publish = "/"
 
-# Permite que o JavaScript leia os arquivos Markdown da pasta _products
 [[headers]]
   for = "/_products/*"
   [headers.values]
