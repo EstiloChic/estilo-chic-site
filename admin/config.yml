@@ -1,11 +1,12 @@
-# ADICIONADO: Configurações de tradução e personalização
-locale: 'pt' # Traduz a interface para o Português
-logo_url: https://i.postimg.cc/ZqP5v2Cj/ES-2.png # Adiciona o seu logo
-site_url: https://estilocichicsite.netlify.app/ # Link para o seu site (opcional)
+# Configurações de tradução e personalização
+locale: 'pt' 
+editor: { preview_style: "/admin/style.css" } # ADICIONADO: Carrega o CSS personalizado
+logo_url: https://i.postimg.cc/ZqP5v2Cj/ES-2.png 
+site_url: https://estilocichicsite.netlify.app/ 
 
 backend:
   name: git-gateway
-  branch: main # ou master
+  branch: main 
 
 media_folder: "assets/uploads" 
 public_folder: "/assets/uploads"

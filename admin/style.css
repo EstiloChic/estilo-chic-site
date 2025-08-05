@@ -1,0 +1,68 @@
+/*
+ * ==========================================================================
+ * CSS para Personalização do Painel de Controle - Estilo Chic
+ * ==========================================================================
+ */
+
+:root {
+  /* Cores principais da sua loja */
+  --purple-dark: #6a1b9a;
+  --purple-medium: #a855f7;
+  --purple-light: #d1c4e9;
+  --accent-pink: #ec4899;
+  --text-primary: #3a2d46;
+
+  /* Cores do tema do painel */
+  --primary: var(--purple-dark); /* Cor principal para botões e links */
+  --background-primary: #fff;
+  --background-secondary: #f9f6ff; /* Fundo principal (roxo bem claro) */
+  --background-page: #f9f6ff;
+  --foreground-primary: var(--text-primary);
+  --foreground-secondary: #6d5f7a;
+  --foreground-tertiary: #ccc;
+  --separator: var(--purple-light);
+  --border-primary: var(--purple-light);
+  --surface: #fff;
+
+  /* Fontes */
+  --font-family-sans-serif: 'Poppins', sans-serif;
+  --font-family-monospace: monospace;
+}
+
+/* Importa a fonte Poppins para o painel */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Altera o botão principal de "Login" */
+[data-testid="netlify-identity-button"] {
+    background-color: var(--purple-dark) !important;
+    border-radius: 99px !important;
+    font-weight: 600 !important;
+    padding: 10px 16px !important;
+}
+
+/* Personaliza o cabeçalho principal do painel */
+[data-testid="header-toolbar"] {
+    background-color: var(--purple-dark) !important;
+}
+
+/* Cor do botão "Novo Produto" */
+[data-testid="create-new-button"] {
+  background-color: var(--purple-dark) !important;
+}
+[data-testid="create-new-button"]:hover {
+  background-color: #4a0e6b !important;
+}
+
+/* Cor do botão "Publicar" (Publish) */
+button[class*='PublishButton-button-'] {
+  background-color: var(--purple-dark) !important;
+}
+button[class*='PublishButton-button-']:hover {
+  background-color: #4a0e6b !important;
+}
+
+/* Cor de fundo da coleção ativa (Produtos) */
+a[class*='CollectionLink-link-active-'] {
+    background-color: var(--purple-light) !important;
+    border-left-color: var(--purple-dark) !important;
+}
