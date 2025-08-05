@@ -396,7 +396,7 @@
     <!-- Injeta os dados dos produtos do Eleventy em uma variável JavaScript -->
     <script>
         {%- assign productList = collections.products | getProductList -%}
-        const allProducts = {{ productList | safe }};
+        const allProducts = {{ productList }};
     </script>
 
     <script>
