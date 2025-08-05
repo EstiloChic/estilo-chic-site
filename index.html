@@ -17,8 +17,8 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
     
-    <!-- MUDANÇA IMPORTANTE: Usando um link de CDN diferente e mais robusto para o gray-matter -->
-    <script src="https://unpkg.com/gray-matter@4.0.3/browser.js"></script>
+    <!-- MUDANÇA FINAL: Carregando a biblioteca a partir do arquivo local -->
+    <script src="/libs/gray-matter.js"></script>
 
     <!-- O resto do seu CSS continua aqui... -->
     <style>
@@ -344,7 +344,7 @@
     <!-- ======================================================= -->
     <!-- INÍCIO DO CÓDIGO JAVASCRIPT -->
     <!-- ======================================================= -->
-    <script defer>
+    <script>
         // O código JavaScript principal vem aqui...
         // ... (todo o bloco de script que já tínhamos antes)
         document.addEventListener('DOMContentLoaded', () => {
@@ -493,7 +493,7 @@
                 </div>`;
             };
 
-            const renderProducts = () => { const t = UIElements.searchInput.value.trim(); let p = [...allProducts]; if (activeFilter !== 'all') p = p.filter(pr => pr.category === activeFilter); if (t) { const r = fuse.search(t); const ids = new Set(r.map(i => i.item.id)); p = p.filter(pr => ids.has(pr.id)); } if (activeSort === 'price-asc') p.sort((a,b)=>a.price-b.price); else if (activeSort === 'price-desc') p.sort((a,b)=>b.price-a.price); else if (activeSort === 'name-asc') p.sort((a,b)=>a.name.localeCompare(b.name)); UIElements.productGrid.innerHTML = p.map(createProductCardHTML).join(''); UIElements.noProductsMessage.classList.toggle('hidden', p.length === 0); if (p.length === 0) UIElements.noProductsMessage.innerHTML = `<i class="ph ph-flower-lotus text-5xl text-purple-300 mb-4"></i><p class="font-semibold text-xl font-display">Nenhum tesouro encontrado</p>`; getAll('#product-grid .product').forEach((pr, i) => { pr.style.animationDelay = `${i * 60}ms`; }); updateProductCardStates(); };
+            const renderProducts = () => { const t = UIElements.searchInput.value.trim(); let p = [...allProducts]; if (activeFilter !== 'all') p = p.filter(pr => pr.category === activeFilter); if (t) { const r = fuse.search(t); const ids = new Set(r.map(i => i.item.id)); p = p.filter(pr => ids.has(pr.id)); } if (activeSort === 'price-asc') p.sort((a,b)=>a.price-b.price); else if (activeSort === 'price-desc') p.sort((a,b)=>b.price-a.price); else if (activeSort === 'name-asc') p.sort((a,b)=>a.name.localeCompare(b.name)); UIElements.productGrid.innerHTML = p.map(createProductCardHTML).join(''); UIElements.noProductsMessage.classList.toggle('hidden', p.length > 0); if (p.length === 0) UIElements.noProductsMessage.innerHTML = `<i class="ph ph-flower-lotus text-5xl text-purple-300 mb-4"></i><p class="font-semibold text-xl font-display">Nenhum tesouro encontrado</p>`; getAll('#product-grid .product').forEach((pr, i) => { pr.style.animationDelay = `${i * 60}ms`; }); updateProductCardStates(); };
             const updateVisuals = () => { allProducts.forEach(p => { const e = get(`#viewing-info-${p.id}`); if (e) { if (Math.random() > 0.7) p.viewing = Math.max(0, (p.viewing || 0) + (Math.floor(Math.random() * 3) - 1)); e.innerHTML = (p.viewing > 1) ? `<div class="flex items-center gap-1 text-white text-xs font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm animate-pulse"><i class="ph-fill ph-eye text-sm"></i><span>${p.viewing}</span></div>` : ''; } }); };
             const showFeedbackToast = (type) => { const t = type === 'cart' ? UIElements.cartFeedbackToast : UIElements.favoritesFeedbackToast; let to = type === 'cart' ? cartToastTimeout : favoritesToastTimeout; clearTimeout(to); t.classList.add('show'); to = setTimeout(() => t.classList.remove('show'), 2000); if (type === 'cart') cartToastTimeout = to; else favoritesToastTimeout = to; };
             const flyToCart = (target) => { const c = target.closest('.product, .favorite-dropdown-item'); if (!c) return; const i = c.querySelector('img'); if(!i) return; const fi = i.cloneNode(true); const r1 = i.getBoundingClientRect(); const r2 = UIElements.floatingCartBtn.getBoundingClientRect(); fi.style.cssText = `position: fixed; z-index: 9999; left: ${r1.left}px; top: ${r1.top}px; width: ${r1.width}px; height: ${r1.height}px; border-radius: 0.5rem; transition: all 0.7s cubic-bezier(0.5, 0, 0.75, 0.2);`; document.body.appendChild(fi); requestAnimationFrame(() => { fi.style.left = `${r2.left + r2.width / 2 - 20}px`; fi.style.top = `${r2.top + r2.height / 2 - 20}px`; fi.style.width = '40px'; fi.style.height = '40px'; fi.style.transform = 'scale(0.2) rotate(180deg)'; fi.style.opacity = '0'; }); setTimeout(() => { fi.remove(); UIElements.floatingCartBtn.classList.add('shake'); setTimeout(() => UIElements.floatingCartBtn.classList.remove('shake'), 500); }, 700); };
