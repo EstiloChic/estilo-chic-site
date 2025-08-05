@@ -3,13 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
+    
+    {# Usa a variável 'title' do Front Matter para o título da página #}
+    <title>{{ title }} - Estilo Chic</title>
+    
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+        img { max-width: 100%; height: auto; border-radius: 8px; }
+        h1 { color: #6a1b9a; }
+        .price { font-size: 1.5em; font-weight: bold; color: #333; }
+        .back-link { display: inline-block; margin-top: 20px; text-decoration: none; background: #f5f3ff; color: #6a1b9a; padding: 10px 15px; border-radius: 5px; }
+    </style>
 </head>
 <body>
-    <h1>{{ title }}</h1>
-    
-    {{ content | safe }}
 
-    <a href="/">Voltar para a Home</a>
+    {# Usa a variável 'name' do Front Matter #}
+    <h1>{{ name }}</h1>
+
+    {# Usa a variável 'image' do Front Matter #}
+    <img src="{{ image }}" alt="{{ name }}">
+
+    {# Usa a variável 'price' do Front Matter #}
+    <p class="price">R$ {{ price | formatPrice }}</p>
+
+    {# O 'content' é o texto da descrição que vem de baixo do '---' #}
+    <div class="description">
+        {{ content | safe }}
+    </div>
+
+    <a href="/" class="back-link">← Voltar para todos os produtos</a>
+
 </body>
 </html>
