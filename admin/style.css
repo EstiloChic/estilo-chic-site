@@ -13,31 +13,21 @@
   --text-primary: #3a2d46;
 
   /* Cores do tema do painel */
-  --primary: var(--purple-dark); /* Cor principal para botões e links */
+  --primary: var(--purple-dark);
   --background-primary: #fff;
-  --background-secondary: #f9f6ff; /* Fundo principal (roxo bem claro) */
+  --background-secondary: #f9f6ff;
   --background-page: #f9f6ff;
   --foreground-primary: var(--text-primary);
   --foreground-secondary: #6d5f7a;
-  --foreground-tertiary: #ccc;
   --separator: var(--purple-light);
   --border-primary: var(--purple-light);
-  --surface: #fff;
-
-  /* Fontes */
-  --font-family-sans-serif: 'Poppins', sans-serif;
-  --font-family-monospace: monospace;
 }
 
 /* Importa a fonte Poppins para o painel */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-/* Altera o botão principal de "Login" */
-[data-testid="netlify-identity-button"] {
-    background-color: var(--purple-dark) !important;
-    border-radius: 99px !important;
-    font-weight: 600 !important;
-    padding: 10px 16px !important;
+body {
+  font-family: 'Poppins', sans-serif;
 }
 
 /* Personaliza o cabeçalho principal do painel */
