@@ -2,7 +2,7 @@ module.exports = function(eleventyConfig) {
   // Copia a pasta 'admin' para a pasta de saída '_site'
   eleventyConfig.addPassthroughCopy("admin");
 
-  // NOVO: Filtro personalizado para formatar números como preço (ex: 30 -> 30,00)
+  // Filtro personalizado para formatar números como preço (ex: 30 -> 30,00)
   eleventyConfig.addFilter("formatPrice", function(value) {
     if (typeof value !== 'number') {
       return value;
@@ -10,8 +10,29 @@ module.exports = function(eleventyConfig) {
     return Number(value).toFixed(2).replace('.', ',');
   });
 
+  // NOVO: Função para criar uma lista limpa de produtos para o JavaScript
+  // Isso resolve o erro de referência circular.
+  eleventyConfig.addJavaScriptFunction("getProductList", function(collection) {
+    const productList = collection.map(product => {
+      return {
+        id: product.data.id,
+        name: product.data.name,
+        price: product.data.price,
+        originalPrice: product.data.originalPrice,
+        image: product.data.image,
+        category: product.data.category,
+        size: product.data.size,
+        badge: product.data.badge,
+        dateAdded: product.data.dateAdded,
+        url: product.url,
+        description: product.templateContent.trim()
+      };
+    });
+    // Converte a lista limpa para uma string JSON
+    return JSON.stringify(productList);
+  });
+
   return {
-    // Estas são as pastas padrão, mas é bom tê-las aqui
     dir: {
       input: ".",
       includes: "_includes",
