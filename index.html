@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -16,7 +16,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
-    <!-- ADICIONADO: Biblioteca para ler os arquivos de produtos -->
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
     
     <!-- ======================================================= -->
@@ -168,7 +167,7 @@
     <div class="loading-overlay"><div class="spinner"></div></div>
     
     <div class="bg-[#6a1b9a] relative header-bg-pattern flex items-center justify-center h-[120px]">
-        <a href="#" aria-label="Página Inicial" class="relative z-10">
+        <a href="/" aria-label="Página Inicial" class="relative z-10">
             <img src="https://i.postimg.cc/ZqP5v2Cj/ES-2.png" alt="Logo Estilo Chic" class="h-36 mx-auto w-auto">
         </a>
     </div>
@@ -253,7 +252,54 @@
             </div>
         </section>
 
-        <section class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4" id="product-grid"></section>
+        <!-- ====================================================================== -->
+        <!-- ÁREA DOS PRODUTOS ATUALIZADA - INÍCIO -->
+        <!-- ====================================================================== -->
+        <section class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4" id="product-grid">
+            
+            {# Este é um loop do Eleventy. Ele vai repetir o código abaixo para cada produto na coleção 'products'. #}
+            {%- for product in collections.products | reverse -%}
+                <div class="product flex flex-col group" data-id="{{ product.data.id }}" data-category="{{ product.data.category }}" tabindex="0">
+                    <div class="relative overflow-hidden">
+                        <a href="{{ product.url | url }}">
+                            <img loading="lazy" src="{{ product.data.image }}" alt="{{ product.data.name }}" class="product-image w-full h-48 sm:h-64 object-cover">
+                        </a>
+                        {% if product.data.badge %}
+                            <div class="product-badge">{{ product.data.badge.text }}</div>
+                        {% endif %}
+                        <div class="absolute top-3 right-3">
+                            <button class="toggle-favorite-btn w-10 h-10 rounded-full flex items-center justify-center" data-id="{{ product.data.id }}">
+                                <i class="heart-icon ph-fill ph-heart text-2xl pointer-events-none"></i>
+                            </button>
+                        </div>
+                         <div id="viewing-info-{{ product.data.id }}" class="absolute bottom-2 left-2 h-5"></div>
+                    </div>
+                    <div class="p-3 flex flex-col flex-grow text-center">
+                        <a href="{{ product.url | url }}">
+                            <h3 class="text-base font-semibold text-gray-800 truncate mb-1">{{ product.data.name }}</h3>
+                        </a>
+                        <p class="text-xs text-gray-500 min-h-[16px] mb-3">{{ product.data.size or '' }}</p>
+                        <div class="mt-auto">
+                            <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
+                                <span class="text-gray-500 line-through whitespace-nowrap">R$ {{ "%.2f" | format(product.data.originalPrice) | replace('.', ',') }}</span>
+                                <span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ {{ "%.2f" | format(product.data.price) | replace('.', ',') }}</span>
+                            </div>
+                            <div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>
+                            <div class="flex flex-col gap-2 text-sm">
+                                <button class="btn btn-add-default add-to-cart-btn" data-id="{{ product.data.id }}">
+                                    Adicionar
+                                </button>
+                                <a href="https://wa.me/5522998802545?text=Olá!%20Tenho%20interesse%20no%20produto%3A%20{{ product.data.name | url_encode }}" target="_blank" class="btn btn-buy">Comprar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {%- endfor -%}
+
+        </section>
+        <!-- ====================================================================== -->
+        <!-- ÁREA DOS PRODUTOS ATUALIZADA - FIM -->
+        <!-- ====================================================================== -->
         
         <div id="no-products-message" class="text-center py-16 text-gray-600 hidden"></div>
         
@@ -346,6 +392,12 @@
     <!-- ======================================================= -->
     <!-- INÍCIO DO CÓDIGO JAVASCRIPT (VERSÃO CORRIGIDA) -->
     <!-- ======================================================= -->
+    
+    <!-- Injeta os dados dos produtos do Eleventy em uma variável JavaScript -->
+    <script>
+        const allProducts = {{ collections.products | dump | safe }}.map(p => ({ ...p.data, url: p.url }));
+    </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
@@ -362,7 +414,7 @@
                 };
             }
 
-            let allProducts = [];
+            // A variável `allProducts` já foi definida pelo Eleventy acima.
 
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
             const UIElements = { productGrid: get('#product-grid'), cartDropdown: get('#cart-dropdown'), favoritesDropdown: get('#favorites-dropdown'), floatingCartBtn: get('#floating-cart-btn'), floatingFavoritesBtn: get('#floating-favorites-btn'), productDetailModal: get('#product-detail-modal'), shippingInfoModal: get('#shipping-info-modal'), modalOverlay: get('#modal-overlay'), searchInput: get('#search-input'), clearSearchBtn: get('#clear-search-btn'), searchIcon: get('#search-icon'), searchSuggestions: get('#search-suggestions'), noProductsMessage: get('#no-products-message'), loadingOverlay: get('.loading-overlay'), sortDropdownContainer: get('#sort-dropdown-container'), sortOptions: get('#sort-options'), sortCaret: get('#sort-caret'), cartFeedbackToast: get('#cart-feedback-toast'), favoritesFeedbackToast: get('#favorites-feedback-toast'), activityToast: get('#activity-toast'), welcomePopupOverlay: get('#welcome-popup-overlay'), hamburgerButton: get('#hamburger-button'), mobileNav: get('#mobile-nav'), mainHeader: get('#main-header'), floatingButtonsContainer: get('#floating-buttons-container'), scrollObserverTarget: get('#contato') };
@@ -439,9 +491,11 @@
                 const paymentHTML = `<div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>`;
 
                 return `
-                <div class="product flex flex-col group ${isNew ? 'new-since-last-visit' : ''}" data-id="${product.id}" tabindex="0">
+                <div class="product flex flex-col group ${isNew ? 'new-since-last-visit' : ''}" data-id="${product.id}" data-category="${product.category}" tabindex="0">
                     <div class="relative overflow-hidden">
-                        <img loading="lazy" src="${product.image}" alt="${product.name}" class="product-image w-full h-48 sm:h-64 object-cover">
+                        <a href="${product.url}">
+                            <img loading="lazy" src="${product.image}" alt="${product.name}" class="product-image w-full h-48 sm:h-64 object-cover">
+                        </a>
                         ${product.badge ? `<div class="product-badge">${product.badge.text}</div>` : ''}
                         <div class="absolute top-3 right-3">
                             <button class="toggle-favorite-btn w-10 h-10 rounded-full flex items-center justify-center" data-id="${product.id}">
@@ -451,7 +505,9 @@
                         <div id="viewing-info-${product.id}" class="absolute bottom-2 left-2 h-5"></div>
                     </div>
                     <div class="p-3 flex flex-col flex-grow text-center">
-                        <h3 class="text-base font-semibold text-gray-800 truncate mb-1">${product.name}</h3>
+                        <a href="${product.url}">
+                            <h3 class="text-base font-semibold text-gray-800 truncate mb-1">${product.name}</h3>
+                        </a>
                         <p class="text-xs text-gray-500 min-h-[16px] mb-3">${product.size||''}</p>
                         <div class="mt-auto">
                             ${priceHTML}
@@ -573,52 +629,14 @@
                 getAll('.sort-option').forEach(o => o.addEventListener('click', (e) => { e.preventDefault(); get('#sort-button-text').textContent = `Ordenar: ${o.textContent}`; activeSort = o.dataset.value; getAll('.sort-option').forEach(opt => opt.classList.remove('font-bold')); o.classList.add('font-bold'); UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); renderProducts(); }));
             }
 
-            // CORRIGIDO: Função para carregar os produtos usando js-yaml
-            async function loadProducts() {
-                try {
-                    // CORRIGIDO: Nomes de arquivo corretos que criamos
-                    const productFiles = [
-                        'saia-de-brilho.md', 'body.md', 'colar-de-perola.md',
-                        'cordao-com-inicial.md', 'salto-baixo-bloco.md', 'blusa-tricot-gola-alta.md',
-                        'batom-matte.md', 'delineador.md', 'lapis-preto-de-olho.md',
-                        'rimel.md', 'iluminador.md', 'oculos-dourado.md',
-                        'oculos-preto.md', 'corretivo.md', 'cinto.md'
-                    ];
-
-                    const productPromises = productFiles.map(file => 
-                        fetch(`/_products/${file}`)
-                            .then(response => {
-                                if (!response.ok) throw new Error(`Arquivo não encontrado: ${file}`);
-                                return response.text();
-                            })
-                            .then(text => {
-                                // Separa os dados (frontmatter) do conteúdo
-                                const match = text.match(/^---([\s\S]*?)---/);
-                                if (match && match[1]) {
-                                    // Usa a biblioteca js-yaml para converter o texto em um objeto
-                                    return jsyaml.load(match[1]);
-                                }
-                                return null;
-                            })
-                    );
-
-                    const loadedProducts = await Promise.all(productPromises);
-                    allProducts = loadedProducts.filter(p => p !== null);
-
-                } catch (error) {
-                    console.error("Erro ao carregar os produtos:", error);
-                    UIElements.noProductsMessage.innerHTML = `<p>Ocorreu um erro ao carregar os produtos. Verifique o console.</p>`;
-                    UIElements.noProductsMessage.classList.remove('hidden');
-                }
-            }
-
             async function init() {
                 lastVisit = localStorage.getItem('estiloChicLastVisit');
                 localStorage.setItem('estiloChicLastVisit', new Date().getTime());
                 
                 loadState();
                 
-                await loadProducts();
+                // A função `loadProducts()` foi removida.
+                // A variável `allProducts` já está disponível.
                 
                 allProducts.forEach(p => p.viewing = 0);
                 fuse = new Fuse(allProducts, { keys: ['name', 'category', 'description'], threshold: 0.4 });
@@ -629,7 +647,8 @@
                 get('#filter-buttons button[data-category="all"]').classList.add('filter-active');
                 get('.sort-option[data-value="default"]').classList.add('font-bold');
                 
-                renderProducts();
+                // renderProducts() não é mais necessário aqui, pois o Eleventy já renderizou.
+                // Mas os filtros e busca vão chamá-la depois.
                 updateApp();
                 checkButtonsVisibility();
                 setupWelcomePopup();
