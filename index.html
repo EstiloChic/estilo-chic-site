@@ -16,8 +16,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
-    <!-- NOVO SCRIPT: Gray-matter para processar os arquivos .md -->
-    <script src="https://cdn.jsdelivr.net/npm/gray-matter@4.0.3/browser.min.js"></script>
+    <!-- SCRIPT DO GRAY-MATTER FOI REMOVIDO DAQUI -->
 
     <!-- ======================================================= -->
     <!-- INÍCIO DO CÓDIGO CSS -->
@@ -346,6 +345,10 @@
     <!-- ======================================================= -->
     <!-- INÍCIO DO CÓDIGO JAVASCRIPT (VERSÃO CORRIGIDA) -->
     <!-- ======================================================= -->
+    
+    <!-- SCRIPT DO GRAY-MATTER MOVIDO PARA CÁ -->
+    <script src="https://cdn.jsdelivr.net/npm/gray-matter@4.0.3/browser.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
@@ -530,7 +533,7 @@
                     { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' }
                 ];
                 const showRandom = () => {
-                    if (document.hidden) return;
+                    if (document.hidden || !allProducts || allProducts.length === 0) return;
                     const name = names[Math.floor(Math.random() * names.length)];
                     const city = cities[Math.floor(Math.random() * cities.length)];
                     const action = actions[Math.floor(Math.random() * actions.length)];
