@@ -395,7 +395,8 @@
     
     <!-- Injeta os dados dos produtos do Eleventy em uma variável JavaScript -->
     <script>
-        const allProductsData = {{ collections.products | jsonify }};
+        {%- set productList = collections.products | getProductList -%}
+        const allProducts = {{ productList | safe }};
     </script>
 
     <script>
@@ -414,8 +415,7 @@
                 };
             }
 
-            // Transforma os dados injetados pelo Eleventy em um formato que o JavaScript já entende.
-            const allProducts = allProductsData.map(p => ({ ...p.data, url: p.url, description: p.templateContent.trim() }));
+            // A variável `allProducts` já foi definida pelo Eleventy acima.
 
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
             const UIElements = { productGrid: get('#product-grid'), cartDropdown: get('#cart-dropdown'), favoritesDropdown: get('#favorites-dropdown'), floatingCartBtn: get('#floating-cart-btn'), floatingFavoritesBtn: get('#floating-favorites-btn'), productDetailModal: get('#product-detail-modal'), shippingInfoModal: get('#shipping-info-modal'), modalOverlay: get('#modal-overlay'), searchInput: get('#search-input'), clearSearchBtn: get('#clear-search-btn'), searchIcon: get('#search-icon'), searchSuggestions: get('#search-suggestions'), noProductsMessage: get('#no-products-message'), loadingOverlay: get('.loading-overlay'), sortDropdownContainer: get('#sort-dropdown-container'), sortOptions: get('#sort-options'), sortCaret: get('#sort-caret'), cartFeedbackToast: get('#cart-feedback-toast'), favoritesFeedbackToast: get('#favorites-feedback-toast'), activityToast: get('#activity-toast'), welcomePopupOverlay: get('#welcome-popup-overlay'), hamburgerButton: get('#hamburger-button'), mobileNav: get('#mobile-nav'), mainHeader: get('#main-header'), floatingButtonsContainer: get('#floating-buttons-container'), scrollObserverTarget: get('#contato') };
