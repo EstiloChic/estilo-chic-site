@@ -1,4 +1,4 @@
-   <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -259,7 +259,7 @@
             
             {# Este é um loop do Eleventy. Ele vai repetir o código abaixo para cada produto na coleção 'products'. #}
             {%- for product in collections.products | reverse -%}
-                <div class="product flex flex-col group" data-id="{{ product.data.id }}" data-category="{{ product.data.category }}" tabindex="0">
+                <div class="product flex flex-col group" data-id="{{ product.data.id }}" data-category="{{ product.data.category }}" tabindex="0" style="opacity: 1;">
                     <div class="relative overflow-hidden">
                         <a href="{{ product.url | url }}">
                             <img loading="lazy" src="{{ product.data.image }}" alt="{{ product.data.name }}" class="product-image w-full h-48 sm:h-64 object-cover">
@@ -281,8 +281,8 @@
                         <p class="text-xs text-gray-500 min-h-[16px] mb-3">{{ product.data.size or '' }}</p>
                         <div class="mt-auto">
                             <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
-                                <span class="text-gray-500 line-through whitespace-nowrap">R$ {{ "%.2f" | format(product.data.originalPrice) | replace('.', ',') }}</span>
-                                <span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ {{ "%.2f" | format(product.data.price) | replace('.', ',') }}</span>
+                                <span class="text-gray-500 line-through whitespace-nowrap">R$ {{ product.data.originalPrice | formatPrice }}</span>
+                                <span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ {{ product.data.price | formatPrice }}</span>
                             </div>
                             <div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>
                             <div class="flex flex-col gap-2 text-sm">
@@ -395,7 +395,7 @@
     
     <!-- Injeta os dados dos produtos do Eleventy em uma variável JavaScript -->
     <script>
-        const allProducts = {{ collections.products | dump | safe }}.map(p => ({ ...p.data, url: p.url }));
+        const allProducts = {{ collections.products | dump | safe }}.map(p => ({ ...p.data, url: p.url, description: p.templateContent.trim() }));
     </script>
 
     <script>
@@ -589,7 +589,12 @@
                     if (target.closest('.open-shipping-info-modal')) { UIElements.modalOverlay.classList.add('visible'); UIElements.shippingInfoModal.classList.remove('hidden'); return; }
                     if (target.closest('#shipping-info-modal .close-modal-btn') || target.closest('#close-shipping-info-btn')) { closeShippingInfoModal(); return; }
                     if (target.closest('#product-detail-modal .close-modal-btn')) { closeAllModals(); return; }
-                    if (target.matches('.product-image')) { showProductDetailModal(target.closest('.product').dataset.id); return; }
+                    
+                    const productCard = target.closest('.product');
+                    if(productCard && !target.closest('button') && !target.closest('a[target="_blank"]')) {
+                        const productLink = productCard.querySelector('a[href]');
+                        if(productLink) productLink.click();
+                    }
                     
                     if (!target.closest('.search-container')) hideSearchSuggestions();
                     if (!target.closest('#sort-dropdown-container')) { UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); }
@@ -629,14 +634,11 @@
                 getAll('.sort-option').forEach(o => o.addEventListener('click', (e) => { e.preventDefault(); get('#sort-button-text').textContent = `Ordenar: ${o.textContent}`; activeSort = o.dataset.value; getAll('.sort-option').forEach(opt => opt.classList.remove('font-bold')); o.classList.add('font-bold'); UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); renderProducts(); }));
             }
 
-            async function init() {
+            function init() {
                 lastVisit = localStorage.getItem('estiloChicLastVisit');
                 localStorage.setItem('estiloChicLastVisit', new Date().getTime());
                 
                 loadState();
-                
-                // A função `loadProducts()` foi removida.
-                // A variável `allProducts` já está disponível.
                 
                 allProducts.forEach(p => p.viewing = 0);
                 fuse = new Fuse(allProducts, { keys: ['name', 'category', 'description'], threshold: 0.4 });
@@ -647,8 +649,6 @@
                 get('#filter-buttons button[data-category="all"]').classList.add('filter-active');
                 get('.sort-option[data-value="default"]').classList.add('font-bold');
                 
-                // renderProducts() não é mais necessário aqui, pois o Eleventy já renderizou.
-                // Mas os filtros e busca vão chamá-la depois.
                 updateApp();
                 checkButtonsVisibility();
                 setupWelcomePopup();
