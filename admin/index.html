@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Controle | Estilo Chic</title>
+  <link rel="icon" href="https://i.postimg.cc/ZqP5v2Cj/ES-2.png" type="image/png">
+  
+  <!-- Script para o serviço de identidade do Netlify -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+  <!-- Script principal do Decap CMS -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+    // Inicializa o CMS apontando para o arquivo de configuração
+    CMS.init({ config: { load_config_file: "/admin/config.yml" } });
+  </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+backend:
+  name: git-gateway
+  branch: main # ou master, dependendo do nome do seu branch principal
+
+media_folder: "assets/uploads" # Onde as imagens serão salvas
+public_folder: "/assets/uploads" # Como o site irá acessar as imagens
+
+collections:
+  - name: "products" # Nome da coleção
+    label: "Produtos" # Rótulo que aparece no painel
+    folder: "_products" # A pasta onde os arquivos de produto estão
+    create: true # Permitir a criação de novos produtos
+    slug: "{{name}}" # Gera o nome do arquivo a partir do nome do produto
+    fields: # Os campos de cada produto
+      - { label: "ID do Produto", name: "id", widget: "string" }
+      - { label: "Nome do Produto", name: "name", widget: "string" }
+      - { label: "Preço", name: "price", widget: "number", value_type: "float" }
+      - { label: "Preço Original (riscado)", name: "originalPrice", widget: "number", value_type: "float" }
+      - { label: "Imagem", name: "image", widget: "image" }
+      - { label: "Categoria", name: "category", widget: "select", options: ["roupas", "maquiagens", "acessorios"] }
+      - { label: "Tamanho", name: "size", widget: "string", required: false }
+      - { label: "Selo (Ex: Novidade)", name: "badge", widget: "object", required: false, fields: [{ label: "Texto do Selo", name: "text", widget: "string" }] }
+      - { label: "Descrição", name: "description", widget: "text", required: false }
+      - { label: "Data de Adição", name: "dateAdded", widget: "datetime" }
