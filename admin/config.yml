@@ -1,28 +1,30 @@
-locale: 'pt' 
-logo_url: https://i.postimg.cc/ZqP5v2Cj/ES-2.png 
-site_url: https://estilocichicsite.netlify.app/ 
-
 backend:
   name: git-gateway
-  branch: main 
+  branch: main # ou a branch que você usa, ex: master
 
-media_folder: "assets/uploads" 
-public_folder: "/assets/uploads"
+media_folder: "assets/uploads" # Pasta onde as imagens serão salvas
+public_folder: "/assets/uploads" # Como o site irá acessar as imagens
 
 collections:
-  - name: "products"
-    label: "Produtos" 
-    folder: "_products" 
-    create: true 
-    slug: "{{name}}" 
-    fields: 
-      - { label: "ID do Produto", name: "id", widget: "string" }
+  - name: "products" # Nome da coleção
+    label: "Produtos" # Nome que aparece no painel
+    folder: "_products" # Pasta onde os arquivos .md serão criados
+    create: true # Permite criar novos produtos
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}" # Formato do nome do arquivo
+    fields: # Os campos do formulário no painel
       - { label: "Nome do Produto", name: "name", widget: "string" }
-      - { label: "Preço", name: "price", widget: "number", value_type: "float" }
-      - { label: "Preço Original (riscado)", name: "originalPrice", widget: "number", value_type: "float" }
+      - { label: "Título da Página (igual ao nome)", name: "title", widget: "string" }
+      - { label: "Preço", name: "price", widget: "number" }
+      - { label: "Preço Original (riscado)", name: "originalPrice", widget: "number" }
       - { label: "Imagem", name: "image", widget: "image" }
       - { label: "Categoria", name: "category", widget: "select", options: ["roupas", "maquiagens", "acessorios"] }
-      - { label: "Tamanho", name: "size", widget: "string", required: false }
-      - { label: "Selo (Ex: Novidade)", name: "badge", widget: "object", required: false, fields: [{ label: "Texto do Selo", name: "text", widget: "string" }] }
-      - { label: "Descrição", name: "description", widget: "text", required: false }
+      - { label: "Tamanho (opcional)", name: "size", widget: "string", required: false }
+      - { label: "Selo (Ex: Novidade, Promoção)", name: "badge", widget: "object", fields: [{label: "Texto do Selo", name: "text", widget: "string"}], required: false }
       - { label: "Data de Adição", name: "dateAdded", widget: "datetime" }
+      
+      # --- CORREÇÃO IMPORTANTE ABAIXO ---
+      - { label: "Descrição", name: "body", widget: "markdown" } # MUDADO DE 'description' PARA 'body'
+
+      # --- CAMPOS OCULTOS PARA O ELEVENTY ---
+      - { label: "Layout", name: "layout", widget: "hidden", default: "produto.njk" }
+      - { label: "Tags", name: "tags", widget: "hidden", default: "products" }
