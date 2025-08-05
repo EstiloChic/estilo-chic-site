@@ -10,9 +10,12 @@ module.exports = function(eleventyConfig) {
     return Number(value).toFixed(2).replace('.', ',');
   });
 
-  // NOVO: Função para criar uma lista limpa de produtos para o JavaScript
-  // Isso resolve o erro de referência circular.
-  eleventyConfig.addJavaScriptFunction("getProductList", function(collection) {
+  // CORRIGIDO: Registra a função como um FILTRO para Liquid, não como uma função JS.
+  // Isso resolve o erro "undefined filter: getProductList".
+  eleventyConfig.addLiquidFilter("getProductList", function(collection) {
+    if (!collection) {
+      return [];
+    }
     const productList = collection.map(product => {
       return {
         id: product.data.id,
