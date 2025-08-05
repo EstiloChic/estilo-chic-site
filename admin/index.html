@@ -13,7 +13,12 @@
   <!-- Inclua o script do Decap CMS -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   <script>
-    // CORREÇÃO: Garante que o usuário seja redirecionado para o painel após o login
+    // CORREÇÃO: Registra a nossa folha de estilos personalizada para a UI do painel
+    CMS.registerStylesheet("/admin/style.css"); 
+    // Inicializa o CMS para carregar a configuração
+    CMS.init(); 
+
+    // Garante que o usuário seja redirecionado para o painel após o login
     if (window.netlifyIdentity) {
       window.netlifyIdentity.on("init", user => {
         if (!user) {
