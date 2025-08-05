@@ -16,7 +16,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
-    <!-- SCRIPT DO GRAY-MATTER FOI REMOVIDO DAQUI -->
+    
+    <!-- Biblioteca Gray Matter - essencial para ler os produtos -->
+    <script src="https://cdn.jsdelivr.net/npm/gray-matter@4.0.3/browser.min.js"></script>
 
     <!-- ======================================================= -->
     <!-- INÍCIO DO CÓDIGO CSS -->
@@ -161,9 +163,8 @@
 </head>
 <body>
 
-    <!-- ======================================================= -->
-    <!-- INÍCIO DO CONTEÚDO HTML -->
-    <!-- ======================================================= -->
+    <!-- O HTML do corpo da página continua o mesmo... -->
+    
     <div class="loading-overlay"><div class="spinner"></div></div>
     
     <div class="bg-[#6a1b9a] relative header-bg-pattern flex items-center justify-center h-[120px]">
@@ -343,13 +344,9 @@
     <div id="welcome-popup-overlay" class="welcome-popup-overlay"><div class="welcome-popup"><button id="close-popup" class="close-popup-btn"><i class="ph ph-x"></i></button><i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i><h2 class="section-title text-2xl mb-2">Um presente para você!</h2><p class="text-gray-600 mb-6">É sua primeira vez aqui? Ganhe <strong>5% de desconto</strong> no seu primeiro pedido!</p><a href="https://wa.me/5522998802545?text=Olá!%20Vim%20pelo%20site%20e%20quero%20meu%20cupom%20de%205%25%20OFF%20de%20boas-vindas!" target="_blank" id="claim-coupon-btn" class="btn btn-buy py-3"><i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>Resgatar Cupom</a></div></div>
 
     <!-- ======================================================= -->
-    <!-- INÍCIO DO CÓDIGO JAVASCRIPT (VERSÃO CORRIGIDA) -->
+    <!-- INÍCIO DO CÓDIGO JAVASCRIPT -->
     <!-- ======================================================= -->
-    
-    <!-- SCRIPT DO GRAY-MATTER MOVIDO PARA CÁ -->
-    <script src="https://cdn.jsdelivr.net/npm/gray-matter@4.0.3/browser.min.js"></script>
-
-    <script>
+    <script defer>
         document.addEventListener('DOMContentLoaded', () => {
 
             const get = (selector) => document.querySelector(selector);
@@ -365,14 +362,9 @@
                 };
             }
 
-            // A LISTA DE PRODUTOS SERÁ CARREGADA DINAMICAMENTE
             let allProducts = [];
 
-            // =======================================================
-            // NOVA FUNÇÃO PARA BUSCAR E PROCESSAR PRODUTOS
-            // =======================================================
             async function fetchProducts() {
-                // Lista de nomes de arquivos. No futuro, isso pode ser gerado dinamicamente.
                 const productFiles = [
                     'saia-de-brilho.md', 'body.md', 'colar-de-perola.md', 'cordao-com-inicial.md',
                     'salto-baixo-bloco.md', 'blusa-tricot-gola-alta.md', 'batom-matte.md', 'delineador.md',
@@ -389,8 +381,7 @@
                             continue;
                         }
                         const text = await response.text();
-                        // Usa a biblioteca gray-matter para separar os dados (frontmatter) do conteúdo
-                        const parsed = matter(text);
+                        const parsed = matter(text); // A função matter() já deve estar definida aqui
                         products.push(parsed.data);
                     } catch (error) {
                         console.error(`Falha ao processar o arquivo ${file}:`, error);
@@ -613,7 +604,6 @@
                 lastVisit = localStorage.getItem('estiloChicLastVisit');
                 localStorage.setItem('estiloChicLastVisit', new Date().getTime());
                 
-                // Carrega os produtos de forma dinâmica
                 allProducts = await fetchProducts();
                 allProducts.forEach(p => p.viewing = 0);
 
