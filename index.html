@@ -16,11 +16,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+    <!-- ADICIONADO: Biblioteca para ler os arquivos de produtos -->
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
     
-    <!-- MUDANÇA FINAL: Carregando a biblioteca a partir do arquivo local -->
-    <script src="/libs/gray-matter.js"></script>
-
-    <!-- O resto do seu CSS continua aqui... -->
+    <!-- ======================================================= -->
+    <!-- INÍCIO DO CÓDIGO CSS -->
+    <!-- ======================================================= -->
     <style>
         :root {
             --purple-dark: #6a1b9a;
@@ -161,8 +162,9 @@
 </head>
 <body>
 
-    <!-- Corpo do HTML... -->
-    <!-- (todo o conteúdo do body vem aqui, como antes) -->
+    <!-- ======================================================= -->
+    <!-- INÍCIO DO CONTEÚDO HTML -->
+    <!-- ======================================================= -->
     <div class="loading-overlay"><div class="spinner"></div></div>
     
     <div class="bg-[#6a1b9a] relative header-bg-pattern flex items-center justify-center h-[120px]">
@@ -342,11 +344,9 @@
     <div id="welcome-popup-overlay" class="welcome-popup-overlay"><div class="welcome-popup"><button id="close-popup" class="close-popup-btn"><i class="ph ph-x"></i></button><i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i><h2 class="section-title text-2xl mb-2">Um presente para você!</h2><p class="text-gray-600 mb-6">É sua primeira vez aqui? Ganhe <strong>5% de desconto</strong> no seu primeiro pedido!</p><a href="https://wa.me/5522998802545?text=Olá!%20Vim%20pelo%20site%20e%20quero%20meu%20cupom%20de%205%25%20OFF%20de%20boas-vindas!" target="_blank" id="claim-coupon-btn" class="btn btn-buy py-3"><i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>Resgatar Cupom</a></div></div>
 
     <!-- ======================================================= -->
-    <!-- INÍCIO DO CÓDIGO JAVASCRIPT -->
+    <!-- INÍCIO DO CÓDIGO JAVASCRIPT (VERSÃO MODIFICADA) -->
     <!-- ======================================================= -->
     <script>
-        // O código JavaScript principal vem aqui...
-        // ... (todo o bloco de script que já tínhamos antes)
         document.addEventListener('DOMContentLoaded', () => {
 
             const get = (selector) => document.querySelector(selector);
@@ -362,33 +362,8 @@
                 };
             }
 
+            // MODIFICADO: A lista de produtos agora começa vazia e será preenchida dinamicamente.
             let allProducts = [];
-
-            async function fetchProducts() {
-                const productFiles = [
-                    'saia-de-brilho.md', 'body.md', 'colar-de-perola.md', 'cordao-com-inicial.md',
-                    'salto-baixo-bloco.md', 'blusa-tricot-gola-alta.md', 'batom-matte.md', 'delineador.md',
-                    'lapis-preto-de-olho.md', 'rimel.md', 'iluminador.md', 'oculos-dourado.md',
-                    'oculos-preto.md', 'corretivo.md', 'cinto.md'
-                ];
-
-                const products = [];
-                for (const file of productFiles) {
-                    try {
-                        const response = await fetch(`/_products/${file}`);
-                        if (!response.ok) {
-                            console.error(`Erro ao buscar o produto: ${file}`);
-                            continue;
-                        }
-                        const text = await response.text();
-                        const parsed = matter(text); // A função matter() já deve estar definida aqui
-                        products.push(parsed.data);
-                    } catch (error) {
-                        console.error(`Falha ao processar o arquivo ${file}:`, error);
-                    }
-                }
-                return products;
-            }
 
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
             const UIElements = { productGrid: get('#product-grid'), cartDropdown: get('#cart-dropdown'), favoritesDropdown: get('#favorites-dropdown'), floatingCartBtn: get('#floating-cart-btn'), floatingFavoritesBtn: get('#floating-favorites-btn'), productDetailModal: get('#product-detail-modal'), shippingInfoModal: get('#shipping-info-modal'), modalOverlay: get('#modal-overlay'), searchInput: get('#search-input'), clearSearchBtn: get('#clear-search-btn'), searchIcon: get('#search-icon'), searchSuggestions: get('#search-suggestions'), noProductsMessage: get('#no-products-message'), loadingOverlay: get('.loading-overlay'), sortDropdownContainer: get('#sort-dropdown-container'), sortOptions: get('#sort-options'), sortCaret: get('#sort-caret'), cartFeedbackToast: get('#cart-feedback-toast'), favoritesFeedbackToast: get('#favorites-feedback-toast'), activityToast: get('#activity-toast'), welcomePopupOverlay: get('#welcome-popup-overlay'), hamburgerButton: get('#hamburger-button'), mobileNav: get('#mobile-nav'), mainHeader: get('#main-header'), floatingButtonsContainer: get('#floating-buttons-container'), scrollObserverTarget: get('#contato') };
@@ -429,8 +404,8 @@
 
                             <div class="flex justify-between items-center mt-4">
                                 <div class="flex flex-col items-start">
-                                    <p class="text-3xl font-bold text-purple-700">R$ ${Number(product.price).toFixed(2).replace('.', ',')}</p>
-                                    <span class="text-lg text-gray-400 line-through -mt-1">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
+                                    <p class="text-3xl font-bold text-purple-700">R$ ${product.price.toFixed(2).replace('.', ',')}</p>
+                                    <span class="text-lg text-gray-400 line-through -mt-1">R$ ${product.originalPrice.toFixed(2).replace('.',',')}</span>
                                 </div>
                                 <div class="flex flex-col gap-2 text-sm w-36">
                                     <button class="btn ${isInCart ? 'btn-add-success':'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
@@ -447,7 +422,7 @@
 
             const updateCounters = () => { const c1 = UIElements.floatingCartBtn.querySelector('.cart-count'); const c2 = UIElements.floatingFavoritesBtn.querySelector('.cart-count'); const t = Object.values(cart).reduce((s, q) => s + q, 0); c1.textContent = t; c1.style.display = t > 0 ? 'flex' : 'none'; c2.textContent = favorites.length; c2.style.display = favorites.length > 0 ? 'flex' : 'none'; };
             const renderCart = () => { if (Object.keys(cart).length === 0) { UIElements.cartDropdown.innerHTML = `<div class="text-center p-4"><i class="ph ph-shopping-cart text-4xl text-gray-300 mb-2"></i><p class="font-semibold text-gray-700">Seu carrinho está vazio</p></div>`; return; } let h = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-purple-800">Meu Carrinho</h3><button class="clear-cart-btn text-xs bg-red-100 text-red-600 font-semibold hover:bg-red-200 px-3 py-1 rounded-full">Limpar</button></div>`; let t = 0; let w = "Olá! Gostaria de encomendar:\n\n"; for (const [i, q] of Object.entries(cart)) { const p = allProducts.find(pr => pr.id === i); if (!p) continue; t += p.price * q; w += `- ${q}x ${p.name}\n`; h += `<div class="cart-item flex items-center gap-4 py-3"><img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-grow"><p class="font-semibold text-sm">${p.name}</p><div class="flex items-center gap-2 mt-1"><button class="decrease-quantity-btn bg-purple-100 text-purple-700 rounded-full w-6 h-6 flex items-center justify-center hover:bg-purple-200 transition-colors" data-id="${i}"><i class="ph ph-minus text-sm pointer-events-none"></i></button><span class="font-bold text-purple-800 w-5 text-center">${q}</span><button class="increase-quantity-btn bg-purple-100 text-purple-700 rounded-full w-6 h-6 flex items-center justify-center hover:bg-purple-200 transition-colors" data-id="${i}"><i class="ph ph-plus text-sm pointer-events-none"></i></button></div></div><div class="flex flex-col items-end gap-2"><p class="text-sm font-semibold text-purple-700">R$ ${(p.price*q).toFixed(2).replace('.',',')}</p><button class="remove-item-btn icon-btn-circle" data-id="${i}"><i class="ph ph-trash text-base pointer-events-none"></i></button></div></div>`; } w += `\n*Total: R$ ${t.toFixed(2).replace('.',',')}*`; h += `<div class="mt-4 pt-4 border-t"><div class="flex justify-between items-center font-bold text-lg"><span>Total:</span><span class="text-purple-800">R$ ${t.toFixed(2).replace('.',',')}</span></div><div class="flex items-center justify-center text-xs text-gray-500 mt-3 gap-1"><span>Frete grátis para São Francisco e região.</span> <i class="ph-fill ph-info info-icon open-shipping-info-modal"></i></div><a href="https://wa.me/5522998802545?text=${encodeURIComponent(w)}" target="_blank" class="btn btn-buy w-full mt-4 py-3"><i class="ph-fill ph-whatsapp-logo mr-2"></i> Finalizar Pedido</a></div>`; UIElements.cartDropdown.innerHTML = h; };
-            const renderFavorites = () => { if (favorites.length === 0) { UIElements.favoritesDropdown.innerHTML = `<div class="text-center p-4"><i class="ph ph-heart text-4xl text-gray-300 mb-2"></i><p class="font-semibold text-gray-700">Lista de favoritos vazia.</p></div>`; return; } let h = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-purple-800">Meus Favoritos</h3><button class="clear-favorites-btn text-xs bg-red-100 text-red-600 font-semibold hover:bg-red-200 px-3 py-1 rounded-full">Limpar</button></div>`; favorites.forEach(id => { const p = allProducts.find(pr => pr.id === id); if (!p) return; h += `<div class="favorite-dropdown-item flex items-center gap-4 py-3"><img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-grow"><p class="font-semibold text-sm">${p.name}</p><p class="text-xs text-purple-600 font-medium">R$ ${Number(p.price).toFixed(2).replace('.',',')}</p></div><div class="flex items-center gap-2"><button class="add-to-cart-from-fav-btn icon-btn-circle bg-purple-100 text-purple-700 hover:bg-purple-600" data-id="${id}"><i class="ph ph-shopping-cart-simple pointer-events-none"></i></button><button class="remove-from-favorites-btn icon-btn-circle" data-id="${id}"><i class="ph ph-trash text-base pointer-events-none"></i></button></div></div>`; }); UIElements.favoritesDropdown.innerHTML = h; };
+            const renderFavorites = () => { if (favorites.length === 0) { UIElements.favoritesDropdown.innerHTML = `<div class="text-center p-4"><i class="ph ph-heart text-4xl text-gray-300 mb-2"></i><p class="font-semibold text-gray-700">Lista de favoritos vazia.</p></div>`; return; } let h = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-purple-800">Meus Favoritos</h3><button class="clear-favorites-btn text-xs bg-red-100 text-red-600 font-semibold hover:bg-red-200 px-3 py-1 rounded-full">Limpar</button></div>`; favorites.forEach(id => { const p = allProducts.find(pr => pr.id === id); if (!p) return; h += `<div class="favorite-dropdown-item flex items-center gap-4 py-3"><img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-grow"><p class="font-semibold text-sm">${p.name}</p><p class="text-xs text-purple-600 font-medium">R$ ${p.price.toFixed(2).replace('.',',')}</p></div><div class="flex items-center gap-2"><button class="add-to-cart-from-fav-btn icon-btn-circle bg-purple-100 text-purple-700 hover:bg-purple-600" data-id="${id}"><i class="ph ph-shopping-cart-simple pointer-events-none"></i></button><button class="remove-from-favorites-btn icon-btn-circle" data-id="${id}"><i class="ph ph-trash text-base pointer-events-none"></i></button></div></div>`; }); UIElements.favoritesDropdown.innerHTML = h; };
             const updateProductCardStates = () => { getAll('#product-grid .product').forEach(c => { const id = c.dataset.id; const i = cart[id] > 0; const b = c.querySelector('.add-to-cart-btn'); if (b) { b.innerHTML = i ? `<i class="ph-bold ph-check mr-1"></i> Adicionado` : 'Adicionar'; b.classList.remove('btn-add-default', 'btn-add-success'); b.classList.add(i ? 'btn-add-success' : 'btn-add-default'); } const f = c.querySelector('.heart-icon'); if (f) f.classList.toggle('active', favorites.includes(id)); }); };
             const updateApp = () => { saveState(); updateCounters(); renderCart(); renderFavorites(); updateProductCardStates(); };
             
@@ -458,8 +433,8 @@
 
                 const priceHTML = `
                     <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
-                        <span class="text-gray-500 line-through whitespace-nowrap">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
-                        <span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ ${Number(product.price).toFixed(2).replace('.',',')}</span>
+                        <span class="text-gray-500 line-through whitespace-nowrap">R$ ${product.originalPrice.toFixed(2).replace('.',',')}</span>
+                        <span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ ${product.price.toFixed(2).replace('.',',')}</span>
                     </div>`;
                 
                 const paymentHTML = `<div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>`;
@@ -509,9 +484,8 @@
             };
 
             const setupActivityNotifications = () => {
-                if (!allProducts || allProducts.length === 0) return;
                 const toast = UIElements.activityToast;
-                if (!toast) return;
+                if (!toast || allProducts.length === 0) return;
                 const names = ['Ana', 'Mariana', 'Júlia', 'Beatriz', 'Larissa', 'Maria', 'Alice', 'Helena', 'Laura', 'Manuela', 'Valentina', 'Sophia', 'Isabella', 'Lívia', 'Giovanna', 'Yasmin', 'Eloá', 'Clara', 'Cecília', 'Liz', 'Maitê', 'Antonella', 'Elisa', 'Gabriela', 'Luiza', 'Amanda', 'Bruna', 'Camila', 'Fernanda', 'Patrícia', 'Sandra', 'Jéssica', 'Letícia', 'Aline'];
                 const cities = [
                     'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes',
@@ -524,7 +498,7 @@
                     { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' }
                 ];
                 const showRandom = () => {
-                    if (document.hidden || !allProducts || allProducts.length === 0) return;
+                    if (document.hidden) return;
                     const name = names[Math.floor(Math.random() * names.length)];
                     const city = cities[Math.floor(Math.random() * cities.length)];
                     const action = actions[Math.floor(Math.random() * actions.length)];
@@ -600,25 +574,73 @@
                 getAll('.sort-option').forEach(o => o.addEventListener('click', (e) => { e.preventDefault(); get('#sort-button-text').textContent = `Ordenar: ${o.textContent}`; activeSort = o.dataset.value; getAll('.sort-option').forEach(opt => opt.classList.remove('font-bold')); o.classList.add('font-bold'); UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); renderProducts(); }));
             }
 
+            // NOVO: Função para carregar dinamicamente os produtos
+            async function loadProducts() {
+                try {
+                    // Nomes dos arquivos de produtos que criamos.
+                    const productFiles = [
+                        '01-saia-de-brilho.md', '02-body.md', '03-colar-de-perola.md',
+                        '04-cordao-com-inicial.md', '05-salto-bloco.md', '06-blusa-tricot.md',
+                        '07-batom-matte.md', '08-delineador.md', '09-lapis-preto.md',
+                        '10-rimel.md', '11-iluminador.md', '12-oculos-dourado.md',
+                        '13-oculos-preto.md', '14-corretivo.md', '15-cinto.md'
+                    ];
+
+                    const productPromises = productFiles.map(file => 
+                        fetch(`/_products/${file}`)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`Não foi possível carregar o produto: ${file}`);
+                                }
+                                return response.text();
+                            })
+                            .then(text => {
+                                // Separa os dados (frontmatter) do conteúdo.
+                                const match = text.match(/---([\s\S]*?)---/);
+                                if (match && match[1]) {
+                                    // Usa a biblioteca js-yaml para converter o texto em um objeto.
+                                    return jsyaml.load(match[1]);
+                                }
+                                return null;
+                            })
+                    );
+
+                    const loadedProducts = await Promise.all(productPromises);
+                    allProducts = loadedProducts.filter(p => p !== null); // Filtra qualquer arquivo que não pôde ser lido.
+
+                } catch (error) {
+                    console.error("Erro ao carregar os produtos:", error);
+                    UIElements.noProductsMessage.innerHTML = `<p>Ocorreu um erro ao carregar os produtos. Tente novamente mais tarde.</p>`;
+                    UIElements.noProductsMessage.classList.remove('hidden');
+                }
+            }
+
             async function init() {
                 lastVisit = localStorage.getItem('estiloChicLastVisit');
                 localStorage.setItem('estiloChicLastVisit', new Date().getTime());
                 
-                allProducts = await fetchProducts();
-                allProducts.forEach(p => p.viewing = 0);
-
                 loadState();
+                
+                // MODIFICADO: Chama a nova função para carregar os produtos
+                await loadProducts();
+                
+                allProducts.forEach(p => p.viewing = 0);
                 fuse = new Fuse(allProducts, { keys: ['name', 'category', 'description'], threshold: 0.4 });
+                
                 setupEventListeners();
                 setupObservers();
+                
                 get('#filter-buttons button[data-category="all"]').classList.add('filter-active');
                 get('.sort-option[data-value="default"]').classList.add('font-bold');
+                
                 renderProducts();
                 updateApp();
                 checkButtonsVisibility();
                 setupWelcomePopup();
                 setupActivityNotifications();
+                
                 setInterval(updateVisuals, 4000);
+                
                 UIElements.loadingOverlay.classList.add('hidden');
             }
             
