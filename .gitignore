@@ -1,0 +1,10 @@
+# Ignorar a pasta de dependências do Node.js
+# Nunca devemos enviar esta pasta para o GitHub.
+/node_modules
+
+# Ignorar a pasta de saída do site gerado pelo Eleventy.
+# O Netlify vai criar esta pasta durante o build.
+/_site
+
+# Arquivos de sistema do macOS
+.DS_Store
