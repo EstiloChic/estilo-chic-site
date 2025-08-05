@@ -1,6 +1,6 @@
 ---
 id: "16"
-name: "Top academia reforçada "
+name: Top academia reforçada
 price: 22
 originalPrice: 30
 image: /assets/uploads/img_8592.jpeg
