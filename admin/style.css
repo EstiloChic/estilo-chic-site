@@ -1,7 +1,5 @@
 /*
- * ==========================================================================
  * CSS para Personalização do Painel de Controle - Estilo Chic
- * ==========================================================================
  */
 
 :root {
@@ -9,33 +7,29 @@
   --purple-dark: #6a1b9a;
   --purple-medium: #a855f7;
   --purple-light: #d1c4e9;
-  --accent-pink: #ec4899;
   --text-primary: #3a2d46;
 
   /* Cores do tema do painel */
   --primary: var(--purple-dark);
-  --background-primary: #fff;
-  --background-secondary: #f9f6ff;
-  --background-page: #f9f6ff;
+  --background-secondary: #f9f6ff; /* Fundo principal (roxo bem claro) */
   --foreground-primary: var(--text-primary);
-  --foreground-secondary: #6d5f7a;
   --separator: var(--purple-light);
   --border-primary: var(--purple-light);
 }
 
-/* Importa a fonte Poppins para o painel */
+/* Importa a fonte do seu site para o painel */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 body {
   font-family: 'Poppins', sans-serif;
 }
 
-/* Personaliza o cabeçalho principal do painel */
+/* Cabeçalho principal do painel */
 [data-testid="header-toolbar"] {
     background-color: var(--purple-dark) !important;
 }
 
-/* Cor do botão "Novo Produto" */
+/* Botão "Novo Produto" */
 [data-testid="create-new-button"] {
   background-color: var(--purple-dark) !important;
 }
@@ -43,7 +37,7 @@ body {
   background-color: #4a0e6b !important;
 }
 
-/* Cor do botão "Publicar" (Publish) */
+/* Botão "Publicar" (Publish) */
 button[class*='PublishButton-button-'] {
   background-color: var(--purple-dark) !important;
 }
@@ -51,7 +45,7 @@ button[class*='PublishButton-button-']:hover {
   background-color: #4a0e6b !important;
 }
 
-/* Cor de fundo da coleção ativa (Produtos) */
+/* Coleção ativa na barra lateral (Produtos) */
 a[class*='CollectionLink-link-active-'] {
     background-color: var(--purple-light) !important;
     border-left-color: var(--purple-dark) !important;
