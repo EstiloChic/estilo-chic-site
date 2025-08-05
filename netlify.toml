@@ -1,7 +1,7 @@
 [build]
-  publish = "/"
+  command = "npx @11ty/eleventy"
+  publish = "_site"
 
-[[headers]]
-  for = "/_products/*"
-  [headers.values]
-    Content-Type = "text/markdown"
+[[redirects]]
+  from = "/admin"
+  to = "/admin/index.html"
