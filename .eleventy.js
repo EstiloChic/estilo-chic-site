@@ -1,4 +1,4 @@
-// .eleventy.js - VERSÃO FINAL ALINHADA COM O CONFIG.YML
+// .eleventy.js - VERSÃO FINAL, ROBUSTA E CORRIGIDA
 
 const yaml = require("js-yaml");
 
@@ -7,7 +7,7 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("admin");
   eleventyConfig.addPassthroughCopy("assets/uploads");
 
-  // A pasta de produtos agora é "_products"
+  // Agora, lê corretamente da pasta unificada "_products"
   eleventyConfig.addCollection("products", function(collectionApi) {
     return collectionApi.getFilteredByGlob("_products/*.md");
   });
@@ -24,9 +24,19 @@ module.exports = function(eleventyConfig) {
     const productList = collection.map(product => {
       if (!product || !product.data) return null;
       
+      // ===================================================================
+      // LÓGICA DE ID À PROVA DE FALHAS:
+      // 1. Tenta usar a ID do arquivo (product.data.id).
+      // 2. Se não existir, usa a URL como fallback.
+      // 3. Limpa a ID para ser segura para o HTML.
+      // ===================================================================
+      const rawId = product.data.id || product.url;
+      const safeId = String(rawId)
+        .replace(/^\/|\/$/g, '')
+        .replace(/\//g, '-');
+
       const cleanProduct = {
-        // LENDO O ID QUE VEM DO ARQUIVO (GERADO PELO UUID)
-        id: product.data.id, 
+        id: safeId, // Usa a ID segura e garantida
         name: product.data.name,
         price: product.data.price,
         originalPrice: product.data.originalPrice,
