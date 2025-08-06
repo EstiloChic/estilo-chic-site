@@ -161,13 +161,6 @@
 </head>
 <body>
 
-    <!-- ======================================================= -->
-    <!-- MUDANÇA: O contêiner de dados foi removido daqui.         -->
-    <!-- ======================================================= -->
-    
-    <!-- ======================================================= -->
-    <!-- INÍCIO DO CONTEÚDO HTML -->
-    <!-- ======================================================= -->
     <div class="loading-overlay"><div class="spinner"></div></div>
     
     <div class="bg-[#6a1b9a] relative header-bg-pattern flex items-center justify-center h-[120px]">
@@ -368,20 +361,9 @@
             }
 
             // ===================================================================
-            // CORREÇÃO FINAL: MÉTODO À PROVA DE FALHAS PARA CARREGAR OS DADOS
+            // CORREÇÃO FINALÍSSIMA: Esta é a forma correta de fazer.
             // ===================================================================
-            let allProducts = [];
-            try {
-                // 1. Crie uma variável que armazena os dados como uma string usando backticks (`)
-                //    Isso evita que caracteres especiais quebrem o script.
-                const rawJsonData = `{{ collections.products | getProductList }}`;
-                
-                // 2. Converta (parse) a string para um objeto JavaScript.
-                allProducts = JSON.parse(rawJsonData);
-            } catch (error) {
-                console.error("Erro ao carregar os dados dos produtos:", error);
-                // Deixa allProducts como um array vazio para o site não quebrar.
-            }
+            const allProducts = {{ collections.products | getProductList }};
 
 
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
@@ -484,7 +466,7 @@
                             ${paymentHTML}
                             <div class="flex flex-col gap-2 text-sm">
                                 <button class="btn ${isInCart ? 'btn-add-success' : 'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
-                                    ${isInCart ? `<i class="ph-bold ph-check mr-1"></i> Adicionado` : 'Adicionar'}
+                                    ${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado' : 'Adicionar'}
                                 </button>
                                 <a href="${whatsAppURL}" target="_blank" class="btn btn-buy">Comprar</a>
                             </div>
@@ -610,9 +592,15 @@
                 
                 loadState();
                 
-                allProducts.forEach(p => p.viewing = 0);
-                fuse = new Fuse(allProducts, { keys: ['name', 'category', 'description'], threshold: 0.4 });
-                
+                // Checa se allProducts é realmente um array antes de continuar
+                if (Array.isArray(allProducts)) {
+                    allProducts.forEach(p => p.viewing = 0);
+                    fuse = new Fuse(allProducts, { keys: ['name', 'category', 'description'], threshold: 0.4 });
+                } else {
+                    console.error("allProducts não é um array. Verifique o build.", allProducts);
+                    allProducts = []; // Garante que o resto do site não quebre
+                }
+
                 setupEventListeners();
                 setupObservers();
                 
