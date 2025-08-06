@@ -258,11 +258,9 @@
         <section class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4" id="product-grid">
 
             {%- for product in collections.products | reverse -%}
-                <div class="product flex flex-col group" data-id="{{ product.data.id }}" data-category="{{ product.data.category }}" tabindex="0" style="opacity: 1;">
+                <div class="product flex flex-col group" data-id="{{ product.data.id }}" data-category="{{ product.data.category }}" tabindex="0">
                     <div class="relative overflow-hidden">
-                        <a href="{{ product.url | url }}">
-                            <img loading="lazy" src="{{ product.data.image }}" alt="{{ product.data.name }}" class="product-image w-full h-48 sm:h-64 object-cover">
-                        </a>
+                        <img loading="lazy" src="{{ product.data.image }}" alt="{{ product.data.name }}" class="product-image w-full h-48 sm:h-64 object-cover" data-id="{{ product.data.id }}">
                         {% if product.data.badge %}
                             <div class="product-badge">{{ product.data.badge.text }}</div>
                         {% endif %}
@@ -271,17 +269,15 @@
                                 <i class="heart-icon ph-fill ph-heart text-2xl pointer-events-none"></i>
                             </button>
                         </div>
-                         <div id="viewing-info-{{ product.data.id }}" class="absolute bottom-2 left-2 h-5"></div>
+                        <div id="viewing-info-{{ product.data.id }}" class="absolute bottom-2 left-2 h-5"></div>
                     </div>
                     <div class="p-3 flex flex-col flex-grow text-center">
                         <a href="{{ product.url | url }}">
                             <h3 class="text-base font-semibold text-gray-800 truncate mb-1">{{ product.data.name }}</h3>
                         </a>
-                        {% if product.data.size and product.data.size != "" %}
-                            <p class="text-xs text-gray-500 min-h-[16px] mb-3">{{ product.data.size }}</p>
-                        {% else %}
-                            <p class="text-xs text-gray-500 min-h-[16px] mb-3">&nbsp;</p>
-                        {% endif %}
+                        
+                        <p class="text-xs text-gray-500 min-h-[16px] mb-3">{{ product.data.size or '&nbsp;' }}</p>
+                        
                         <div class="mt-auto">
                             <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
                                 <span class="text-gray-500 line-through whitespace-nowrap">R$ {{ product.data.originalPrice | formatPrice }}</span>
@@ -594,10 +590,9 @@
                     if (target.closest('#shipping-info-modal .close-modal-btn') || target.closest('#close-shipping-info-btn')) { closeShippingInfoModal(); return; }
                     if (target.closest('#product-detail-modal .close-modal-btn')) { closeAllModals(); return; }
                     
-                    const productCard = target.closest('.product');
-                    if(productCard && !target.closest('button') && !target.closest('a[target="_blank"]')) {
-                        const productLink = productCard.querySelector('a[href]');
-                        if(productLink) productLink.click();
+                    if (target.matches('.product-image')) {
+                        showProductDetailModal(target.dataset.id);
+                        return;
                     }
                     
                     if (!target.closest('.search-container')) hideSearchSuggestions();
