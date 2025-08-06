@@ -1,4 +1,4 @@
-// .eleventy.js - VERSÃO FINAL, ROBUSTA E CORRIGIDA
+// .eleventy.js - VERSÃO FINAL COM ORDENAÇÃO EXPLÍCITA
 
 const yaml = require("js-yaml");
 
@@ -7,10 +7,17 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("admin");
   eleventyConfig.addPassthroughCopy("assets/uploads");
 
-  // Agora, lê corretamente da pasta unificada "_products"
+  // ===================================================================
+  // AQUI ESTÁ A CORREÇÃO: ADICIONANDO UMA ORDENAÇÃO EXPLÍCITA
+  // ===================================================================
   eleventyConfig.addCollection("products", function(collectionApi) {
-    return collectionApi.getFilteredByGlob("_products/*.md");
+    return collectionApi.getFilteredByGlob("_products/*.md")
+      .sort((a, b) => {
+        // Ordena os produtos pela data de adição, do mais novo para o mais antigo
+        return new Date(b.data.dateAdded) - new Date(a.data.dateAdded);
+      });
   });
+  // ===================================================================
 
   eleventyConfig.addFilter("formatPrice", function(price) {
     if (typeof price !== 'number') return "Preço indisponível";
@@ -24,19 +31,13 @@ module.exports = function(eleventyConfig) {
     const productList = collection.map(product => {
       if (!product || !product.data) return null;
       
-      // ===================================================================
-      // LÓGICA DE ID À PROVA DE FALHAS:
-      // 1. Tenta usar a ID do arquivo (product.data.id).
-      // 2. Se não existir, usa a URL como fallback.
-      // 3. Limpa a ID para ser segura para o HTML.
-      // ===================================================================
       const rawId = product.data.id || product.url;
       const safeId = String(rawId)
         .replace(/^\/|\/$/g, '')
         .replace(/\//g, '-');
 
       const cleanProduct = {
-        id: safeId, // Usa a ID segura e garantida
+        id: safeId,
         name: product.data.name,
         price: product.data.price,
         originalPrice: product.data.originalPrice,
