@@ -12,4 +12,4 @@ dateAdded: 2025-08-06T13:07:00.000-03:00
 layout: produto.njk
 tags: products
 ---
-Alça reforçada
+Top academia com modelagem confortável, alça reforçada e tecido de alta sustentação. Ideal para treinos e uso diário.
