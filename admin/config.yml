@@ -12,10 +12,24 @@ collections:
     create: true
     slug: "{{slug}}"
     fields:
-      - {label: "Nome do Produto", name: "name", widget: "string"}
-      - {label: "Imagem do Produto", name: "image", widget: "image"}
-      - {label: "Preço Original (Ex: 30.00)", name: "originalPrice", widget: "number", value_type: "float"}
-      - {label: "Preço com Desconto (Ex: 22.00)", name: "price", widget: "number", value_type: "float"}
+      - label: "Nome do Produto"
+        name: "name"
+        widget: "string"
+
+      - label: "Imagem do Produto"
+        name: "image"
+        widget: "image"
+
+      - label: "Preço Original (Ex: 30.00)"
+        name: "originalPrice"
+        widget: "number"
+        value_type: "float"
+
+      - label: "Preço com Desconto (Ex: 22.00)"
+        name: "price"
+        widget: "number"
+        value_type: "float"
+
       - label: "Categoria"
         name: "category"
         widget: "select"
@@ -23,19 +37,31 @@ collections:
           - {label: "Roupas", value: "roupas"}
           - {label: "Maquiagens", value: "maquiagens"}
           - {label: "Acessórios", value: "acessorios"}
-      - {label: "Tamanho (Ex: G, 38, P/M. Deixe em branco se não aplicável)", name: "size", widget: "string", required: false}
-      
+
+      - label: "Tamanho (Ex: G, 38, P/M. Deixe em branco se não aplicável)"
+        name: "size"
+        widget: "string"
+        required: false
+
       # ===================================================================
-      # AQUI ESTÁ A CORREÇÃO
-      # O campo de texto DENTRO do Badge agora também é opcional.
+      # AQUI ESTÁ A CORREÇÃO DO BADGE, AGORA EM FORMATO SEGURO
       # ===================================================================
       - label: "Badge (Opcional)"
         name: "badge"
         widget: "object"
         required: false
         fields:
-          - {label: "Texto do Badge (Ex: Novidade, Promoção)", name: "text", widget: "string", required: false}
+          - label: "Texto do Badge (Ex: Novidade, Promoção)"
+            name: "text"
+            widget: "string"
+            required: false
       # ===================================================================
 
-      - {label: "Descrição Completa do Produto", name: "body", widget: "markdown"}
-      - {label: "Data de Adição", name: "dateAdded", widget: "datetime", default: "", required: false}
+      - label: "Descrição Completa do Produto"
+        name: "body"
+        widget: "markdown"
+
+      - label: "Data de Adição"
+        name: "dateAdded"
+        widget: "datetime"
+        required: false
