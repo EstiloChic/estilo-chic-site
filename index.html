@@ -480,23 +480,26 @@
             const renderProducts = () => { const t = UIElements.searchInput.value.trim(); let p = [...allProducts]; if (activeFilter !== 'all') p = p.filter(pr => pr.category === activeFilter); if (t) { const r = fuse.search(t); const ids = new Set(r.map(i => i.item.id)); p = p.filter(pr => ids.has(pr.id)); } if (activeSort === 'price-asc') p.sort((a,b)=>a.price-b.price); else if (activeSort === 'price-desc') p.sort((a,b)=>b.price-a.price); else if (activeSort === 'name-asc') p.sort((a,b)=>a.name.localeCompare(b.name)); UIElements.productGrid.innerHTML = p.map(createProductCardHTML).join(''); UIElements.noProductsMessage.classList.toggle('hidden', p.length === 0); if (p.length === 0) UIElements.noProductsMessage.innerHTML = `<i class="ph ph-flower-lotus text-5xl text-purple-300 mb-4"></i><p class="font-semibold text-xl font-display">Nenhum tesouro encontrado</p><p class="text-gray-500">Adicione produtos ao seu catálogo para vê-los aqui.</p>`; getAll('#product-grid .product').forEach((pr, i) => { pr.style.animationDelay = `${i * 60}ms`; }); updateProductCardStates(); };
             
             // ======================================================================
-            // INÍCIO DA CORREÇÃO: LÓGICA ATUALIZADA PARA OS OLHINHOS
+            // INÍCIO DA CORREÇÃO DEFINITIVA: LÓGICA DE SIMULAÇÃO MAIS FORTE
             // ======================================================================
             const updateVisuals = () => {
                 allProducts.forEach(p => {
                     const e = get(`#viewing-info-${p.id}`);
                     if (e) {
-                        if (Math.random() > 0.7) p.viewing = Math.max(0, (p.viewing || 0) + (Math.floor(Math.random() * 3) - 1));
-                        
-                        // Lógica corrigida para exibir o olhinho com mais frequência
+                        // 1. Chance de 15% de o contador de um produto ser alterado neste ciclo.
+                        if (Math.random() < 0.15) {
+                            // 2. Se for alterar, há 70% de chance de AUMENTAR e 30% de DIMINUIR.
+                            // Isso cria uma tendência de os números subirem, tornando a simulação visível.
+                            const change = Math.random() < 0.7 ? 1 : -1;
+                            p.viewing = Math.max(0, (p.viewing || 0) + change);
+                        }
+
+                        // 3. A lógica de exibição, que mostra o ícone se a contagem for 1 ou mais.
                         if (p.viewing > 1) {
-                            // Se a simulação for > 1, mostra o olho + número
                             e.innerHTML = `<div class="flex items-center gap-1 text-white text-xs font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm animate-pulse"><i class="ph-fill ph-eye text-sm"></i><span>${p.viewing}</span></div>`;
                         } else if (p.viewing === 1) {
-                            // Se a simulação for == 1, mostra apenas o olho
                             e.innerHTML = `<div class="flex items-center gap-1 text-white text-xs font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm animate-pulse"><i class="ph-fill ph-eye text-sm"></i></div>`;
                         } else {
-                            // Se a simulação for 0, não mostra nada
                             e.innerHTML = '';
                         }
                     }
