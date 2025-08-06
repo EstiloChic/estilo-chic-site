@@ -1,4 +1,4 @@
-// .eleventy.js - VERSÃO FINAL CORRIGIDA PARA LIQUID
+// .eleventy.js - VERSÃO FINAL E CORRIGIDA
 
 const yaml = require("js-yaml");
 
@@ -17,18 +17,20 @@ module.exports = function(eleventyConfig) {
   });
 
   // ===================================================================
-  // CORREÇÃO CRÍTICA: O filtro VOLTA a usar JSON.stringify.
-  // Isso é necessário porque o Liquid não tem um filtro 'dump'.
-  // O filtro agora entrega a string JSON pronta para o HTML.
+  // CORREÇÃO DEFINITIVA: A "ponte" de dados.
+  // Agora, o ID de cada produto será a sua URL, que é sempre única.
+  // Isso garante que todos os produtos, antigos e novos, tenham um ID.
   // ===================================================================
   eleventyConfig.addFilter("getProductList", function(collection) {
     if (!collection) {
-      return "[]"; // Retorna uma string de array vazio
+      return "[]";
     }
     const productList = collection.map(product => {
       if (!product || !product.data) return null;
+      
       const cleanProduct = {
-        id: product.data.id,
+        // A MUDANÇA CRÍTICA ESTÁ AQUI:
+        id: product.url, // Usamos a URL como ID único e confiável.
         name: product.data.name,
         price: product.data.price,
         originalPrice: product.data.originalPrice,
@@ -37,15 +39,12 @@ module.exports = function(eleventyConfig) {
         badge: product.data.badge,
         dateAdded: product.data.dateAdded,
         url: product.url,
-        description: product.templateContent ? product.templateContent.trim().replace(/<p>|<\/p>/g, "") : ""
+        description: product.templateContent ? product.templateContent.trim().replace(/<p>|<\/p>/g, "") : "",
+        size: product.data.size || null
       };
-      if (product.data.size) {
-        cleanProduct.size = product.data.size;
-      }
       return cleanProduct;
     }).filter(p => p);
 
-    // Converte a lista de objetos em texto JSON
     return JSON.stringify(productList);
   });
   // ===================================================================
