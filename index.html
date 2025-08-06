@@ -427,25 +427,25 @@
             const updateProductCardStates = () => { getAll('#product-grid .product').forEach(c => { const id = c.dataset.id; const i = cart[id] > 0; const b = c.querySelector('.add-to-cart-btn'); if (b) { b.innerHTML = i ? `<i class="ph-bold ph-check mr-1"></i> Adicionado` : 'Adicionar'; b.classList.remove('btn-add-default', 'btn-add-success'); b.classList.add(i ? 'btn-add-success' : 'btn-add-default'); } const f = c.querySelector('.heart-icon'); if (f) f.classList.toggle('active', favorites.includes(id)); }); };
             const updateApp = () => { saveState(); updateCounters(); renderCart(); renderFavorites(); updateProductCardStates(); };
             
+            // ======================================================================
+            // INÍCIO DA ÁREA ATUALIZADA
+            // ======================================================================
             const createProductCardHTML = (product) => {
                 const isInCart = cart[product.id] > 0;
-                const whatsAppURL = `https://wa.me/5522998802545?text=${encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name}`)}`;
                 const isNew = lastVisit && (new Date(product.dateAdded).getTime() > lastVisit);
 
                 const priceHTML = `
-                    <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
-                        <span class="text-gray-500 line-through whitespace-nowrap">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
-                        <span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ ${Number(product.price).toFixed(2).replace('.',',')}</span>
+                    <div class="flex flex-col items-center mb-4">
+                        <span class="text-3xl font-bold text-purple-700">R$ ${Number(product.price).toFixed(2).replace('.', ',')}</span>
+                        <span class="text-lg text-gray-400 line-through -mt-1">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
                     </div>`;
-                
-                const paymentHTML = `<div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>`;
 
                 return `
                 <div class="product flex flex-col group ${isNew ? 'new-since-last-visit' : ''}" data-id="${product.id}" data-category="${product.category}" tabindex="0">
                     <div class="relative overflow-hidden">
-                        <a href="${product.url || '#'}">
-                            <img loading="lazy" src="${product.image}" alt="${product.name}" class="product-image w-full h-48 sm:h-64 object-cover">
-                        </a>
+                        
+                        <img loading="lazy" src="${product.image}" alt="${product.name}" class="product-image w-full h-48 sm:h-64 object-cover" onclick="showProductDetailModal('${product.id}')">
+                        
                         ${product.badge ? `<div class="product-badge">${product.badge.text}</div>` : ''}
                         <div class="absolute top-3 right-3">
                             <button class="toggle-favorite-btn w-10 h-10 rounded-full flex items-center justify-center" data-id="${product.id}">
@@ -454,26 +454,26 @@
                         </div>
                         <div id="viewing-info-${product.id}" class="absolute bottom-2 left-2 h-5"></div>
                     </div>
-                    <div class="p-3 flex flex-col flex-grow text-center">
-                        <a href="${product.url || '#'}">
-                            <h3 class="text-base font-semibold text-gray-800 truncate mb-1">${product.name}</h3>
-                        </a>
-
-                        <p class="text-xs text-gray-500 min-h-[16px] mb-3">${product.size ? product.size : '&nbsp;'}</p>
+                    <div class="p-4 flex flex-col flex-grow text-center">
+                        
+                        <h3 class="text-lg font-bold font-display text-gray-800 truncate mb-2">${product.name}</h3>
+                        
+                        <p class="text-sm text-gray-600 min-h-[40px] mb-4">${product.description ? product.description.substring(0, 50) + '...' : '&nbsp;'}</p>
 
                         <div class="mt-auto">
                             ${priceHTML}
-                            ${paymentHTML}
                             <div class="flex flex-col gap-2 text-sm">
-                                <button class="btn ${isInCart ? 'btn-add-success' : 'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
+                                <button class="btn ${isInCart ? 'btn-add-success' : 'btn-add-default'} add-to-cart-btn py-2.5" data-id="${product.id}">
                                     ${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado' : 'Adicionar'}
                                 </button>
-                                <a href="${whatsAppURL}" target="_blank" class="btn btn-buy">Comprar</a>
                             </div>
                         </div>
                     </div>
                 </div>`;
             };
+            // ======================================================================
+            // FIM DA ÁREA ATUALIZADA
+            // ======================================================================
 
             const renderProducts = () => { const t = UIElements.searchInput.value.trim(); let p = [...allProducts]; if (activeFilter !== 'all') p = p.filter(pr => pr.category === activeFilter); if (t) { const r = fuse.search(t); const ids = new Set(r.map(i => i.item.id)); p = p.filter(pr => ids.has(pr.id)); } if (activeSort === 'price-asc') p.sort((a,b)=>a.price-b.price); else if (activeSort === 'price-desc') p.sort((a,b)=>b.price-a.price); else if (activeSort === 'name-asc') p.sort((a,b)=>a.name.localeCompare(b.name)); UIElements.productGrid.innerHTML = p.map(createProductCardHTML).join(''); UIElements.noProductsMessage.classList.toggle('hidden', p.length === 0); if (p.length === 0) UIElements.noProductsMessage.innerHTML = `<i class="ph ph-flower-lotus text-5xl text-purple-300 mb-4"></i><p class="font-semibold text-xl font-display">Nenhum tesouro encontrado</p><p class="text-gray-500">Adicione produtos ao seu catálogo para vê-los aqui.</p>`; getAll('#product-grid .product').forEach((pr, i) => { pr.style.animationDelay = `${i * 60}ms`; }); updateProductCardStates(); };
             const updateVisuals = () => { allProducts.forEach(p => { const e = get(`#viewing-info-${p.id}`); if (e) { if (Math.random() > 0.7) p.viewing = Math.max(0, (p.viewing || 0) + (Math.floor(Math.random() * 3) - 1)); e.innerHTML = (p.viewing > 1) ? `<div class="flex items-center gap-1 text-white text-xs font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm animate-pulse"><i class="ph-fill ph-eye text-sm"></i><span>${p.viewing}</span></div>` : ''; } }); };
@@ -542,11 +542,8 @@
                     if (target.closest('#shipping-info-modal .close-modal-btn') || target.closest('#close-shipping-info-btn')) { closeShippingInfoModal(); return; }
                     if (target.closest('#product-detail-modal .close-modal-btn')) { closeAllModals(); return; }
                     
-                    if (target.matches('.product-image')) {
-                        const productId = target.closest('.product').dataset.id;
-                        showProductDetailModal(productId);
-                        return;
-                    }
+                    // Removido: A função onclick na imagem agora cuida disso.
+                    // if (target.matches('.product-image')) { ... }
                     
                     if (!target.closest('.search-container')) hideSearchSuggestions();
                     if (!target.closest('#sort-dropdown-container')) { UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); }
