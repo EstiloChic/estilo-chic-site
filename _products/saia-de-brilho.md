@@ -1,17 +1,17 @@
 ---
+layout: produto.njk
 id: "1"
+dateAdded: 2025-07-30T10:00:00.000Z
 name: Saia de brilho
-title: "Saia de brilho"
-price: 30
 originalPrice: 40
-image: https://i.postimg.cc/8kfLXdnG/Whats-App-Image-2025-07-22-at-13-00-24.jpg
-category: roupas
-size: Tamanho M
+price: 30
+size: M
 badge:
   text: Mais Vendido
-dateAdded: 2025-07-30T10:00:00.000Z
-layout: "produto.njk"
+title: Saia de brilho
 tags: products
+image: https://i.postimg.cc/8kfLXdnG/Whats-App-Image-2025-07-22-at-13-00-24.jpg
+category: roupas
 ---
 
 Saia curta deslumbrante com acabamento em brilho, perfeita para eventos noturnos e festas.
