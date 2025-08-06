@@ -1,4 +1,4 @@
-// .eleventy.js - VERSÃO FINAL E CORRIGIDA
+// .eleventy.js - VERSÃO COM ID SANITIZADA
 
 const yaml = require("js-yaml");
 
@@ -16,11 +16,6 @@ module.exports = function(eleventyConfig) {
     return `R$ ${price.toFixed(2).replace('.', ',')}`;
   });
 
-  // ===================================================================
-  // CORREÇÃO DEFINITIVA: A "ponte" de dados.
-  // Agora, o ID de cada produto será a sua URL, que é sempre única.
-  // Isso garante que todos os produtos, antigos e novos, tenham um ID.
-  // ===================================================================
   eleventyConfig.addFilter("getProductList", function(collection) {
     if (!collection) {
       return "[]";
@@ -28,9 +23,17 @@ module.exports = function(eleventyConfig) {
     const productList = collection.map(product => {
       if (!product || !product.data) return null;
       
+      // ===================================================================
+      // CORREÇÃO DEFINITIVA DA ID
+      // Transforma a URL (ex: /produtos/meu-vestido/) em uma ID segura
+      // (ex: produtos-meu-vestido) removendo as barras.
+      const safeId = product.url
+        .replace(/^\/|\/$/g, '') // Remove a primeira e a última barra
+        .replace(/\//g, '-');     // Substitui as barras do meio por hífens
+      // ===================================================================
+
       const cleanProduct = {
-        // A MUDANÇA CRÍTICA ESTÁ AQUI:
-        id: product.url, // Usamos a URL como ID único e confiável.
+        id: safeId, // Usamos a ID segura e única.
         name: product.data.name,
         price: product.data.price,
         originalPrice: product.data.originalPrice,
@@ -47,7 +50,6 @@ module.exports = function(eleventyConfig) {
 
     return JSON.stringify(productList);
   });
-  // ===================================================================
 
   return {
     dir: {
