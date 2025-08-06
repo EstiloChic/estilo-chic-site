@@ -162,6 +162,13 @@
 <body>
 
     <!-- ======================================================= -->
+    <!-- [MUDANÇA 1 de 2] CONTÊINER SEGURO DE DADOS ADICIONADO AQUI -->
+    <!-- ======================================================= -->
+    <script type="application/json" id="product-data">
+    {{ collections.products | getProductList | dump | safe }}
+    </script>
+
+    <!-- ======================================================= -->
     <!-- INÍCIO DO CONTEÚDO HTML -->
     <!-- ======================================================= -->
     <div class="loading-overlay"><div class="spinner"></div></div>
@@ -348,13 +355,9 @@
     <div id="welcome-popup-overlay" class="welcome-popup-overlay"><div class="welcome-popup"><button id="close-popup" class="close-popup-btn"><i class="ph ph-x"></i></button><i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i><h2 class="section-title text-2xl mb-2">Um presente para você!</h2><p class="text-gray-600 mb-6">É sua primeira vez aqui? Ganhe <strong>5% de desconto</strong> no seu primeiro pedido!</p><a href="https://wa.me/5522998802545?text=Olá!%20Vim%20pelo%20site%20e%20quero%20meu%20cupom%20de%205%25%20OFF%20de%20boas-vindas!" target="_blank" id="claim-coupon-btn" class="btn btn-buy py-3"><i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>Resgatar Cupom</a></div></div>
 
     <!-- ======================================================= -->
-    <!-- ESTA SEÇÃO SERÁ PREENCHIDA AUTOMATICAMENTE PELO NETLIFY -->
+    <!-- SCRIPT ANTIGO REMOVIDO DAQUI -->
     <!-- ======================================================= -->
     
-    <script>
-    const allProducts = {{ collections.products | getProductList }};
-    </script>
-
     <!-- ======================================================= -->
     <!-- CÓDIGO DE FUNCIONALIDADE DO SITE (NÃO PRECISA ALTERAR) -->
     <!-- ======================================================= -->
@@ -374,11 +377,11 @@
                 };
             }
 
-            // A variável `allProducts` é preenchida automaticamente pelo Eleventy.
-            // Se allProducts não for um array (por um erro de build), inicializa como um array vazio.
-            if (typeof allProducts === 'undefined' || !Array.isArray(allProducts)) {
-                var allProducts = [];
-            }
+            // =========================================================================
+            // [MUDANÇA 2 de 2] NOVA FORMA, MAIS SEGURA, DE CARREGAR OS DADOS DO PRODUTO
+            // =========================================================================
+            const productDataElement = document.getElementById('product-data');
+            const allProducts = productDataElement ? JSON.parse(productDataElement.textContent) : [];
 
 
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
