@@ -1,35 +1,42 @@
-// .eleventy.js - VERSÃO CORRIGIDA
+// .eleventy.js - VERSÃO DE DEPURAÇÃO
 
-// Importa o pacote js-yaml para ler os arquivos de dados
 const yaml = require("js-yaml");
 
 module.exports = function(eleventyConfig) {
-  // Ensina o Eleventy a entender arquivos .yml na pasta _data
   eleventyConfig.addDataExtension("yml", contents => yaml.load(contents));
-
-  // Copia a pasta 'admin' para a pasta de saída '_site' (para o painel funcionar)
   eleventyConfig.addPassthroughCopy("admin");
-  // Copia as imagens dos produtos para a pasta de saída '_site'
   eleventyConfig.addPassthroughCopy("assets/uploads");
 
-  // Filtro para formatar um número como um preço em Reais (BRL).
   eleventyConfig.addFilter("formatPrice", function(price) {
-    if (typeof price !== 'number') {
-      return "Preço indisponível";
-    }
+    if (typeof price !== 'number') return "Preço indisponível";
     return `R$ ${price.toFixed(2).replace('.', ',')}`;
   });
 
-  // Filtro para criar a lista de produtos que será usada na página inicial.
+  // ===================================================================
+  // FILTRO DE DEPURAÇÃO
+  // ===================================================================
   eleventyConfig.addFilter("getProductList", function(collection) {
+    // Estas mensagens vão aparecer no log de build do Netlify
+    console.log("--- INICIANDO DEPURAÇÃO DO FILTRO getProductList ---");
+
     if (!collection) {
-      // ===================================================================
-      // AQUI ESTÁ A CORREÇÃO CRÍTICA:
-      // Devemos retornar uma string de array vazio, e não um objeto array.
-      return "[]"; 
-      // ===================================================================
+      console.log("--- ERRO DE DEPURAÇÃO: A coleção de produtos é NULA ou INDEFINIDA! ---");
+      return "[]";
     }
+
+    if (collection.length === 0) {
+      console.log("--- AVISO DE DEPURAÇÃO: A coleção de produtos foi encontrada, mas está VAZIA (0 itens). ---");
+    } else {
+      console.log(`--- SUCESSO DE DEPURAÇÃO: Foram encontrados ${collection.length} produtos na coleção. ---`);
+      // Vamos inspecionar os dados do primeiro produto para ver se estão corretos
+      console.log("--- DADOS DO PRIMEIRO PRODUTO ENCONTRADO:", JSON.stringify(collection[0].data, null, 2));
+    }
+
     const productList = collection.map(product => {
+      if (!product || !product.data) {
+        console.log("--- AVISO DE DEPURAÇÃO: Item inválido encontrado na coleção. Pulando. ---");
+        return null;
+      }
       const cleanProduct = {
         id: product.data.id,
         name: product.data.name,
@@ -40,15 +47,18 @@ module.exports = function(eleventyConfig) {
         badge: product.data.badge,
         dateAdded: product.data.dateAdded,
         url: product.url,
-        description: product.templateContent.trim().replace(/<p>|<\/p>/g, "")
+        description: product.templateContent ? product.templateContent.trim().replace(/<p>|<\/p>/g, "") : ""
       };
       if (product.data.size) {
         cleanProduct.size = product.data.size;
       }
       return cleanProduct;
-    });
+    }).filter(p => p !== null); // Remove qualquer item nulo/inválido
+
+    console.log(`--- DEPURAÇÃO FINAL: ${productList.length} produtos foram processados e serão enviados para a página. ---`);
     return JSON.stringify(productList);
   });
+  // ===================================================================
 
   return {
     dir: {
