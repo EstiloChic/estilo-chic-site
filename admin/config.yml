@@ -1,3 +1,8 @@
+# ===================================================================
+# ARQUIVO admin/config.yml - VERSÃO FINAL E CORRIGIDA
+# Adicionadas as instruções 'format' e 'extension'
+# ===================================================================
+
 backend:
   name: git-gateway
   branch: main
@@ -10,6 +15,29 @@ collections:
     label: "Produtos"
     folder: "produtos"
     create: true
+    # INSTRUÇÕES CRÍTICAS QUE FALTAVAM:
+    extension: "md"
+    format: "frontmatter"
+    # ==================================
+    slug: "{{slug}}"
     fields:
       - {label: "Nome do Produto", name: "name", widget: "string"}
-      - {label: "Descrição", name: "body", widget: "markdown"}
+      - {label: "Imagem do Produto", name: "image", widget: "image"}
+      - {label: "Preço Original (Ex: 30.00)", name: "originalPrice", widget: "number", value_type: "float"}
+      - {label: "Preço com Desconto (Ex: 22.00)", name: "price", widget: "number", value_type: "float"}
+      - label: "Categoria"
+        name: "category"
+        widget: "select"
+        options:
+          - {label: "Roupas", value: "roupas"}
+          - {label: "Maquiagens", value: "maquiagens"}
+          - {label: "Acessórios", value: "acessorios"}
+      - {label: "Tamanho (Ex: G, 38, P/M. Deixe em branco se não aplicável)", name: "size", widget: "string", required: false}
+      - label: "Badge (Opcional)"
+        name: "badge"
+        widget: "object"
+        required: false
+        fields:
+          - {label: "Texto do Badge (Ex: Novidade, Promoção)", name: "text", widget: "string", required: false}
+      - {label: "Descrição Completa do Produto", name: "body", widget: "markdown"}
+      - {label: "Data de Adição", name: "dateAdded", widget: "datetime", required: false}
