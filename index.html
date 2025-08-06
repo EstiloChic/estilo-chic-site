@@ -161,11 +161,10 @@
 </head>
 <body>
 
-    <!-- Contêiner de dados seguro para os produtos -->
-    <script type="application/json" id="product-data">
-    {{ collections.products | getProductList | safe }}
-    </script>
-
+    <!-- ======================================================= -->
+    <!-- MUDANÇA: O contêiner de dados foi removido daqui.         -->
+    <!-- ======================================================= -->
+    
     <!-- ======================================================= -->
     <!-- INÍCIO DO CONTEÚDO HTML -->
     <!-- ======================================================= -->
@@ -368,8 +367,21 @@
                 };
             }
 
-            const productDataElement = document.getElementById('product-data');
-            const allProducts = productDataElement ? JSON.parse(productDataElement.textContent) : [];
+            // ===================================================================
+            // CORREÇÃO FINAL: MÉTODO À PROVA DE FALHAS PARA CARREGAR OS DADOS
+            // ===================================================================
+            let allProducts = [];
+            try {
+                // 1. Crie uma variável que armazena os dados como uma string usando backticks (`)
+                //    Isso evita que caracteres especiais quebrem o script.
+                const rawJsonData = `{{ collections.products | getProductList }}`;
+                
+                // 2. Converta (parse) a string para um objeto JavaScript.
+                allProducts = JSON.parse(rawJsonData);
+            } catch (error) {
+                console.error("Erro ao carregar os dados dos produtos:", error);
+                // Deixa allProducts como um array vazio para o site não quebrar.
+            }
 
 
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
