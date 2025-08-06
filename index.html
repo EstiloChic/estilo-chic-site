@@ -276,7 +276,11 @@
                     <h3 class="text-base font-semibold text-gray-800 truncate mb-1">{{ product.data.name }}</h3>
                 </a>
                 
-                <p class="text-xs text-gray-500 min-h-[16px] mb-3">{{ product.data.size or '&nbsp;' }}</p>
+                {% if product.data.size and product.data.size != "" %}
+                    <p class="text-xs text-gray-500 min-h-[16px] mb-3">{{ product.data.size }}</p>
+                {% else %}
+                    <p class="text-xs text-gray-500 min-h-[16px] mb-3">&nbsp;</p>
+                {% endif %}
                 
                 <div class="mt-auto">
                     <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
