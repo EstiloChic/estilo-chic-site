@@ -252,57 +252,57 @@
             </div>
         </section>
 
-<!-- ====================================================================== -->
-<!-- ÁREA DOS PRODUTOS ATUALIZADA - INÍCIO -->
-<!-- ====================================================================== -->
-<section class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4" id="product-grid">
+        <!-- ====================================================================== -->
+        <!-- ÁREA DOS PRODUTOS ATUALIZADA - INÍCIO -->
+        <!-- ====================================================================== -->
+        <section class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4" id="product-grid">
 
-    {%- for product in collections.products | reverse -%}
-        <div class="product flex flex-col group" data-id="{{ product.data.id }}" data-category="{{ product.data.category }}" tabindex="0">
-            <div class="relative overflow-hidden">
-                <img loading="lazy" src="{{ product.data.image }}" alt="{{ product.data.name }}" class="product-image w-full h-48 sm:h-64 object-cover" data-id="{{ product.data.id }}">
-                {% if product.data.badge %}
-                    <div class="product-badge">{{ product.data.badge.text }}</div>
-                {% endif %}
-                <div class="absolute top-3 right-3">
-                    <button class="toggle-favorite-btn w-10 h-10 rounded-full flex items-center justify-center" data-id="{{ product.data.id }}">
-                        <i class="heart-icon ph-fill ph-heart text-2xl pointer-events-none"></i>
-                    </button>
-                </div>
-                <div id="viewing-info-{{ product.data.id }}" class="absolute bottom-2 left-2 h-5"></div>
-            </div>
-            <div class="p-3 flex flex-col flex-grow text-center">
-                <a href="{{ product.url | url }}">
-                    <h3 class="text-base font-semibold text-gray-800 truncate mb-1">{{ product.data.name }}</h3>
-                </a>
-                
-                {% if product.data.size and product.data.size != "" %}
-                    <p class="text-xs text-gray-500 min-h-[16px] mb-3">{{ product.data.size }}</p>
-                {% else %}
-                    <p class="text-xs text-gray-500 min-h-[16px] mb-3">&nbsp;</p>
-                {% endif %}
-                
-                <div class="mt-auto">
-                    <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
-                        <span class="text-gray-500 line-through whitespace-nowrap">R$ {{ product.data.originalPrice | formatPrice }}</span>
-                        <span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ {{ product.data.price | formatPrice }}</span>
+            {%- for product in collections.products | reverse -%}
+                <div class="product flex flex-col group" data-id="{{ product.data.id }}" data-category="{{ product.data.category }}" tabindex="0">
+                    <div class="relative overflow-hidden">
+                        <img loading="lazy" src="{{ product.data.image }}" alt="{{ product.data.name }}" class="product-image w-full h-48 sm:h-64 object-cover" data-id="{{ product.data.id }}">
+                        {% if product.data.badge %}
+                            <div class="product-badge">{{ product.data.badge.text }}</div>
+                        {% endif %}
+                        <div class="absolute top-3 right-3">
+                            <button class="toggle-favorite-btn w-10 h-10 rounded-full flex items-center justify-center" data-id="{{ product.data.id }}">
+                                <i class="heart-icon ph-fill ph-heart text-2xl pointer-events-none"></i>
+                            </button>
+                        </div>
+                        <div id="viewing-info-{{ product.data.id }}" class="absolute bottom-2 left-2 h-5"></div>
                     </div>
-                    <div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>
-                    <div class="flex flex-col gap-2 text-sm">
-                        <button class="btn btn-add-default add-to-cart-btn" data-id="{{ product.data.id }}">
-                            Adicionar
-                        </button>
-                        <a href="https://wa.me/{{ settings.whatsapp_number }}?text=Olá!%20Tenho%20interesse%20no%20produto%3A%20{{ product.data.name | url_encode }}" target="_blank" class="btn btn-buy">Comprar</a>
+                    <div class="p-3 flex flex-col flex-grow text-center">
+                        <a href="{{ product.url | url }}">
+                            <h3 class="text-base font-semibold text-gray-800 truncate mb-1">{{ product.data.name }}</h3>
+                        </a>
+                        
+                        {%- if product.data.size and product.data.size != "" -%}
+                            <p class="text-xs text-gray-500 min-h-[16px] mb-3">{{ product.data.size }}</p>
+                        {%- else -%}
+                            <p class="text-xs text-gray-500 min-h-[16px] mb-3">&nbsp;</p>
+                        {%- endif -%}
+                        
+                        <div class="mt-auto">
+                            <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
+                                <span class="text-gray-500 line-through whitespace-nowrap">R$ {{ product.data.originalPrice | formatPrice }}</span>
+                                <span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ {{ product.data.price | formatPrice }}</span>
+                            </div>
+                            <div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>
+                            <div class="flex flex-col gap-2 text-sm">
+                                <button class="btn btn-add-default add-to-cart-btn" data-id="{{ product.data.id }}">
+                                    Adicionar
+                                </button>
+                                <a href="https://wa.me/5522998802545?text=Olá!%20Tenho%20interesse%20no%20produto%3A%20{{ product.data.name | url_encode }}" target="_blank" class="btn btn-buy">Comprar</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    {%- endfor -%}
+            {%- endfor -%}
 
-</section>
-<!-- ====================================================================== -->
-<!-- ÁREA DOS PRODUTOS ATUALIZADA - FIM -->
-<!-- ====================================================================== -->
+        </section>
+        <!-- ====================================================================== -->
+        <!-- ÁREA DOS PRODUTOS ATUALIZADA - FIM -->
+        <!-- ====================================================================== -->
         
         <div id="no-products-message" class="text-center py-16 text-gray-600 hidden"></div>
         
