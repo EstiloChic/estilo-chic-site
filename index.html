@@ -345,6 +345,58 @@
     <div id="welcome-popup-overlay" class="welcome-popup-overlay"><div class="welcome-popup"><button id="close-popup" class="close-popup-btn"><i class="ph ph-x"></i></button><i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i><h2 class="section-title text-2xl mb-2">Um presente para você!</h2><p class="text-gray-600 mb-6">É sua primeira vez aqui? Ganhe <strong>5% de desconto</strong> no seu primeiro pedido!</p><a href="https://wa.me/5522998802545?text=Olá!%20Vim%20pelo%20site%20e%20quero%20meu%20cupom%20de%205%25%20OFF%20de%20boas-vindas!" target="_blank" id="claim-coupon-btn" class="btn btn-buy py-3"><i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>Resgatar Cupom</a></div></div>
     
     <script>
+        // A função do modal agora é declarada globalmente antes do DOMContentLoaded
+        let allProducts = [];
+        
+        function showProductDetailModal(productId) {
+            const get = (selector) => document.querySelector(selector);
+            const UIElements = { productDetailModal: get('#product-detail-modal'), modalOverlay: get('#modal-overlay') };
+            const cart = JSON.parse(localStorage.getItem('estiloChicCart') || '{}');
+
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) {
+                console.error("Produto não encontrado:", productId);
+                return;
+            }
+
+            const isInCart = cart[product.id] > 0;
+            UIElements.productDetailModal.innerHTML = `
+                <div class="image-modal-content">
+                    <button class="close-modal-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
+                    <img src="${product.image}" alt="${product.name}">
+                    <div class="p-4 sm:p-6 text-left">
+                        <h3 class="text-2xl font-bold font-display text-gray-800 mb-2">${product.name}</h3>
+                        <p class="text-sm text-gray-600 mb-4">${product.description || ''}</p>
+                        
+                        <div class="mt-4 p-3 bg-green-50/80 rounded-lg text-sm text-green-800 flex items-center gap-3">
+                            <i class="ph-fill ph-truck text-2xl"></i>
+                            <div>
+                                <strong>Frete grátis para São Francisco e região.</strong>
+                                <span class="block text-xs">Demais localidades, frete a combinar.</span>
+                            </div>
+                            <i class="ph-fill ph-info text-xl ml-auto info-icon open-shipping-info-modal" title="Saiba mais sobre a entrega"></i>
+                        </div>
+
+                        <div class="border-t border-purple-100 my-4"></div>
+
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="flex flex-col items-start">
+                                <p class="text-3xl font-bold text-purple-700">R$ ${Number(product.price).toFixed(2).replace('.', ',')}</p>
+                                <span class="text-lg text-gray-400 line-through -mt-1">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
+                            </div>
+                            <div class="flex flex-col gap-2 text-sm w-36">
+                                <button class="btn ${isInCart ? 'btn-add-success':'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
+                                    ${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado':'Adicionar'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            
+            UIElements.modalOverlay.classList.add('visible');
+            UIElements.productDetailModal.classList.remove('hidden');
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
 
             const get = (selector) => document.querySelector(selector);
@@ -360,7 +412,8 @@
                 };
             }
 
-            const allProducts = {{ collections.products | getProductList }};
+            // Popula a variável global `allProducts`
+            allProducts = {{ collections.products | getProductList }};
 
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
             const UIElements = { productGrid: get('#product-grid'), cartDropdown: get('#cart-dropdown'), favoritesDropdown: get('#favorites-dropdown'), floatingCartBtn: get('#floating-cart-btn'), floatingFavoritesBtn: get('#floating-favorites-btn'), productDetailModal: get('#product-detail-modal'), shippingInfoModal: get('#shipping-info-modal'), modalOverlay: get('#modal-overlay'), searchInput: get('#search-input'), clearSearchBtn: get('#clear-search-btn'), searchIcon: get('#search-icon'), searchSuggestions: get('#search-suggestions'), noProductsMessage: get('#no-products-message'), loadingOverlay: get('.loading-overlay'), sortDropdownContainer: get('#sort-dropdown-container'), sortOptions: get('#sort-options'), sortCaret: get('#sort-caret'), cartFeedbackToast: get('#cart-feedback-toast'), favoritesFeedbackToast: get('#favorites-feedback-toast'), activityToast: get('#activity-toast'), welcomePopupOverlay: get('#welcome-popup-overlay'), hamburgerButton: get('#hamburger-button'), mobileNav: get('#mobile-nav'), mainHeader: get('#main-header'), floatingButtonsContainer: get('#floating-buttons-container'), scrollObserverTarget: get('#contato') };
@@ -375,51 +428,6 @@
             const openCart = () => { if (favoritesOpen) closeFavorites(true); UIElements.modalOverlay.classList.add('visible'); cartOpen = true; UIElements.cartDropdown.classList.add('show'); UIElements.floatingCartBtn.classList.add('active'); };
             const openFavorites = () => { if (cartOpen) closeCart(true); UIElements.modalOverlay.classList.add('visible'); favoritesOpen = true; UIElements.favoritesDropdown.classList.add('show'); UIElements.floatingFavoritesBtn.classList.add('active'); };
             
-            // ======================================================================
-            // CORREÇÃO: A função agora é anexada ao 'window' para ser globalmente acessível
-            // ======================================================================
-            window.showProductDetailModal = (productId) => {
-                const product = allProducts.find(p => p.id === productId);
-                if (!product) return;
-
-                const isInCart = cart[product.id] > 0;
-                UIElements.productDetailModal.innerHTML = `
-                    <div class="image-modal-content">
-                        <button class="close-modal-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
-                        <img src="${product.image}" alt="${product.name}">
-                        <div class="p-4 sm:p-6 text-left">
-                            <h3 class="text-2xl font-bold font-display text-gray-800 mb-2">${product.name}</h3>
-                            <p class="text-sm text-gray-600 mb-4">${product.description || ''}</p>
-                            
-                            <div class="mt-4 p-3 bg-green-50/80 rounded-lg text-sm text-green-800 flex items-center gap-3">
-                                <i class="ph-fill ph-truck text-2xl"></i>
-                                <div>
-                                    <strong>Frete grátis para São Francisco e região.</strong>
-                                    <span class="block text-xs">Demais localidades, frete a combinar.</span>
-                                </div>
-                                <i class="ph-fill ph-info text-xl ml-auto info-icon open-shipping-info-modal" title="Saiba mais sobre a entrega"></i>
-                            </div>
-
-                            <div class="border-t border-purple-100 my-4"></div>
-
-                            <div class="flex justify-between items-center mt-4">
-                                <div class="flex flex-col items-start">
-                                    <p class="text-3xl font-bold text-purple-700">R$ ${Number(product.price).toFixed(2).replace('.', ',')}</p>
-                                    <span class="text-lg text-gray-400 line-through -mt-1">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
-                                </div>
-                                <div class="flex flex-col gap-2 text-sm w-36">
-                                    <button class="btn ${isInCart ? 'btn-add-success':'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
-                                        ${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado':'Adicionar'}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
-                
-                UIElements.modalOverlay.classList.add('visible');
-                UIElements.productDetailModal.classList.remove('hidden');
-            };
-
             const updateCounters = () => { const c1 = UIElements.floatingCartBtn.querySelector('.cart-count'); const c2 = UIElements.floatingFavoritesBtn.querySelector('.cart-count'); const t = Object.values(cart).reduce((s, q) => s + q, 0); c1.textContent = t; c1.style.display = t > 0 ? 'flex' : 'none'; c2.textContent = favorites.length; c2.style.display = favorites.length > 0 ? 'flex' : 'none'; };
             const renderCart = () => { if (Object.keys(cart).length === 0) { UIElements.cartDropdown.innerHTML = `<div class="text-center p-4"><i class="ph ph-shopping-cart text-4xl text-gray-300 mb-2"></i><p class="font-semibold text-gray-700">Seu carrinho está vazio</p></div>`; return; } let h = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-purple-800">Meu Carrinho</h3><button class="clear-cart-btn text-xs bg-red-100 text-red-600 font-semibold hover:bg-red-200 px-3 py-1 rounded-full">Limpar</button></div>`; let t = 0; let w = "Olá! Gostaria de encomendar:\n\n"; for (const [i, q] of Object.entries(cart)) { const p = allProducts.find(pr => pr.id === i); if (!p) continue; t += p.price * q; w += `- ${q}x ${p.name}\n`; h += `<div class="cart-item flex items-center gap-4 py-3"><img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-grow"><p class="font-semibold text-sm">${p.name}</p><div class="flex items-center gap-2 mt-1"><button class="decrease-quantity-btn bg-purple-100 text-purple-700 rounded-full w-6 h-6 flex items-center justify-center hover:bg-purple-200 transition-colors" data-id="${i}"><i class="ph ph-minus text-sm pointer-events-none"></i></button><span class="font-bold text-purple-800 w-5 text-center">${q}</span><button class="increase-quantity-btn bg-purple-100 text-purple-700 rounded-full w-6 h-6 flex items-center justify-center hover:bg-purple-200 transition-colors" data-id="${i}"><i class="ph ph-plus text-sm pointer-events-none"></i></button></div></div><div class="flex flex-col items-end gap-2"><p class="text-sm font-semibold text-purple-700">R$ ${(p.price*q).toFixed(2).replace('.',',')}</p><button class="remove-item-btn icon-btn-circle" data-id="${i}"><i class="ph ph-trash text-base pointer-events-none"></i></button></div></div>`; } w += `\n*Total: R$ ${t.toFixed(2).replace('.',',')}*`; h += `<div class="mt-4 pt-4 border-t"><div class="flex justify-between items-center font-bold text-lg"><span>Total:</span><span class="text-purple-800">R$ ${t.toFixed(2).replace('.',',')}</span></div><div class="flex items-center justify-center text-xs text-gray-500 mt-3 gap-1"><span>Frete grátis para São Francisco e região.</span> <i class="ph-fill ph-info info-icon open-shipping-info-modal"></i></div><a href="https://wa.me/5522998802545?text=${encodeURIComponent(w)}" target="_blank" class="btn btn-buy w-full mt-4 py-3"><i class="ph-fill ph-whatsapp-logo mr-2"></i> Finalizar Pedido</a></div>`; UIElements.cartDropdown.innerHTML = h; };
             const renderFavorites = () => { if (favorites.length === 0) { UIElements.favoritesDropdown.innerHTML = `<div class="text-center p-4"><i class="ph ph-heart text-4xl text-gray-300 mb-2"></i><p class="font-semibold text-gray-700">Lista de favoritos vazia.</p></div>`; return; } let h = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-purple-800">Meus Favoritos</h3><button class="clear-favorites-btn text-xs bg-red-100 text-red-600 font-semibold hover:bg-red-200 px-3 py-1 rounded-full">Limpar</button></div>`; favorites.forEach(id => { const p = allProducts.find(pr => pr.id === id); if (!p) return; h += `<div class="favorite-dropdown-item flex items-center gap-4 py-3"><img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-grow"><p class="font-semibold text-sm">${p.name}</p><p class="text-xs text-purple-600 font-medium">R$ ${Number(p.price).toFixed(2).replace('.',',')}</p></div><div class="flex items-center gap-2"><button class="add-to-cart-from-fav-btn icon-btn-circle bg-purple-100 text-purple-700 hover:bg-purple-600" data-id="${id}"><i class="ph ph-shopping-cart-simple pointer-events-none"></i></button><button class="remove-from-favorites-btn icon-btn-circle" data-id="${id}"><i class="ph ph-trash text-base pointer-events-none"></i></button></div></div>`; }); UIElements.favoritesDropdown.innerHTML = h; };
