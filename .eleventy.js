@@ -1,4 +1,4 @@
-// .eleventy.js - VERSÃO FINAL E SEGURA
+// .eleventy.js - VERSÃO FINAL CORRIGIDA PARA LIQUID
 
 const yaml = require("js-yaml");
 
@@ -17,12 +17,13 @@ module.exports = function(eleventyConfig) {
   });
 
   // ===================================================================
-  // MUDANÇA IMPORTANTE: O filtro agora retorna o array de objetos diretamente.
-  // Eleventy irá lidar com a conversão para JSON de forma segura com o filtro 'dump'.
+  // CORREÇÃO CRÍTICA: O filtro VOLTA a usar JSON.stringify.
+  // Isso é necessário porque o Liquid não tem um filtro 'dump'.
+  // O filtro agora entrega a string JSON pronta para o HTML.
   // ===================================================================
   eleventyConfig.addFilter("getProductList", function(collection) {
     if (!collection) {
-      return [];
+      return "[]"; // Retorna uma string de array vazio
     }
     const productList = collection.map(product => {
       if (!product || !product.data) return null;
@@ -44,7 +45,8 @@ module.exports = function(eleventyConfig) {
       return cleanProduct;
     }).filter(p => p);
 
-    return productList;
+    // Converte a lista de objetos em texto JSON
+    return JSON.stringify(productList);
   });
   // ===================================================================
 
