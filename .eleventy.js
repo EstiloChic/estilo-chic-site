@@ -1,4 +1,10 @@
+// Importa o pacote js-yaml para ler os arquivos de dados
+const yaml = require("js-yaml");
+
 module.exports = function(eleventyConfig) {
+  // Ensina o Eleventy a entender arquivos .yml na pasta _data
+  eleventyConfig.addDataExtension("yml", contents => yaml.load(contents));
+
   // Copia a pasta 'admin' para a pasta de saída '_site'
   eleventyConfig.addPassthroughCopy("admin");
 
@@ -10,28 +16,34 @@ module.exports = function(eleventyConfig) {
     return Number(value).toFixed(2).replace('.', ',');
   });
 
-  // CORRIGIDO: Registra a função como um FILTRO para Liquid, não como uma função JS.
-  // Isso resolve o erro "undefined filter: getProductList".
+  // Filtro para criar uma lista limpa de produtos para o JavaScript
   eleventyConfig.addLiquidFilter("getProductList", function(collection) {
     if (!collection) {
       return [];
     }
     const productList = collection.map(product => {
-      return {
+      // Cria um objeto base com os campos que sempre existem
+      const cleanProduct = {
         id: product.data.id,
         name: product.data.name,
         price: product.data.price,
         originalPrice: product.data.originalPrice,
         image: product.data.image,
         category: product.data.category,
-        size: product.data.size,
         badge: product.data.badge,
         dateAdded: product.data.dateAdded,
         url: product.url,
         description: product.templateContent.trim()
       };
+
+      // *** A CORREÇÃO ESTÁ AQUI ***
+      // Só adiciona a propriedade 'size' se ela existir no arquivo .md
+      if (product.data.size) {
+        cleanProduct.size = product.data.size;
+      }
+
+      return cleanProduct;
     });
-    // Converte a lista limpa para uma string JSON
     return JSON.stringify(productList);
   });
 
