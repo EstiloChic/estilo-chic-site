@@ -7,9 +7,9 @@ image: /assets/uploads/img_8592.jpeg
 category: roupas
 size: G
 badge:
-  text: "Alça reforçada "
+  text: "Novidade "
 dateAdded: 2025-08-06T09:30:00.000-03:00
 layout: produto.njk
 tags: products
 ---
-Novidades
+Alça reforçada
