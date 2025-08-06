@@ -276,7 +276,10 @@
                             <h3 class="text-base font-semibold text-gray-800 truncate mb-1">{{ product.data.name }}</h3>
                         </a>
                         
-                        <p class="text-xs text-gray-500 min-h-[16px] mb-3">{{ product.data.size | default: "&nbsp;" }}</p>
+                        <!-- =========== CORREÇÃO 1: LÓGICA DO TAMANHO (LIQUID) =========== -->
+                        <p class="text-xs text-gray-500 min-h-[16px] mb-3">
+                            {% if product.data.size %}{{ product.data.size }}{% else %}&nbsp;{% endif %}
+                        </p>
                         
                         <div class="mt-auto">
                             <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
@@ -508,7 +511,10 @@
                         <a href="${product.url}">
                             <h3 class="text-base font-semibold text-gray-800 truncate mb-1">${product.name}</h3>
                         </a>
-                        <p class="text-xs text-gray-500 min-h-[16px] mb-3">${product.size||''}</p>
+
+                        <!-- =========== CORREÇÃO 2: LÓGICA DO TAMANHO (JAVASCRIPT) =========== -->
+                        <p class="text-xs text-gray-500 min-h-[16px] mb-3">${product.size ? product.size : '&nbsp;'}</p>
+
                         <div class="mt-auto">
                             ${priceHTML}
                             ${paymentHTML}
