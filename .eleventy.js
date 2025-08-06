@@ -1,3 +1,5 @@
+// .eleventy.js
+
 // Importa o pacote js-yaml para ler os arquivos de dados
 const yaml = require("js-yaml");
 
@@ -9,6 +11,23 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("admin");
   // Copia as imagens dos produtos para a pasta de saída '_site'
   eleventyConfig.addPassthroughCopy("assets/uploads");
+
+  // ===================================================================
+  // FILTRO CORRIGIDO E ADICIONADO ABAIXO
+  // ===================================================================
+  /**
+   * Filtro para formatar um número como um preço em Reais (BRL).
+   * Exemplo de uso no template: {{ product.price | formatPrice }}
+   */
+  eleventyConfig.addFilter("formatPrice", function(price) {
+    // Verifica se o preço é um número válido antes de formatar
+    if (typeof price !== 'number') {
+      return "Preço indisponível";
+    }
+    // Formata o número para ter 2 casas decimais e troca o ponto por vírgula
+    return `R$ ${price.toFixed(2).replace('.', ',')}`;
+  });
+  // ===================================================================
 
   // Filtro para criar a lista de produtos que será usada na página inicial.
   // Esta é a "mágica" que conecta o painel ao site.
