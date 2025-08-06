@@ -348,13 +348,16 @@
     <div id="welcome-popup-overlay" class="welcome-popup-overlay"><div class="welcome-popup"><button id="close-popup" class="close-popup-btn"><i class="ph ph-x"></i></button><i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i><h2 class="section-title text-2xl mb-2">Um presente para você!</h2><p class="text-gray-600 mb-6">É sua primeira vez aqui? Ganhe <strong>5% de desconto</strong> no seu primeiro pedido!</p><a href="https://wa.me/5522998802545?text=Olá!%20Vim%20pelo%20site%20e%20quero%20meu%20cupom%20de%205%25%20OFF%20de%20boas-vindas!" target="_blank" id="claim-coupon-btn" class="btn btn-buy py-3"><i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>Resgatar Cupom</a></div></div>
 
     <!-- ======================================================= -->
-    <!-- INÍCIO DO CÓDIGO JAVASCRIPT ("PAINEL DE CONTROLE") -->
+    <!-- ESTA SEÇÃO SERÁ PREENCHIDA AUTOMATICAMENTE PELO NETLIFY -->
     <!-- ======================================================= -->
     
     <script>
-    const allProducts = []; // LISTA DE PRODUTOS VAZIA
+    const allProducts = []; // O Netlify vai substituir esta linha pela lista de produtos do seu painel
     </script>
 
+    <!-- ======================================================= -->
+    <!-- CÓDIGO DE FUNCIONALIDADE DO SITE (NÃO PRECISA ALTERAR) -->
+    <!-- ======================================================= -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
@@ -371,7 +374,12 @@
                 };
             }
 
-            // A variável `allProducts` já foi definida acima.
+            // A variável `allProducts` é preenchida automaticamente pelo Netlify
+            // Se allProducts não for um array (por um erro de build), inicializa como um array vazio
+            if (!Array.isArray(allProducts)) {
+                allProducts = [];
+            }
+
 
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
             const UIElements = { productGrid: get('#product-grid'), cartDropdown: get('#cart-dropdown'), favoritesDropdown: get('#favorites-dropdown'), floatingCartBtn: get('#floating-cart-btn'), floatingFavoritesBtn: get('#floating-favorites-btn'), productDetailModal: get('#product-detail-modal'), shippingInfoModal: get('#shipping-info-modal'), modalOverlay: get('#modal-overlay'), searchInput: get('#search-input'), clearSearchBtn: get('#clear-search-btn'), searchIcon: get('#search-icon'), searchSuggestions: get('#search-suggestions'), noProductsMessage: get('#no-products-message'), loadingOverlay: get('.loading-overlay'), sortDropdownContainer: get('#sort-dropdown-container'), sortOptions: get('#sort-options'), sortCaret: get('#sort-caret'), cartFeedbackToast: get('#cart-feedback-toast'), favoritesFeedbackToast: get('#favorites-feedback-toast'), activityToast: get('#activity-toast'), welcomePopupOverlay: get('#welcome-popup-overlay'), hamburgerButton: get('#hamburger-button'), mobileNav: get('#mobile-nav'), mainHeader: get('#main-header'), floatingButtonsContainer: get('#floating-buttons-container'), scrollObserverTarget: get('#contato') };
