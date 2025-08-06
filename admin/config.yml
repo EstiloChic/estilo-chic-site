@@ -1,6 +1,5 @@
-# ===================================================================
-# ARQUIVO admin/config.yml - BASEADO NA SUA VERSÃO FUNCIONAL
-# ===================================================================
+# Arquivo: admin/config.yml (Com o slug corrigido)
+
 backend:
   name: git-gateway
   branch: main
@@ -11,16 +10,17 @@ public_folder: "/assets/uploads"
 collections:
   - name: "products"
     label: "Produtos"
-    # VOLTANDO PARA A PASTA CORRETA:
     folder: "_products"
     create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    
+    # SLUG CORRIGIDO PARA USAR O NOME DO PRODUTO:
+    slug: "{{name}}"
+    
     fields:
       - {label: "Layout", name: "layout", widget: "hidden", default: "produto.njk"}
-      
-      # USANDO A SOLUÇÃO ORIGINAL E CORRETA PARA O ID:
       - {label: "ID", name: "id", widget: "uuid", required: true}
-
       - {label: "Data de Adição", name: "dateAdded", widget: "datetime"}
       - {label: "Nome do Produto", name: "name", widget: "string"}
       - {label: "Preço Original (Ex: 30.00)", name: "originalPrice", widget: "number", value_type: "float"}
