@@ -1,8 +1,6 @@
 # ===================================================================
-# ARQUIVO admin/config.yml - VERSÃO FINAL E CORRIGIDA
-# Adicionadas as instruções 'format' e 'extension'
+# ARQUIVO admin/config.yml - BASEADO NA SUA VERSÃO FUNCIONAL
 # ===================================================================
-
 backend:
   name: git-gateway
   branch: main
@@ -13,18 +11,21 @@ public_folder: "/assets/uploads"
 collections:
   - name: "products"
     label: "Produtos"
-    folder: "produtos"
+    # VOLTANDO PARA A PASTA CORRETA:
+    folder: "_products"
     create: true
-    # INSTRUÇÕES CRÍTICAS QUE FALTAVAM:
-    extension: "md"
-    format: "frontmatter"
-    # ==================================
-    slug: "{{slug}}"
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
+      - {label: "Layout", name: "layout", widget: "hidden", default: "produto.njk"}
+      
+      # USANDO A SOLUÇÃO ORIGINAL E CORRETA PARA O ID:
+      - {label: "ID", name: "id", widget: "uuid", required: true}
+
+      - {label: "Data de Adição", name: "dateAdded", widget: "datetime"}
       - {label: "Nome do Produto", name: "name", widget: "string"}
-      - {label: "Imagem do Produto", name: "image", widget: "image"}
       - {label: "Preço Original (Ex: 30.00)", name: "originalPrice", widget: "number", value_type: "float"}
       - {label: "Preço com Desconto (Ex: 22.00)", name: "price", widget: "number", value_type: "float"}
+      - {label: "Imagem Principal", name: "image", widget: "image"}
       - label: "Categoria"
         name: "category"
         widget: "select"
@@ -38,6 +39,5 @@ collections:
         widget: "object"
         required: false
         fields:
-          - {label: "Texto do Badge (Ex: Novidade, Promoção)", name: "text", widget: "string", required: false}
+          - {label: "Texto do Badge (Ex: NOVIDADE, PROMOÇÃO)", name: "text", widget: "string", required: false}
       - {label: "Descrição Completa do Produto", name: "body", widget: "markdown"}
-      - {label: "Data de Adição", name: "dateAdded", widget: "datetime", required: false}
