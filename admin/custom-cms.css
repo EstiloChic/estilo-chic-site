@@ -1,43 +1,52 @@
-/* admin/custom-cms.css - VERSÃO FINAL E CORRIGIDA */
+/* admin/custom-cms.css - VERSÃO DEFINITIVA PARA RESPONSIVIDADE */
 
-/* Regras aplicadas apenas em telas pequenas (mobile) */
-@media (max-width: 768px) {
+/* Regras que se aplicam apenas em telas com até 799px de largura (o ponto de quebra do próprio Netlify CMS) */
+@media (max-width: 799px) {
 
-  /* --- PASSO 1: FORÇAR OS CONTAINERS A SEREM FLEXÍVEIS --- */
+  /* --- 1. AJUSTES GERAIS DE USABILIDADE --- */
   
+  /* Garante que o padding não cause problemas de layout */
+  * { box-sizing: border-box; }
+
+  /* Aumenta o tamanho da fonte para melhor leitura e toque */
+  input, textarea, .Button-button, .css-16 Mpx-Select-placeholder {
+    font-size: 16px !important;
+  }
+  .Button-button { padding: 12px 16px !important; }
+
+  /* --- 2. CORREÇÃO DA LISTA DE PRODUTOS (A TELA CORTADA) --- */
+  
+  /* Força os contêineres principais a nunca serem mais largos que a tela.
+     O 'min-width: 0' é o truque chave para impedir que eles se expandam. */
   .App-main, .Collection-main-container, .Collection-main {
     width: 100% !important;
     min-width: 0 !important; 
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-    box-sizing: border-box;
+    padding: 0 15px !important;
   }
-
-  .App-container {
-    padding: 0 !important;
-  }
-
-  /* --- PASSO 2: FAZER A TABELA ROLAR HORIZONTALMENTE --- */
   
+  /* Faz com que APENAS A TABELA tenha rolagem horizontal se for muito larga. */
   .List-root {
     display: block;
     width: 100%;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch; /* Melhora a rolagem em iOS */
   }
 
-  /* --- PASSO 3: OTIMIZAÇÃO DA TELA DE EDIÇÃO --- */
+  /* --- 3. CORREÇÃO DA TELA DE EDIÇÃO DE PRODUTO --- */
 
+  /* Empilha as colunas de edição e pré-visualização */
   .Editor-root {
     display: flex;
     flex-direction: column;
   }
 
+  /* Faz as colunas ocuparem 100% da largura */
   .Editor-main, .Editor-preview {
     width: 100% !important;
     max-width: 100% !important;
   }
 
+  /* Ajusta a borda para o layout empilhado */
   .Editor-preview {
     border-left: none !important;
     border-top: 2px solid #e5e7eb;
@@ -45,21 +54,16 @@
     padding-top: 20px;
   }
 
-  /* --- 4. AJUSTES DE USABILIDADE --- */
-  
-  input, textarea, .Select-value-label {
-    font-size: 16px !important;
-    padding: 12px !important;
+  /* --- 4. CORREÇÃO DA GALERIA DE IMAGENS --- */
+
+  /* Faz a janela da galeria de mídia ocupar mais espaço na tela */
+  .Modal-modal-dialog {
+    width: 95vw !important;
+    max-width: 95vw !important;
   }
 
-  .Button-button {
-    padding: 12px 16px !important;
-  }
-
-  .CollectionTop-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: stretch;
+  /* Organiza as imagens da galeria em 2 colunas, em vez de 4 ou 5 */
+  .MediaLibrary-gridCards {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
