@@ -1,53 +1,60 @@
-/* admin/admin-styles.css */
+/* admin/admin-styles.css - VERSÃO 2 (MAIS AGRESSIVA) */
 
-/* Regras aplicadas apenas em telas menores, como smartphones */
+/* ================================================ */
+/* AJUSTES GERAIS PARA TELAS PEQUENAS (CELULAR)     */
+/* ================================================ */
 @media (max-width: 768px) {
 
-  /* Diminui o tamanho da fonte geral para caber mais informação na tela */
   body, input, textarea, button {
     font-size: 14px;
   }
 
-  /* Diminui o tamanho das etiquetas dos campos para evitar que quebrem em duas linhas */
   label {
-    font-size: 13px !important; /* Usamos !important para garantir que nosso estilo seja aplicado */
-    font-weight: 600; /* Deixa o texto da etiqueta um pouco mais forte */
+    font-size: 13px !important;
+    font-weight: 600;
   }
 
-  /* Reduz o espaçamento dos botões principais para economizar espaço */
   [class^="Button-button"] {
     padding: 8px 12px;
     font-size: 13px;
   }
 
-  /* Ajusta o campo de texto grande (Descrição) para não ficar tão alto */
   textarea[id^="body-field"] {
     min-height: 150px;
   }
 
-  /* Melhora a visualização das dicas de ajuda */
   p[class*="Hint-hint"] {
       font-size: 12px;
   }
 }
 
-/*
-  ================================================================
-  CORREÇÃO PARA O MODAL DE IMAGENS CORTADO NO CELULAR
-  ================================================================
-*/
+/* ================================================ */
+/* CORREÇÃO FORÇADA PARA MODAL CORTADO NO CELULAR   */
+/* ================================================ */
 @media (max-width: 768px) {
 
-  /* Força o modal a não passar da altura da tela */
-  [data-testid="media-library-modal"] > div {
-    max-height: 85vh; /* Ocupa no máximo 85% da altura da tela */
-    display: flex;
-    flex-direction: column;
+  /* Seleciona o container do modal de mídia */
+  div[class*="Modal-modal-"] {
+    /* Força o modal a ter um tamanho controlado e não estourar a tela */
+    top: 2.5vh !important;
+    left: 2.5vw !important;
+    right: 2.5vw !important;
+    bottom: 2.5vh !important;
+    height: 95vh !important;
+    width: 95vw !important;
+    
+    /* Organiza o conteúdo interno em coluna */
+    display: flex !important;
+    flex-direction: column !important;
   }
 
-  /* Permite que a área de conteúdo (onde as imagens aparecem) seja rolável */
-  [data-testid="media-library-modal"] [role="dialog"] > div:last-of-type {
-    overflow-y: auto; /* Adiciona a barra de rolagem vertical */
-    flex-grow: 1; /* Faz esta área crescer para preencher o espaço disponível */
+  /* Seleciona o corpo do modal, onde as imagens e o conteúdo ficam */
+  div[class*="Modal-body-"] {
+    /* Força o corpo a ocupar todo o espaço vertical disponível */
+    flex-grow: 1 !important;
+    
+    /* ESSA É A LINHA MAIS IMPORTANTE: */
+    /* Força a aparição da barra de rolagem vertical APENAS no corpo do modal */
+    overflow-y: auto !important;
   }
 }
