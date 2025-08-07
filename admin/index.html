@@ -4,21 +4,54 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel de Controle | Estilo Chic</title>
-  <link rel="icon" href="https://i.postimg.cc/ZqP5v2Cj/ES-2.png" type="image/png">
   
-  <!-- SCRIPT DE IDENTIDADE DO NETLIFY (DEVE VIR PRIMEIRO) -->
+  <!-- Carrega os estilos aprimorados para telas pequenas -->
+  <link rel="stylesheet" href="custom-cms.css" />
+  
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <!-- SCRIPT DO DECAP CMS -->
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-  
-  <script>
-    // 1. REGISTRA A FOLHA DE ESTILOS PERSONALIZADA
-    CMS.registerStylesheet("/admin/style.css");
-    
-    // 2. INICIALIZA O CMS (CARREGA O CONFIG.YML)
-    CMS.init();
+  <!-- Inclui o script do Netlify CMS -->
+  <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+
+  <!-- =================================================================== -->
+  <!-- INÍCIO DO BLOCO DE TRADUÇÃO DO LOGIN (A PARTE QUE FALTAVA) -->
+  <!-- =================================================================== -->
+  <script type="text/yaml" id="netlify-identity-widget-i18n">
+    pt:
+      login:
+        login_with_netlify_identity: "Entrar com Netlify Identity"
+        login_with_email: "Entrar com Email"
+        signup: "Cadastrar"
+        email: "Email"
+        password: "Senha"
+        logging_in: "Entrando..."
+        forgot_password: "Esqueceu sua senha?"
+        or: "ou"
+        return_to_website: "Retornar ao site"
+      signup:
+        signup_with_netlify_identity: "Cadastrar com Netlify Identity"
+        signup_with_email: "Cadastrar com Email"
+        email: "Email"
+        password: "Senha"
+        signing_up: "Cadastrando..."
+        or: "ou"
+        return_to_website: "Retornar ao site"
+      identity:
+        invited_you: "convidou você para se juntar"
+        invitation_accept: "Aceitar o convite"
+        logout: "Sair"
+      recovery:
+        recovering_password: "Recuperando sua senha..."
+        send_request: "Enviar"
+      mail:
+        recovery_link_details: "Clique no link abaixo para alterar sua senha."
+        magic_link_details: "Clique no link abaixo para entrar:"
+        magic_link_details_awaiting_verification: "Clique no link abaixo para verificar seu endereço de e-mail e entrar:"
+        magic_link_generated_by: "Este link foi gerado por"
   </script>
+  <!-- =================================================================== -->
+  <!-- FIM DO BLOCO DE TRADUÇÃO DO LOGIN -->
+  <!-- =================================================================== -->
 </body>
 </html>
