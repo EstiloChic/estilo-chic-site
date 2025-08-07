@@ -1,7 +1,7 @@
-# admin/config.yml - VERSÃO ESTÁVEL + TRADUÇÃO
+# admin/config.yml - VERSÃO FINAL COM TRADUÇÃO CORRETA
 
-# TRADUZ A INTERFACE PRINCIPAL DO PAINEL
-locale: 'pt_br'
+# CARREGA O NOSSO ARQUIVO DE TRADUÇÃO PERSONALIZADO
+locale_phrases: ['pt_br']
 
 backend:
   name: git-gateway
@@ -9,6 +9,10 @@ backend:
 
 media_folder: "assets/uploads"
 public_folder: "/assets/uploads"
+
+# Adiciona o script de tradução à interface
+editor:
+  preview_styles: ["/admin/pt_br.js"]
 
 collections:
   - name: "products"
@@ -23,12 +27,10 @@ collections:
     fields:
       - {label: "Layout", name: "layout", widget: "hidden", default: "produto.njk"}
       - {label: "ID", name: "id", widget: "uuid", required: true}
-      
       - label: "Produto em Estoque?"
         name: "inStock"
         widget: "boolean"
         default: true
-
       - {label: "Data de Adição", name: "dateAdded", widget: "datetime"}
       - {label: "Nome do Produto", name: "name", widget: "string"}
       - {label: "Preço Original (Ex: 30.00)", name: "originalPrice", widget: "number", value_type: "float"}
