@@ -1,62 +1,65 @@
-/* admin/custom-cms.css */
+/* admin/custom-cms.css - VERSÃO APRIMORADA */
 
-/* Estas regras só se aplicam em telas com até 768px de largura (celulares e tablets pequenos) */
+/* Regra global para evitar que padding cause overflows */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Força o painel a não ter rolagem horizontal */
+html, body, .App-container {
+  overflow-x: hidden !important;
+  width: 100%;
+}
+
+/* Regras específicas para telas pequenas */
 @media (max-width: 768px) {
-
-  /* --- 1. MELHORA A LEGIBILIDADE GERAL --- */
-
-  /* Aumenta o tamanho da fonte base para facilitar a leitura */
+  /* Aumenta a fonte base para facilitar a leitura */
   body {
     font-size: 16px !important;
   }
 
-  /* Aumenta a fonte dentro dos campos de texto para facilitar a digitação */
+  /* Aumenta a fonte dentro dos campos para facilitar a digitação */
   input, textarea, .Select-value-label {
     font-size: 16px !important;
-    padding: 12px !important; /* Mais espaço para tocar */
+    padding: 12px !important;
   }
-
-  /* --- 2. OTIMIZA O LAYOUT (A MUDANÇA MAIS IMPORTANTE) --- */
 
   /* Força a visualização principal a usar o espaço todo */
   .App-main-view {
     min-width: 100%;
   }
 
-  /* Pega o container do editor e da pré-visualização e os empilha (um em cima do outro) */
+  /* Pega o container do editor e da pré-visualização e os empilha */
   .Editor-root {
     display: flex;
     flex-direction: column;
   }
 
-  /* Faz a coluna do editor e a da pré-visualização ocuparem a largura total */
+  /* Faz as colunas do editor e da pré-visualização ocuparem a largura total */
   .Editor-main, .Editor-preview {
     width: 100% !important;
     max-width: 100% !important;
   }
 
-  /* Remove a borda divisória que fica estranha no layout empilhado */
+  /* Remove a borda divisória e adiciona uma no topo para separar */
   .Editor-preview {
     border-left: none !important;
-    border-top: 2px solid #e5e7eb; /* Adiciona uma borda no topo para separar */
+    border-top: 2px solid #e5e7eb;
     margin-top: 20px;
     padding-top: 20px;
   }
-
-
-  /* --- 3. AJUSTA CONTROLES E BOTÕES --- */
 
   /* Aumenta o espaço interno dos botões para facilitar o toque */
   .Button-button {
     padding: 12px 16px !important;
   }
 
-  /* Ajusta o cabeçalho da coleção para não espremer os botões */
+  /* Ajusta o cabeçalho da coleção para empilhar os botões */
   .CollectionTop-actions {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Adiciona espaço entre os botões empilhados */
-    align-items: stretch; /* Faz os botões ocuparem a largura toda */
+    gap: 10px;
+    align-items: stretch;
   }
 
   .CollectionTop-actions .Button-button {
