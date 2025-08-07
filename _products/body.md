@@ -1,6 +1,7 @@
 ---
 layout: produto.njk
 id: "2"
+inStock: true
 dateAdded: 2025-07-28T11:00:00.000Z
 name: Body
 originalPrice: 20
