@@ -1,0 +1,52 @@
+/*
+ * CSS para Personalização do Painel de Controle - Estilo Chic
+ */
+
+:root {
+  /* Cores principais da sua loja */
+  --purple-dark: #6a1b9a;
+  --purple-medium: #a855f7;
+  --purple-light: #d1c4e9;
+  --text-primary: #3a2d46;
+
+  /* Cores do tema do painel */
+  --primary: var(--purple-dark);
+  --background-secondary: #f9f6ff; /* Fundo principal (roxo bem claro) */
+  --foreground-primary: var(--text-primary);
+  --separator: var(--purple-light);
+  --border-primary: var(--purple-light);
+}
+
+/* Importa a fonte do seu site para o painel */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Cabeçalho principal do painel */
+[data-testid="header-toolbar"] {
+    background-color: var(--purple-dark) !important;
+}
+
+/* Botão "Novo Produto" */
+[data-testid="create-new-button"] {
+  background-color: var(--purple-dark) !important;
+}
+[data-testid="create-new-button"]:hover {
+  background-color: #4a0e6b !important;
+}
+
+/* Botão "Publicar" (Publish) */
+button[class*='PublishButton-button-'] {
+  background-color: var(--purple-dark) !important;
+}
+button[class*='PublishButton-button-']:hover {
+  background-color: #4a0e6b !important;
+}
+
+/* Coleção ativa na barra lateral (Produtos) */
+a[class*='CollectionLink-link-active-'] {
+    background-color: var(--purple-light) !important;
+    border-left-color: var(--purple-dark) !important;
+}
