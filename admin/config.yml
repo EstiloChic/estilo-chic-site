@@ -1,4 +1,7 @@
-# admin/config.yml - VERSÃO ESTÁVEL (COMO ESTAVA ANTES DAS MUDANÇAS MOBILE)
+# admin/config.yml - VERSÃO ESTÁVEL + TRADUÇÃO
+
+# TRADUZ A INTERFACE PRINCIPAL DO PAINEL
+locale: 'pt_br'
 
 backend:
   name: git-gateway
