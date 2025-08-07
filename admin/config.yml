@@ -1,4 +1,4 @@
-# admin/config.yml - COMPLETO E ATUALIZADO (Tradução + Organização + Dicas de Ajuda)
+# admin/config.yml - VERSÃO FINAL (Tradução, Organização e Dicas em todos os campos)
 
 locale: 'pt'
 
@@ -34,25 +34,35 @@ collections:
         widget: "boolean"
         default: true
       - {label: "Data de Adição", name: "dateAdded", widget: "datetime"}
-      - {label: "Nome do Produto", name: "name", widget: "string"}
-      
-      # MUDANÇA AQUI: Campo com dica de ajuda
+
+      # Campo com dica
+      - label: "Nome do Produto"
+        name: "name"
+        widget: "string"
+        hint: "Seja descritivo. Ex: Blusa de Tricot Gola Alta Bege"
+
+      # Campo com dica
       - label: "Preço Original"
         name: "originalPrice"
         widget: "number"
         value_type: "float"
-        hint: "Este é o preço 'de'. Ex: 30.00. Use ponto para os centavos."
+        hint: "Este é o preço 'de'. Ex: 30.00. Use ponto para os centavos. Deixe em branco se não houver desconto."
+        required: false
 
-      # MUDANÇA AQUI: Campo com dica de ajuda
-      - label: "Preço com Desconto"
+      # Campo com dica
+      - label: "Preço Final (com desconto)"
         name: "price"
         widget: "number"
         value_type: "float"
-        hint: "Este é o preço final 'por'. Ex: 22.00. Este é o preço que aparece em destaque no site."
-        
-      - {label: "Imagem Principal", name: "image", widget: "image"}
+        hint: "Este é o preço 'por'. Ex: 22.00. Este é o preço que aparece em destaque no site."
 
-      # MUDANÇA AQUI: Campo com valor padrão
+      # Campo com dica
+      - label: "Imagem Principal"
+        name: "image"
+        widget: "image"
+        hint: "Clique para escolher uma imagem. Prefira imagens quadradas (Ex: 800x800 pixels) para melhor visualização."
+
+      # Campo com valor padrão
       - label: "Categoria"
         name: "category"
         widget: "select"
@@ -62,11 +72,23 @@ collections:
           - {label: "Maquiagens", value: "maquiagens"}
           - {label: "Acessórios", value: "acessorios"}
 
+      # Campo com dica no label
       - {label: "Tamanho (Ex: G, 38, P/M. Deixe em branco se não aplicável)", name: "size", widget: "string", required: false}
+      
+      # Campo com dica interna
       - label: "Badge (Opcional)"
         name: "badge"
         widget: "object"
         required: false
         fields:
-          - {label: "Texto do Badge (Ex: NOVIDADE, PROMOÇÃO)", name: "text", widget: "string", required: false}
-      - {label: "Descrição Completa do Produto", name: "body", widget: "markdown"}
+          - label: "Texto do Badge"
+            name: "text"
+            widget: "string"
+            required: false
+            hint: "Use textos curtos e chamativos. Ex: 'Promoção', 'Novidade', 'Últimas Peças'."
+      
+      # Campo com dica
+      - label: "Descrição Completa do Produto"
+        name: "body"
+        widget: "markdown"
+        hint: "Escreva uma descrição detalhada. Você pode usar **negrito** e *itálico* para destacar informações."
