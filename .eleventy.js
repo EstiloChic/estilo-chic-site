@@ -1,4 +1,4 @@
-// .eleventy.js - VERSÃO FINAL COM ORDENAÇÃO EXPLÍCITA
+// .eleventy.js - COMPLETO E ATUALIZADO
 
 const yaml = require("js-yaml");
 
@@ -7,17 +7,13 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("admin");
   eleventyConfig.addPassthroughCopy("assets/uploads");
 
-  // ===================================================================
-  // AQUI ESTÁ A CORREÇÃO: ADICIONANDO UMA ORDENAÇÃO EXPLÍCITA
-  // ===================================================================
   eleventyConfig.addCollection("products", function(collectionApi) {
+    // REMOVEMOS O FILTRO! Agora todos os produtos são enviados para o site.
     return collectionApi.getFilteredByGlob("_products/*.md")
       .sort((a, b) => {
-        // Ordena os produtos pela data de adição, do mais novo para o mais antigo
         return new Date(b.data.dateAdded) - new Date(a.data.dateAdded);
       });
   });
-  // ===================================================================
 
   eleventyConfig.addFilter("formatPrice", function(price) {
     if (typeof price !== 'number') return "Preço indisponível";
@@ -47,7 +43,9 @@ module.exports = function(eleventyConfig) {
         dateAdded: product.data.dateAdded,
         url: product.url,
         description: product.templateContent ? product.templateContent.trim().replace(/<p>|<\/p>/g, "") : "",
-        size: product.data.size || null
+        size: product.data.size || null,
+        // PASSANDO A INFORMAÇÃO DE ESTOQUE PARA O JAVASCRIPT DA PÁGINA
+        inStock: product.data.inStock
       };
       return cleanProduct;
     }).filter(p => p);
