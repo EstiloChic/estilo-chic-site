@@ -1,47 +1,50 @@
-/* admin/custom-cms.css - VERSÃO APRIMORADA */
+/* admin/custom-cms.css - VERSÃO FINAL E CORRIGIDA */
 
-/* Regra global para evitar que padding cause overflows */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-/* Força o painel a não ter rolagem horizontal */
-html, body, .App-container {
-  overflow-x: hidden !important;
-  width: 100%;
-}
-
-/* Regras específicas para telas pequenas */
+/* Regras aplicadas apenas em telas pequenas (mobile) */
 @media (max-width: 768px) {
-  /* Aumenta a fonte base para facilitar a leitura */
-  body {
-    font-size: 16px !important;
-  }
 
-  /* Aumenta a fonte dentro dos campos para facilitar a digitação */
-  input, textarea, .Select-value-label {
-    font-size: 16px !important;
-    padding: 12px !important;
-  }
+  /* --- 1. CONFIGURAÇÃO GERAL DO LAYOUT --- */
 
-  /* Força a visualização principal a usar o espaço todo */
-  .App-main-view {
+  /* Força a raiz do aplicativo a não criar barras de rolagem desnecessárias,
+     mas permite que o conteúdo interno role se precisar. */
+  #nc-root {
     min-width: 100%;
+    width: 100%;
+    overflow-x: hidden;
   }
 
-  /* Pega o container do editor e da pré-visualização e os empilha */
+  /* Garante que a barra superior e a área principal se comportem bem. */
+  .App-header, .App-main {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  /* --- 2. CORREÇÃO DA LISTA DE PRODUTOS (A TELA CORTADA) --- */
+  
+  /* O principal culpado do corte é a tabela da lista de produtos.
+     Esta regra faz com que a tabela possa rolar horizontalmente
+     se o conteúdo for muito largo, SEM cortar o resto da página. */
+  .List-root {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap; /* Impede a quebra de linha indesejada */
+  }
+
+  /* --- 3. OTIMIZAÇÃO DA TELA DE EDIÇÃO --- */
+
+  /* Empilha as colunas de edição e pré-visualização */
   .Editor-root {
     display: flex;
     flex-direction: column;
   }
 
-  /* Faz as colunas do editor e da pré-visualização ocuparem a largura total */
+  /* Faz as colunas ocuparem 100% da largura disponível */
   .Editor-main, .Editor-preview {
     width: 100% !important;
     max-width: 100% !important;
   }
 
-  /* Remove a borda divisória e adiciona uma no topo para separar */
+  /* Ajusta as bordas para o layout empilhado */
   .Editor-preview {
     border-left: none !important;
     border-top: 2px solid #e5e7eb;
@@ -49,20 +52,24 @@ html, body, .App-container {
     padding-top: 20px;
   }
 
-  /* Aumenta o espaço interno dos botões para facilitar o toque */
+  /* --- 4. AJUSTES DE USABILIDADE --- */
+  
+  /* Melhora a legibilidade e o toque nos campos */
+  input, textarea, .Select-value-label {
+    font-size: 16px !important;
+    padding: 12px !important;
+  }
+
+  /* Aumenta o espaço dos botões */
   .Button-button {
     padding: 12px 16px !important;
   }
 
-  /* Ajusta o cabeçalho da coleção para empilhar os botões */
+  /* Empilha os botões de ação no topo da lista */
   .CollectionTop-actions {
     display: flex;
     flex-direction: column;
     gap: 10px;
     align-items: stretch;
-  }
-
-  .CollectionTop-actions .Button-button {
-    width: 100%;
   }
 }
