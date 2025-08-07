@@ -1,4 +1,6 @@
-# Arquivo: admin/config.yml (Com o slug corrigido)
+# admin/config.yml - COMPLETO E ATUALIZADO
+
+locale: 'pt_br'
 
 backend:
   name: git-gateway
@@ -14,13 +16,19 @@ collections:
     create: true
     extension: "md"
     format: "frontmatter"
-    
-    # SLUG CORRIGIDO PARA USAR O NOME DO PRODUTO:
     slug: "{{name}}"
-    
+    summary: "{{name}} - R$ {{price}} ({{category}})"
+
     fields:
       - {label: "Layout", name: "layout", widget: "hidden", default: "produto.njk"}
       - {label: "ID", name: "id", widget: "uuid", required: true}
+      
+      # MUDANÇA AQUI: Renomeado para controle de estoque
+      - label: "Produto em Estoque?"
+        name: "inStock"
+        widget: "boolean"
+        default: true
+
       - {label: "Data de Adição", name: "dateAdded", widget: "datetime"}
       - {label: "Nome do Produto", name: "name", widget: "string"}
       - {label: "Preço Original (Ex: 30.00)", name: "originalPrice", widget: "number", value_type: "float"}
