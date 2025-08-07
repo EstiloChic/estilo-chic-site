@@ -1,0 +1,32 @@
+/* admin/admin-styles.css */
+
+/* Regras aplicadas apenas em telas menores, como smartphones */
+@media (max-width: 768px) {
+
+  /* Diminui o tamanho da fonte geral para caber mais informação na tela */
+  body, input, textarea, button {
+    font-size: 14px;
+  }
+
+  /* Diminui o tamanho das etiquetas dos campos para evitar que quebrem em duas linhas */
+  label {
+    font-size: 13px !important; /* Usamos !important para garantir que nosso estilo seja aplicado */
+    font-weight: 600; /* Deixa o texto da etiqueta um pouco mais forte */
+  }
+
+  /* Reduz o espaçamento dos botões principais para economizar espaço */
+  [class^="Button-button"] {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  /* Ajusta o campo de texto grande (Descrição) para não ficar tão alto */
+  textarea[id^="body-field"] {
+    min-height: 150px;
+  }
+
+  /* Melhora a visualização das dicas de ajuda */
+  p[class*="Hint-hint"] {
+      font-size: 12px;
+  }
+}
