@@ -67,7 +67,21 @@
         .product { background: var(--background-card); border: 1px solid #e0d8f0; border-radius: 16px; box-shadow: var(--shadow-subtle); transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease; animation: fadeInUp 0.5s ease forwards; opacity: 0; }
         .product:hover:not(.out-of-stock) { transform: translateY(-8px); box-shadow: var(--shadow-medium); }
         .product.new-since-last-visit { animation: new-glow 1.2s ease-out forwards 0.5s, fadeInUp 0.5s ease forwards; }
-        .product-image { border-top-left-radius: 15px; border-top-right-radius: 15px; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease; cursor: pointer; }
+        
+        /* --- CORREÇÃO 1: Adiciona o arredondamento ao contêiner da imagem --- */
+        .product > .relative {
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+        }
+
+        .product-image { 
+            /* --- CORREÇÃO 2: Remove o arredondamento daqui, pois agora é controlado pelo contêiner --- */
+            /* border-top-left-radius: 15px; */
+            /* border-top-right-radius: 15px; */
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease; 
+            cursor: pointer; 
+        }
+
         .product:hover:not(.out-of-stock) .product-image { transform: scale(1.05); }
         .product-badge { position: absolute; top: 12px; left: 12px; color: white; padding: 3px 12px; font-size: 0.7rem; font-weight: 500; border-radius: 99px; text-transform: uppercase; background: var(--accent-pink); }
         .toggle-favorite-btn { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); transition: all 0.3s ease; }
@@ -93,17 +107,14 @@
         .image-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1999; pointer-events: none; }
         .image-modal-content { background: var(--background-card); border-radius: 16px; box-shadow: var(--shadow-medium); width: 90%; max-width: 500px; pointer-events: auto; overflow: hidden; transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
         .modal-overlay.visible .image-modal-content { transform: scale(1); }
-        
-        /* --- CORREÇÃO DA IMAGEM DO MODAL --- */
         .image-modal-content img {
             display: block;
             width: 100%;
-            height: auto; /* Permite que a altura se ajuste para manter a proporção */
-            max-height: 70vh; /* Evita que imagens muito altas ocupem toda a tela */
-            object-fit: contain; /* Garante que a imagem inteira seja visível sem cortes */
-            margin: 0 auto; /* Centraliza a imagem se o contêiner for mais largo */
+            height: auto; 
+            max-height: 70vh; 
+            object-fit: contain;
+            margin: 0 auto;
         }
-
         .close-modal-btn { position: absolute; top: 12px; right: 12px; background: rgba(0, 0, 0, 0.3); color: white; cursor: pointer; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; z-index: 2001; }
         .close-modal-btn:hover { background: rgba(0, 0, 0, 0.6); transform: scale(1.1); }
 
