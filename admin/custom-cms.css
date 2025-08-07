@@ -1,70 +1,36 @@
-/* admin/custom-cms.css - VERSÃO FINAL (INCLUI CORREÇÃO PARA A GALERIA DE MÍDIA) */
+/* admin/custom-cms.css - VERSÃO FINAL SIMPLIFICADA E ROBUSTA */
 
-/* Regras aplicadas apenas em telas com até 799px de largura */
+/* Estas regras só se aplicam em telas de até 799px (o ponto de quebra do próprio Netlify CMS) */
 @media (max-width: 799px) {
 
-  /* --- 1. AJUSTES GERAIS DE LAYOUT --- */
-  
-  * { box-sizing: border-box; }
+  /* A REGRA MAIS IMPORTANTE DE TODAS:
+     Pega a área de conteúdo principal do painel... */
+  .App-main {
+    /* ...e permite que ela role horizontalmente se o conteúdo for muito largo. */
+    overflow-x: auto !important;
 
-  .App-main, .Collection-main-container, .Collection-main {
+    /* Melhora a experiência de rolagem em celulares */
+    -webkit-overflow-scrolling: touch !important;
+
+    /* Adiciona um respiro nas laterais */
+    padding: 15px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Na tela de edição, ainda é melhor empilhar as colunas.
+     Isso funciona bem dentro do container que agora é rolável. */
+  .Editor-root {
+    display: flex;
+    flex-direction: column;
+  }
+  .Editor-main, .Editor-preview {
     width: 100% !important;
-    min-width: 0 !important; 
-    padding: 0 15px !important;
+    max-width: 100% !important;
   }
-  
-  .App-container {
-    padding: 0 !important;
-  }
-
-  /* --- 2. CORREÇÃO DA LISTA DE PRODUTOS --- */
-  
-  .List-root {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* --- 3. CORREÇÃO DA TELA DE EDIÇÃO DE PRODUTO --- */
-
-  .Editor-root { display: flex; flex-direction: column; }
-  .Editor-main, .Editor-preview { width: 100% !important; max-width: 100% !important; }
   .Editor-preview {
     border-left: none !important;
     border-top: 2px solid #e5e7eb;
     margin-top: 20px;
     padding-top: 20px;
-  }
-
-  /* --- 4. AJUSTES DE USABILIDADE --- */
-  
-  input, textarea, .Button-button, .css-16 Mpx-Select-placeholder { font-size: 16px !important; }
-  .Button-button { padding: 12px 16px !important; }
-  .CollectionTop-actions { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
-
-  /* =================================================================== */
-  /* NOVO BLOCO DE CORREÇÃO PARA O MODAL DA GALERIA DE MÍDIA             */
-  /* =================================================================== */
-  
-  /* Força a janela pop-up a ocupar quase a tela inteira, mas com pequenas margens */
-  .Modal-modal-dialog {
-    width: 95vw !important;
-    max-width: 95vw !important;
-    height: 85vh !important;
-    max-height: 85vh !important;
-    margin-top: 5vh !important;
-  }
-
-  /* Organiza as imagens da galeria em 2 colunas, para caberem melhor na tela */
-  .MediaLibrary-gridCards {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-  
-  /* Ajusta a barra de botões dentro do modal para não quebrar */
-  .MediaLibrary-control-bar {
-    display: flex;
-    flex-wrap: wrap; /* Permite que os botões quebrem a linha se não couberem */
-    gap: 8px;
   }
 }
