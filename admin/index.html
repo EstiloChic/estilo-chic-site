@@ -4,21 +4,23 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel de Controle | Estilo Chic</title>
-  <link rel="icon" href="https://i.postimg.cc/ZqP5v2Cj/ES-2.png" type="image/png">
-  
-  <!-- SCRIPT DE IDENTIDADE DO NETLIFY (DEVE VIR PRIMEIRO) -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+  <!-- NOVIDADE AQUI: Adicionamos o link para nossos estilos personalizados -->
+  <link rel="stylesheet" href="admin-styles.css" />
+
 </head>
 <body>
-  <!-- SCRIPT DO DECAP CMS -->
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-  
+  <!-- Carrega o script do Netlify CMS -->
+  <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+
+  <!-- Adiciona nossos estilos DEPOIS do script para garantir que eles sejam aplicados -->
   <script>
-    // 1. REGISTRA A FOLHA DE ESTILOS PERSONALIZADA
-    CMS.registerStylesheet("/admin/style.css");
-    
-    // 2. INICIALIZA O CMS (CARREGA O CONFIG.YML)
-    CMS.init();
+    CMS.registerAdditionalLink({
+      id: "admin-styles",
+      rel: "stylesheet",
+      href: "/admin/admin-styles.css",
+    });
   </script>
+
 </body>
 </html>
