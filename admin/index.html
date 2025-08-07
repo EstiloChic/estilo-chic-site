@@ -4,75 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel de Controle | Estilo Chic</title>
-  
-  <!-- Carrega os estilos para corrigir o layout em telas pequenas -->
-  <link rel="stylesheet" href="custom-cms.css" />
-  
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
   <!-- Inclui o script do Netlify CMS -->
   <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
-
-  <!-- =================================================================== -->
-  <!-- INÍCIO DO BLOCO DE TRADUÇÃO COMPLETA DO LOGIN (A PARTE QUE FALTAVA) -->
-  <!-- =================================================================== -->
-  <script>
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.on("init", user => {
-        if (!user) {
-          window.netlifyIdentity.on("login", () => {
-            document.location.href = "/admin/";
-          });
-        }
-      });
-    }
-
-    // Tradução do Widget de Identidade
-    const translations = {
-      pt: {
-        login: {
-          login_with_netlify_identity: "Entrar com Netlify",
-          login_with_email: "Entrar com Email",
-          signup: "Cadastrar",
-          email: "Email",
-          password: "Senha",
-          logging_in: "Entrando...",
-          forgot_password: "Esqueceu sua senha?",
-          or: "ou",
-          return_to_website: "Retornar ao site",
-        },
-        signup: {
-          signup_with_netlify_identity: "Cadastrar com Netlify",
-          signup_with_email: "Cadastrar com Email",
-          email: "Email",
-          password: "Senha",
-          signing_up: "Cadastrando...",
-          or: "ou",
-          return_to_website: "Retornar ao site",
-        },
-        identity: {
-          invited_you: "convidou você para se juntar",
-          invitation_accept: "Aceitar o convite",
-          logout: "Sair",
-        },
-        recovery: {
-          recovering_password: "Recuperando sua senha...",
-          send_request: "Enviar",
-        },
-        mail: {
-          recovery_link_details: "Clique no link abaixo para alterar sua senha.",
-          magic_link_details: "Clique no link abaixo para entrar:",
-          magic_link_details_awaiting_verification: "Clique no link abaixo para verificar seu endereço de e-mail e entrar:",
-          magic_link_generated_by: "Este link foi gerado por",
-        },
-      },
-    };
-    
-    CMS.registerLocale('pt', translations.pt);
-  </script>
-  <!-- =================================================================== -->
-  <!-- FIM DO BLOCO DE TRADUÇÃO DO LOGIN -->
-  <!-- =================================================================== -->
 </body>
 </html>
