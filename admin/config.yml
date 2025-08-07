@@ -1,7 +1,4 @@
-# admin/config.yml - VERSÃO FINAL COM TRADUÇÃO CORRETA
-
-# CARREGA O NOSSO ARQUIVO DE TRADUÇÃO PERSONALIZADO
-locale_phrases: ['pt_br']
+# Arquivo: admin/config.yml (Com o slug corrigido)
 
 backend:
   name: git-gateway
@@ -10,10 +7,6 @@ backend:
 media_folder: "assets/uploads"
 public_folder: "/assets/uploads"
 
-# Adiciona o script de tradução à interface
-editor:
-  preview_styles: ["/admin/pt_br.js"]
-
 collections:
   - name: "products"
     label: "Produtos"
@@ -21,16 +14,13 @@ collections:
     create: true
     extension: "md"
     format: "frontmatter"
+    
+    # SLUG CORRIGIDO PARA USAR O NOME DO PRODUTO:
     slug: "{{name}}"
-    summary: "{{name}} - R$ {{price}} ({{category}})"
-
+    
     fields:
       - {label: "Layout", name: "layout", widget: "hidden", default: "produto.njk"}
       - {label: "ID", name: "id", widget: "uuid", required: true}
-      - label: "Produto em Estoque?"
-        name: "inStock"
-        widget: "boolean"
-        default: true
       - {label: "Data de Adição", name: "dateAdded", widget: "datetime"}
       - {label: "Nome do Produto", name: "name", widget: "string"}
       - {label: "Preço Original (Ex: 30.00)", name: "originalPrice", widget: "number", value_type: "float"}

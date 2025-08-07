@@ -1,36 +1,65 @@
-/* admin/custom-cms.css - VERSÃO FINAL SIMPLIFICADA E ROBUSTA */
+/* admin/custom-cms.css */
 
-/* Estas regras só se aplicam em telas de até 799px (o ponto de quebra do próprio Netlify CMS) */
-@media (max-width: 799px) {
+/* Estas regras só se aplicam em telas com até 768px de largura (celulares e tablets pequenos) */
+@media (max-width: 768px) {
 
-  /* A REGRA MAIS IMPORTANTE DE TODAS:
-     Pega a área de conteúdo principal do painel... */
-  .App-main {
-    /* ...e permite que ela role horizontalmente se o conteúdo for muito largo. */
-    overflow-x: auto !important;
+  /* --- 1. MELHORA A LEGIBILIDADE GERAL --- */
 
-    /* Melhora a experiência de rolagem em celulares */
-    -webkit-overflow-scrolling: touch !important;
-
-    /* Adiciona um respiro nas laterais */
-    padding: 15px !important;
-    box-sizing: border-box !important;
+  /* Aumenta o tamanho da fonte base para facilitar a leitura */
+  body {
+    font-size: 16px !important;
   }
 
-  /* Na tela de edição, ainda é melhor empilhar as colunas.
-     Isso funciona bem dentro do container que agora é rolável. */
+  /* Aumenta a fonte dentro dos campos de texto para facilitar a digitação */
+  input, textarea, .Select-value-label {
+    font-size: 16px !important;
+    padding: 12px !important; /* Mais espaço para tocar */
+  }
+
+  /* --- 2. OTIMIZA O LAYOUT (A MUDANÇA MAIS IMPORTANTE) --- */
+
+  /* Força a visualização principal a usar o espaço todo */
+  .App-main-view {
+    min-width: 100%;
+  }
+
+  /* Pega o container do editor e da pré-visualização e os empilha (um em cima do outro) */
   .Editor-root {
     display: flex;
     flex-direction: column;
   }
+
+  /* Faz a coluna do editor e a da pré-visualização ocuparem a largura total */
   .Editor-main, .Editor-preview {
     width: 100% !important;
     max-width: 100% !important;
   }
+
+  /* Remove a borda divisória que fica estranha no layout empilhado */
   .Editor-preview {
     border-left: none !important;
-    border-top: 2px solid #e5e7eb;
+    border-top: 2px solid #e5e7eb; /* Adiciona uma borda no topo para separar */
     margin-top: 20px;
     padding-top: 20px;
+  }
+
+
+  /* --- 3. AJUSTA CONTROLES E BOTÕES --- */
+
+  /* Aumenta o espaço interno dos botões para facilitar o toque */
+  .Button-button {
+    padding: 12px 16px !important;
+  }
+
+  /* Ajusta o cabeçalho da coleção para não espremer os botões */
+  .CollectionTop-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Adiciona espaço entre os botões empilhados */
+    align-items: stretch; /* Faz os botões ocuparem a largura toda */
+  }
+
+  .CollectionTop-actions .Button-button {
+    width: 100%;
   }
 }
