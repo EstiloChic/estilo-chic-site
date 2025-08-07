@@ -30,3 +30,24 @@
       font-size: 12px;
   }
 }
+
+/*
+  ================================================================
+  CORREÇÃO PARA O MODAL DE IMAGENS CORTADO NO CELULAR
+  ================================================================
+*/
+@media (max-width: 768px) {
+
+  /* Força o modal a não passar da altura da tela */
+  [data-testid="media-library-modal"] > div {
+    max-height: 85vh; /* Ocupa no máximo 85% da altura da tela */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Permite que a área de conteúdo (onde as imagens aparecem) seja rolável */
+  [data-testid="media-library-modal"] [role="dialog"] > div:last-of-type {
+    overflow-y: auto; /* Adiciona a barra de rolagem vertical */
+    flex-grow: 1; /* Faz esta área crescer para preencher o espaço disponível */
+  }
+}
