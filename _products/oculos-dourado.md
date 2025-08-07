@@ -1,7 +1,7 @@
 ---
 layout: produto.njk
 id: "12"
-inStock: true
+inStock: false
 dateAdded: 2025-07-30T14:00:00.000Z
 name: Óculos dourado
 originalPrice: 28
