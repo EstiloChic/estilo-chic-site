@@ -18,9 +18,6 @@
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
     
-    <!-- ======================================================= -->
-    <!-- INÍCIO DO CÓDIGO CSS -->
-    <!-- ======================================================= -->
     <style>
         :root {
             --purple-dark: #6a1b9a;
@@ -67,11 +64,11 @@
         .section-title { font-family: var(--font-display); color: var(--text-primary); font-weight: 700; }
         .section-subtitle { color: var(--text-secondary); max-width: 600px; margin: 0 auto 2.5rem auto; }
 
-        .product { background: var(--background-card); border: 1px solid #e0d8f0; border-radius: 16px; box-shadow: var(--shadow-subtle); transition: transform 0.4s ease, box-shadow 0.4s ease; animation: fadeInUp 0.5s ease forwards; opacity: 0; }
-        .product:hover { transform: translateY(-8px); box-shadow: var(--shadow-medium); }
+        .product { background: var(--background-card); border: 1px solid #e0d8f0; border-radius: 16px; box-shadow: var(--shadow-subtle); transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease; animation: fadeInUp 0.5s ease forwards; opacity: 0; }
+        .product:hover:not(.out-of-stock) { transform: translateY(-8px); box-shadow: var(--shadow-medium); }
         .product.new-since-last-visit { animation: new-glow 1.2s ease-out forwards 0.5s, fadeInUp 0.5s ease forwards; }
-        .product-image { border-top-left-radius: 15px; border-top-right-radius: 15px; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); cursor: pointer; }
-        .product:hover .product-image { transform: scale(1.05); }
+        .product-image { border-top-left-radius: 15px; border-top-right-radius: 15px; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease; cursor: pointer; }
+        .product:hover:not(.out-of-stock) .product-image { transform: scale(1.05); }
         .product-badge { position: absolute; top: 12px; left: 12px; color: white; padding: 3px 12px; font-size: 0.7rem; font-weight: 500; border-radius: 99px; text-transform: uppercase; background: var(--accent-pink); }
         .toggle-favorite-btn { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); transition: all 0.3s ease; }
         .toggle-favorite-btn:hover { background: white; transform: scale(1.1); }
@@ -90,10 +87,6 @@
         .filter-btn { transition: all 0.3s ease; background-color: var(--background-card); color: var(--text-secondary); border: 1px solid var(--purple-light); box-shadow: var(--shadow-subtle); border-radius: 99px; }
         .filter-btn:hover:not(.filter-active) { transform: translateY(-2px); background-color: #f3e8ff; }
         .filter-btn.filter-active { background-color: var(--purple-dark); color: white; border-color: var(--purple-dark); transform: translateY(-2px); box-shadow: var(--shadow-medium); }
-
-        #sort-button { height: 38px; }
-        #sort-options { border: 1px solid #e0d8f0; box-shadow: var(--shadow-medium); }
-        .sort-option.font-bold { color: var(--purple-dark); background-color: #f3e8ff; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(58, 45, 70, 0.5); backdrop-filter: blur(10px); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.4s ease; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
@@ -157,10 +150,24 @@
         .info-icon:hover { transform: scale(1.2); color: var(--purple-dark); }
         .info-modal-content { background: var(--background-card); border-radius: 16px; box-shadow: var(--shadow-medium); width: 90%; max-width: 450px; pointer-events: auto; transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); text-align: left; }
         .modal-overlay.visible .info-modal-content { transform: scale(1); }
+
+        .product.out-of-stock {
+            opacity: 0.7;
+        }
+        .product.out-of-stock .product-image {
+            filter: grayscale(80%);
+            cursor: default;
+        }
+        .btn-sold-out {
+            background-color: #e2e8f0;
+            color: #718096;
+            border-color: #cbd5e0;
+            cursor: not-allowed !important;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
-
     <div class="loading-overlay"><div class="spinner"></div></div>
     
     <div class="bg-[#6a1b9a] relative header-bg-pattern flex items-center justify-center h-[120px]">
@@ -249,9 +256,6 @@
             </div>
         </section>
 
-        <!-- ====================================================================== -->
-        <!-- A ÁREA DOS PRODUTOS SERÁ GERADA PELO JAVASCRIPT AQUI -->
-        <!-- ====================================================================== -->
         <section class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4" id="product-grid">
             <!-- Os cards dos produtos serão inseridos aqui pelo JavaScript -->
         </section>
@@ -314,7 +318,6 @@
     <div id="modal-overlay" class="modal-overlay"></div>
     <div id="product-detail-modal" class="image-modal hidden"></div>
     
-    <!-- Modal de Informação de Frete -->
     <div id="shipping-info-modal" class="image-modal hidden">
         <div class="info-modal-content p-6 relative">
              <button class="close-modal-btn !bg-gray-200 !text-gray-700" aria-label="Fechar"><i class="ph ph-x"></i></button>
@@ -345,7 +348,6 @@
     <div id="welcome-popup-overlay" class="welcome-popup-overlay"><div class="welcome-popup"><button id="close-popup" class="close-popup-btn"><i class="ph ph-x"></i></button><i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i><h2 class="section-title text-2xl mb-2">Um presente para você!</h2><p class="text-gray-600 mb-6">É sua primeira vez aqui? Ganhe <strong>5% de desconto</strong> no seu primeiro pedido!</p><a href="https://wa.me/5522998802545?text=Olá!%20Vim%20pelo%20site%20e%20quero%20meu%20cupom%20de%205%25%20OFF%20de%20boas-vindas!" target="_blank" id="claim-coupon-btn" class="btn btn-buy py-3"><i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>Resgatar Cupom</a></div></div>
     
     <script>
-        // A função do modal agora é declarada globalmente antes do DOMContentLoaded
         let allProducts = [];
         
         function showProductDetailModal(productId) {
@@ -402,17 +404,8 @@
             const get = (selector) => document.querySelector(selector);
             const getAll = (selector) => document.querySelectorAll(selector);
             
-            function debounce(func, delay = 300) {
-                let timeout;
-                return (...args) => {
-                    clearTimeout(timeout);
-                    timeout = setTimeout(() => {
-                        func.apply(this, args);
-                    }, delay);
-                };
-            }
+            function debounce(func, delay = 300) { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => { func.apply(this, args); }, delay); }; }
 
-            // Popula a variável global `allProducts`
             allProducts = {{ collections.products | getProductList }};
 
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
@@ -420,14 +413,12 @@
 
             const saveState = () => { localStorage.setItem('estiloChicCart', JSON.stringify(cart)); localStorage.setItem('estiloChicFavorites', JSON.stringify(favorites)); };
             const loadState = () => { try { const sc = localStorage.getItem('estiloChicCart'); if (sc) cart = JSON.parse(sc) || {}; const sf = localStorage.getItem('estiloChicFavorites'); if (sf) favorites = JSON.parse(sf) || []; } catch { cart = {}; favorites = []; } };
-            
             const closeAllModals = () => { UIElements.modalOverlay.classList.remove('visible'); UIElements.productDetailModal.classList.add('hidden'); UIElements.shippingInfoModal.classList.add('hidden'); if (cartOpen) closeCart(); if (favoritesOpen) closeFavorites(); };
             const closeShippingInfoModal = () => { UIElements.shippingInfoModal.classList.add('hidden'); if (!cartOpen && !favoritesOpen && UIElements.productDetailModal.classList.contains('hidden')) { UIElements.modalOverlay.classList.remove('visible'); } };
             const closeCart = (isChaining = false) => { if (!isChaining && UIElements.shippingInfoModal.classList.contains('hidden')) UIElements.modalOverlay.classList.remove('visible'); cartOpen = false; UIElements.cartDropdown.classList.remove('show'); UIElements.floatingCartBtn.classList.remove('active'); };
             const closeFavorites = (isChaining = false) => { if (!isChaining && UIElements.shippingInfoModal.classList.contains('hidden')) UIElements.modalOverlay.classList.remove('visible'); favoritesOpen = false; UIElements.favoritesDropdown.classList.remove('show'); UIElements.floatingFavoritesBtn.classList.remove('active'); };
             const openCart = () => { if (favoritesOpen) closeFavorites(true); UIElements.modalOverlay.classList.add('visible'); cartOpen = true; UIElements.cartDropdown.classList.add('show'); UIElements.floatingCartBtn.classList.add('active'); };
             const openFavorites = () => { if (cartOpen) closeCart(true); UIElements.modalOverlay.classList.add('visible'); favoritesOpen = true; UIElements.favoritesDropdown.classList.add('show'); UIElements.floatingFavoritesBtn.classList.add('active'); };
-            
             const updateCounters = () => { const c1 = UIElements.floatingCartBtn.querySelector('.cart-count'); const c2 = UIElements.floatingFavoritesBtn.querySelector('.cart-count'); const t = Object.values(cart).reduce((s, q) => s + q, 0); c1.textContent = t; c1.style.display = t > 0 ? 'flex' : 'none'; c2.textContent = favorites.length; c2.style.display = favorites.length > 0 ? 'flex' : 'none'; };
             const renderCart = () => { if (Object.keys(cart).length === 0) { UIElements.cartDropdown.innerHTML = `<div class="text-center p-4"><i class="ph ph-shopping-cart text-4xl text-gray-300 mb-2"></i><p class="font-semibold text-gray-700">Seu carrinho está vazio</p></div>`; return; } let h = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-purple-800">Meu Carrinho</h3><button class="clear-cart-btn text-xs bg-red-100 text-red-600 font-semibold hover:bg-red-200 px-3 py-1 rounded-full">Limpar</button></div>`; let t = 0; let w = "Olá! Gostaria de encomendar:\n\n"; for (const [i, q] of Object.entries(cart)) { const p = allProducts.find(pr => pr.id === i); if (!p) continue; t += p.price * q; w += `- ${q}x ${p.name}\n`; h += `<div class="cart-item flex items-center gap-4 py-3"><img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-grow"><p class="font-semibold text-sm">${p.name}</p><div class="flex items-center gap-2 mt-1"><button class="decrease-quantity-btn bg-purple-100 text-purple-700 rounded-full w-6 h-6 flex items-center justify-center hover:bg-purple-200 transition-colors" data-id="${i}"><i class="ph ph-minus text-sm pointer-events-none"></i></button><span class="font-bold text-purple-800 w-5 text-center">${q}</span><button class="increase-quantity-btn bg-purple-100 text-purple-700 rounded-full w-6 h-6 flex items-center justify-center hover:bg-purple-200 transition-colors" data-id="${i}"><i class="ph ph-plus text-sm pointer-events-none"></i></button></div></div><div class="flex flex-col items-end gap-2"><p class="text-sm font-semibold text-purple-700">R$ ${(p.price*q).toFixed(2).replace('.',',')}</p><button class="remove-item-btn icon-btn-circle" data-id="${i}"><i class="ph ph-trash text-base pointer-events-none"></i></button></div></div>`; } w += `\n*Total: R$ ${t.toFixed(2).replace('.',',')}*`; h += `<div class="mt-4 pt-4 border-t"><div class="flex justify-between items-center font-bold text-lg"><span>Total:</span><span class="text-purple-800">R$ ${t.toFixed(2).replace('.',',')}</span></div><div class="flex items-center justify-center text-xs text-gray-500 mt-3 gap-1"><span>Frete grátis para São Francisco e região.</span> <i class="ph-fill ph-info info-icon open-shipping-info-modal"></i></div><a href="https://wa.me/5522998802545?text=${encodeURIComponent(w)}" target="_blank" class="btn btn-buy w-full mt-4 py-3"><i class="ph-fill ph-whatsapp-logo mr-2"></i> Finalizar Pedido</a></div>`; UIElements.cartDropdown.innerHTML = h; };
             const renderFavorites = () => { if (favorites.length === 0) { UIElements.favoritesDropdown.innerHTML = `<div class="text-center p-4"><i class="ph ph-heart text-4xl text-gray-300 mb-2"></i><p class="font-semibold text-gray-700">Lista de favoritos vazia.</p></div>`; return; } let h = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-purple-800">Meus Favoritos</h3><button class="clear-favorites-btn text-xs bg-red-100 text-red-600 font-semibold hover:bg-red-200 px-3 py-1 rounded-full">Limpar</button></div>`; favorites.forEach(id => { const p = allProducts.find(pr => pr.id === id); if (!p) return; h += `<div class="favorite-dropdown-item flex items-center gap-4 py-3"><img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-grow"><p class="font-semibold text-sm">${p.name}</p><p class="text-xs text-purple-600 font-medium">R$ ${Number(p.price).toFixed(2).replace('.',',')}</p></div><div class="flex items-center gap-2"><button class="add-to-cart-from-fav-btn icon-btn-circle bg-purple-100 text-purple-700 hover:bg-purple-600" data-id="${id}"><i class="ph ph-shopping-cart-simple pointer-events-none"></i></button><button class="remove-from-favorites-btn icon-btn-circle" data-id="${id}"><i class="ph ph-trash text-base pointer-events-none"></i></button></div></div>`; }); UIElements.favoritesDropdown.innerHTML = h; };
@@ -438,19 +429,34 @@
                 const isInCart = cart[product.id] > 0;
                 const whatsAppURL = `https://wa.me/5522998802545?text=${encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name}`)}`;
                 const isNew = lastVisit && (new Date(product.dateAdded).getTime() > lastVisit);
+                const isOutOfStock = product.inStock === false;
 
                 const priceHTML = `
                     <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
                         <span class="text-gray-500 line-through whitespace-nowrap">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
                         <span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ ${Number(product.price).toFixed(2).replace('.',',')}</span>
                     </div>`;
-                
                 const paymentHTML = `<div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>`;
 
+                const buttonsHTML = isOutOfStock
+                  ? `<div class="mt-auto pt-4">
+                       <button class="btn btn-sold-out" disabled><i class="ph ph-x-circle mr-2"></i>Esgotado</button>
+                     </div>`
+                  : `<div class="mt-auto">
+                       ${priceHTML}
+                       ${paymentHTML}
+                       <div class="flex flex-col gap-2 text-sm">
+                           <button class="btn ${isInCart ? 'btn-add-success' : 'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
+                               ${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado' : 'Adicionar'}
+                           </button>
+                           <a href="${whatsAppURL}" target="_blank" class="btn btn-buy">Comprar</a>
+                       </div>
+                     </div>`;
+                
                 return `
-                <div class="product flex flex-col group ${isNew ? 'new-since-last-visit' : ''}" data-id="${product.id}" data-category="${product.category}" tabindex="0">
+                <div class="product flex flex-col group ${isOutOfStock ? 'out-of-stock' : ''} ${isNew ? 'new-since-last-visit' : ''}" data-id="${product.id}" data-category="${product.category}" tabindex="0">
                     <div class="relative overflow-hidden">
-                        <img loading="lazy" src="${product.image}" alt="${product.name}" class="product-image w-full h-48 sm:h-64 object-cover" onclick="showProductDetailModal('${product.id}')">
+                        <img loading="lazy" src="${product.image}" alt="${product.name}" class="product-image w-full h-48 sm:h-64 object-cover" ${!isOutOfStock ? `onclick="showProductDetailModal('${product.id}')"` : ''}>
                         ${product.badge ? `<div class="product-badge">${product.badge.text}</div>` : ''}
                         <div class="absolute top-3 right-3">
                             <button class="toggle-favorite-btn w-10 h-10 rounded-full flex items-center justify-center" data-id="${product.id}">
@@ -462,88 +468,22 @@
                     <div class="p-3 flex flex-col flex-grow text-center">
                         <h3 class="text-base font-semibold text-gray-800 truncate mb-1">${product.name}</h3>
                         <p class="text-xs text-gray-500 min-h-[16px] mb-3">${product.size ? `Tamanho: ${product.size}` : '&nbsp;'}</p>
-
-                        <div class="mt-auto">
-                            ${priceHTML}
-                            ${paymentHTML}
-                            <div class="flex flex-col gap-2 text-sm">
-                                <button class="btn ${isInCart ? 'btn-add-success' : 'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
-                                    ${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado' : 'Adicionar'}
-                                </button>
-                                <a href="${whatsAppURL}" target="_blank" class="btn btn-buy">Comprar</a>
-                            </div>
-                        </div>
+                        ${buttonsHTML}
                     </div>
                 </div>`;
             };
             
             const renderProducts = () => { const t = UIElements.searchInput.value.trim(); let p = [...allProducts]; if (activeFilter !== 'all') p = p.filter(pr => pr.category === activeFilter); if (t) { const r = fuse.search(t); const ids = new Set(r.map(i => i.item.id)); p = p.filter(pr => ids.has(pr.id)); } if (activeSort === 'price-asc') p.sort((a,b)=>a.price-b.price); else if (activeSort === 'price-desc') p.sort((a,b)=>b.price-a.price); else if (activeSort === 'name-asc') p.sort((a,b)=>a.name.localeCompare(b.name)); UIElements.productGrid.innerHTML = p.map(createProductCardHTML).join(''); UIElements.noProductsMessage.classList.toggle('hidden', p.length === 0); if (p.length === 0) UIElements.noProductsMessage.innerHTML = `<i class="ph ph-flower-lotus text-5xl text-purple-300 mb-4"></i><p class="font-semibold text-xl font-display">Nenhum tesouro encontrado</p><p class="text-gray-500">Adicione produtos ao seu catálogo para vê-los aqui.</p>`; getAll('#product-grid .product').forEach((pr, i) => { pr.style.animationDelay = `${i * 60}ms`; }); updateProductCardStates(); };
-            
-// ======================================================================
-// INÍCIO DA CORREÇÃO FINAL: MOSTRAR O NÚMERO 1
-// ======================================================================
-const updateVisuals = () => {
-    allProducts.forEach(p => {
-        const e = get(`#viewing-info-${p.id}`);
-        if (e) {
-            // Lógica da simulação (não muda)
-            if (Math.random() < 0.15) {
-                const change = Math.random() < 0.7 ? 1 : -1;
-                p.viewing = Math.max(0, (p.viewing || 0) + change);
-            }
-
-            // LÓGICA SIMPLIFICADA E CORRIGIDA:
-            // Se a contagem for 1 ou mais, mostra o olho + o número.
-            if (p.viewing > 0) {
-                e.innerHTML = `<div class="flex items-center gap-1 text-white text-xs font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm animate-pulse"><i class="ph-fill ph-eye text-sm"></i><span>${p.viewing}</span></div>`;
-            } else {
-                // Se a contagem for 0, não mostra nada.
-                e.innerHTML = '';
-            }
-        }
-    });
-};
-// ======================================================================
-// FIM DA CORREÇÃO
-// ======================================================================
-
+            const updateVisuals = () => { allProducts.forEach(p => { const e = get(`#viewing-info-${p.id}`); if (e) { if (Math.random() > 0.7) p.viewing = Math.max(0, (p.viewing || 0) + (Math.floor(Math.random() * 3) - 1)); if (p.viewing > 0) { e.innerHTML = `<div class="flex items-center gap-1 text-white text-xs font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm animate-pulse"><i class="ph-fill ph-eye text-sm"></i><span>${p.viewing}</span></div>`; } else { e.innerHTML = ''; } } }); };
             const showFeedbackToast = (type) => { const t = type === 'cart' ? UIElements.cartFeedbackToast : UIElements.favoritesFeedbackToast; let to = type === 'cart' ? cartToastTimeout : favoritesToastTimeout; clearTimeout(to); t.classList.add('show'); to = setTimeout(() => t.classList.remove('show'), 2000); if (type === 'cart') cartToastTimeout = to; else favoritesToastTimeout = to; };
             const flyToCart = (target) => { const c = target.closest('.product, .favorite-dropdown-item'); if (!c) return; const i = c.querySelector('img'); if(!i) return; const fi = i.cloneNode(true); const r1 = i.getBoundingClientRect(); const r2 = UIElements.floatingCartBtn.getBoundingClientRect(); fi.style.cssText = `position: fixed; z-index: 9999; left: ${r1.left}px; top: ${r1.top}px; width: ${r1.width}px; height: ${r1.height}px; border-radius: 0.5rem; transition: all 0.7s cubic-bezier(0.5, 0, 0.75, 0.2);`; document.body.appendChild(fi); requestAnimationFrame(() => { fi.style.left = `${r2.left + r2.width / 2 - 20}px`; fi.style.top = `${r2.top + r2.height / 2 - 20}px`; fi.style.width = '40px'; fi.style.height = '40px'; fi.style.transform = 'scale(0.2) rotate(180deg)'; fi.style.opacity = '0'; }); setTimeout(() => { fi.remove(); UIElements.floatingCartBtn.classList.add('shake'); setTimeout(() => UIElements.floatingCartBtn.classList.remove('shake'), 500); }, 700); };
             const setupWelcomePopup = () => { const o = UIElements.welcomePopupOverlay; if (!o) return; const c = () => { o.classList.remove('show'); localStorage.setItem('estiloChicVisitedBefore', 'true'); }; if (!localStorage.getItem('estiloChicVisitedBefore')) setTimeout(() => o.classList.add('show'), 5000); get('#close-popup').addEventListener('click', c); get('#claim-coupon-btn').addEventListener('click', c); o.addEventListener('click', (e) => { if (e.target === o) c(); }); };
             const hideSearchSuggestions = () => { if (UIElements.searchSuggestions) { UIElements.searchSuggestions.classList.add('hidden'); UIElements.searchSuggestions.innerHTML = ''; } };
             const showSearchSuggestions = (term) => { if (!UIElements.searchSuggestions || term.trim() === '') return hideSearchSuggestions(); const results = fuse.search(term).slice(0, 5); if (results.length === 0) return hideSearchSuggestions(); UIElements.searchSuggestions.innerHTML = results.map(({ item }) => `<div class="suggestion-item" data-name="${item.name}"><span>${item.name}</span></div>`).join(''); UIElements.searchSuggestions.classList.remove('hidden'); };
             const resetAllFilters = () => { activeFilter = 'all'; UIElements.searchInput.value = ''; getAll('#filter-buttons button').forEach(btn => btn.classList.remove('filter-active')); get('#filter-buttons button[data-category="all"]').classList.add('filter-active'); hideSearchSuggestions(); renderProducts(); checkButtonsVisibility(); };
-            
-            const checkButtonsVisibility = () => {
-                const hasText = UIElements.searchInput.value.trim() !== '';
-                if(UIElements.clearSearchBtn) UIElements.clearSearchBtn.classList.toggle('hidden', !hasText);
-                if(UIElements.searchIcon) UIElements.searchIcon.classList.toggle('hidden', hasText);
-            };
-
-            const setupActivityNotifications = () => {
-                const toast = UIElements.activityToast;
-                if (!toast || allProducts.length === 0) return;
-                const names = ['Ana', 'Mariana', 'Júlia', 'Beatriz', 'Larissa', 'Maria', 'Alice', 'Helena', 'Laura', 'Manuela', 'Valentina', 'Sophia', 'Isabella', 'Lívia', 'Giovanna', 'Yasmin', 'Eloá', 'Clara', 'Cecília', 'Liz', 'Maitê', 'Antonella', 'Elisa', 'Gabriela', 'Luiza', 'Amanda', 'Bruna', 'Camila', 'Fernanda', 'Patrícia', 'Sandra', 'Jéssica', 'Letícia', 'Aline'];
-                const cities = [ 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'Macaé', 'Itaperuna', 'Rio de Janeiro' ];
-                const actions = [ { verb: 'acabou de comprar', icon: 'ph-fill ph-shopping-cart-simple', color: 'var(--purple-dark)' }, { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' } ];
-                const showRandom = () => {
-                    if (document.hidden || allProducts.length === 0) return;
-                    const name = names[Math.floor(Math.random() * names.length)];
-                    const city = cities[Math.floor(Math.random() * cities.length)];
-                    const action = actions[Math.floor(Math.random() * actions.length)];
-                    const product = allProducts[Math.floor(Math.random() * allProducts.length)];
-                    toast.innerHTML = `<div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full animate-icon-pulse" style="background-color: ${action.color};"><i class="${action.icon} text-white text-xl"></i></div><div><p><strong>${name}</strong> de ${city}</p><p class="text-sm" style="color: var(--text-secondary);">${action.verb} um(a) <strong>${product.name}</strong></p></div>`;
-                    toast.classList.add('show');
-                    setTimeout(() => { toast.classList.remove('show'); }, 5000);
-                };
-                const startCycle = () => {
-                    const delay = Math.random() * (20000 - 8000) + 8000;
-                    setTimeout(() => { showRandom(); startCycle(); }, delay);
-                };
-                setTimeout(startCycle, 7000);
-            };
+            const checkButtonsVisibility = () => { const hasText = UIElements.searchInput.value.trim() !== ''; if(UIElements.clearSearchBtn) UIElements.clearSearchBtn.classList.toggle('hidden', !hasText); if(UIElements.searchIcon) UIElements.searchIcon.classList.toggle('hidden', hasText); };
+            const setupActivityNotifications = () => { const toast = UIElements.activityToast; if (!toast || allProducts.length === 0) return; const names = ['Ana', 'Mariana', 'Júlia', 'Beatriz', 'Larissa', 'Maria', 'Alice', 'Helena', 'Laura', 'Manuela', 'Valentina', 'Sophia', 'Isabella', 'Lívia', 'Giovanna', 'Yasmin', 'Eloá', 'Clara', 'Cecília', 'Liz', 'Maitê', 'Antonella', 'Elisa', 'Gabriela', 'Luiza', 'Amanda', 'Bruna', 'Camila', 'Fernanda', 'Patrícia', 'Sandra', 'Jéssica', 'Letícia', 'Aline']; const cities = [ 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'Macaé', 'Itaperuna', 'Rio de Janeiro' ]; const actions = [ { verb: 'acabou de comprar', icon: 'ph-fill ph-shopping-cart-simple', color: 'var(--purple-dark)' }, { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' } ]; const showRandom = () => { if (document.hidden || allProducts.length === 0) return; const name = names[Math.floor(Math.random() * names.length)]; const city = cities[Math.floor(Math.random() * cities.length)]; const action = actions[Math.floor(Math.random() * actions.length)]; const product = allProducts[Math.floor(Math.random() * allProducts.length)]; toast.innerHTML = `<div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full animate-icon-pulse" style="background-color: ${action.color};"><i class="${action.icon} text-white text-xl"></i></div><div><p><strong>${name}</strong> de ${city}</p><p class="text-sm" style="color: var(--text-secondary);">${action.verb} um(a) <strong>${product.name}</strong></p></div>`; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 5000); }; const startCycle = () => { const delay = Math.random() * (20000 - 8000) + 8000; setTimeout(() => { showRandom(); startCycle(); }, delay); }; setTimeout(startCycle, 7000); };
             const setupObservers = () => { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { UIElements.floatingButtonsContainer.classList.toggle('hidden', entry.isIntersecting); }); }, { threshold: 0.1 }); if (UIElements.scrollObserverTarget) { observer.observe(UIElements.scrollObserverTarget); } };
-
             function setupEventListeners() {
                 UIElements.hamburgerButton.addEventListener('click', () => { UIElements.hamburgerButton.classList.toggle('menu-open'); UIElements.mobileNav.classList.toggle('menu-open'); });
                 UIElements.modalOverlay.addEventListener('click', (e) => { if (e.target === UIElements.modalOverlay) closeAllModals(); });
