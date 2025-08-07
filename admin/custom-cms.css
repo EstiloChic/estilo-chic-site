@@ -1,41 +1,33 @@
-/* admin/custom-cms.css - VERSÃO DE EMERGÊNCIA (FOCO EM NÃO CORTAR A TELA) */
+/* admin/custom-cms.css - VERSÃO FINAL E CORRIGIDA */
 
-/* Estas regras só se aplicam em telas de até 768px (celulares) */
+/* Regras aplicadas apenas em telas pequenas (mobile) */
 @media (max-width: 768px) {
 
   /* --- PASSO 1: FORÇAR OS CONTAINERS A SEREM FLEXÍVEIS --- */
   
-  /* A regra mais importante:
-     Diz aos principais contêineres do painel para NUNCA serem mais largos que a tela.
-     O 'min-width: 0' é um truque de CSS essencial para impedir que eles se expandam. */
   .App-main, .Collection-main-container, .Collection-main {
     width: 100% !important;
     min-width: 0 !important; 
     padding-left: 10px !important;
     padding-right: 10px !important;
-    box-sizing: border-box; /* Garante que o padding não cause overflow */
+    box-sizing: border-box;
   }
 
-  /* Remove o padding do container geral que pode causar conflito */
   .App-container {
     padding: 0 !important;
   }
 
   /* --- PASSO 2: FAZER A TABELA ROLAR HORIZONTALMENTE --- */
   
-  /* Encontra a tabela da lista de produtos (o verdadeiro culpado).
-     Isto faz com que, se a tabela for muito larga, APENAS ELA
-     ganhe uma barra de rolagem horizontal, sem estragar o resto do layout. */
   .List-root {
     display: block;
     width: 100%;
-    overflow-x: auto; /* Adiciona a barra de rolagem SÓ na tabela */
-    -webkit-overflow-scrolling: touch; /* Melhora a rolagem no iPhone/iPad */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
-  /* --- PASSO 3: MANTER A TELA DE EDIÇÃO FUNCIONAL --- */
+  /* --- PASSO 3: OTIMIZAÇÃO DA TELA DE EDIÇÃO --- */
 
-  /* Mantém a lógica de empilhar as colunas na tela de editar um produto */
   .Editor-root {
     display: flex;
     flex-direction: column;
@@ -51,5 +43,23 @@
     border-top: 2px solid #e5e7eb;
     margin-top: 20px;
     padding-top: 20px;
+  }
+
+  /* --- 4. AJUSTES DE USABILIDADE --- */
+  
+  input, textarea, .Select-value-label {
+    font-size: 16px !important;
+    padding: 12px !important;
+  }
+
+  .Button-button {
+    padding: 12px 16px !important;
+  }
+
+  .CollectionTop-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
   }
 }
