@@ -1,75 +1,55 @@
-/* admin/custom-cms.css - VERSÃO FINAL E CORRIGIDA */
+/* admin/custom-cms.css - VERSÃO DE EMERGÊNCIA (FOCO EM NÃO CORTAR A TELA) */
 
-/* Regras aplicadas apenas em telas pequenas (mobile) */
+/* Estas regras só se aplicam em telas de até 768px (celulares) */
 @media (max-width: 768px) {
 
-  /* --- 1. CONFIGURAÇÃO GERAL DO LAYOUT --- */
-
-  /* Força a raiz do aplicativo a não criar barras de rolagem desnecessárias,
-     mas permite que o conteúdo interno role se precisar. */
-  #nc-root {
-    min-width: 100%;
-    width: 100%;
-    overflow-x: hidden;
-  }
-
-  /* Garante que a barra superior e a área principal se comportem bem. */
-  .App-header, .App-main {
-    width: 100% !important;
-    min-width: 100% !important;
-  }
-
-  /* --- 2. CORREÇÃO DA LISTA DE PRODUTOS (A TELA CORTADA) --- */
+  /* --- PASSO 1: FORÇAR OS CONTAINERS A SEREM FLEXÍVEIS --- */
   
-  /* O principal culpado do corte é a tabela da lista de produtos.
-     Esta regra faz com que a tabela possa rolar horizontalmente
-     se o conteúdo for muito largo, SEM cortar o resto da página. */
+  /* A regra mais importante:
+     Diz aos principais contêineres do painel para NUNCA serem mais largos que a tela.
+     O 'min-width: 0' é um truque de CSS essencial para impedir que eles se expandam. */
+  .App-main, .Collection-main-container, .Collection-main {
+    width: 100% !important;
+    min-width: 0 !important; 
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    box-sizing: border-box; /* Garante que o padding não cause overflow */
+  }
+
+  /* Remove o padding do container geral que pode causar conflito */
+  .App-container {
+    padding: 0 !important;
+  }
+
+  /* --- PASSO 2: FAZER A TABELA ROLAR HORIZONTALMENTE --- */
+  
+  /* Encontra a tabela da lista de produtos (o verdadeiro culpado).
+     Isto faz com que, se a tabela for muito larga, APENAS ELA
+     ganhe uma barra de rolagem horizontal, sem estragar o resto do layout. */
   .List-root {
     display: block;
-    overflow-x: auto;
-    white-space: nowrap; /* Impede a quebra de linha indesejada */
+    width: 100%;
+    overflow-x: auto; /* Adiciona a barra de rolagem SÓ na tabela */
+    -webkit-overflow-scrolling: touch; /* Melhora a rolagem no iPhone/iPad */
   }
 
-  /* --- 3. OTIMIZAÇÃO DA TELA DE EDIÇÃO --- */
+  /* --- PASSO 3: MANTER A TELA DE EDIÇÃO FUNCIONAL --- */
 
-  /* Empilha as colunas de edição e pré-visualização */
+  /* Mantém a lógica de empilhar as colunas na tela de editar um produto */
   .Editor-root {
     display: flex;
     flex-direction: column;
   }
 
-  /* Faz as colunas ocuparem 100% da largura disponível */
   .Editor-main, .Editor-preview {
     width: 100% !important;
     max-width: 100% !important;
   }
 
-  /* Ajusta as bordas para o layout empilhado */
   .Editor-preview {
     border-left: none !important;
     border-top: 2px solid #e5e7eb;
     margin-top: 20px;
     padding-top: 20px;
-  }
-
-  /* --- 4. AJUSTES DE USABILIDADE --- */
-  
-  /* Melhora a legibilidade e o toque nos campos */
-  input, textarea, .Select-value-label {
-    font-size: 16px !important;
-    padding: 12px !important;
-  }
-
-  /* Aumenta o espaço dos botões */
-  .Button-button {
-    padding: 12px 16px !important;
-  }
-
-  /* Empilha os botões de ação no topo da lista */
-  .CollectionTop-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: stretch;
   }
 }
