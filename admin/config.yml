@@ -1,9 +1,4 @@
-# ===================================================================
-# ARQUIVO admin/config.yml - VERSÃO FINAL COM TODAS AS FUNCIONALIDADES
-# ===================================================================
-
-# Traduz a interface do painel para Português do Brasil
-locale: 'pt_br'
+# admin/config.yml - VERSÃO ESTÁVEL (COMO ESTAVA ANTES DAS MUDANÇAS MOBILE)
 
 backend:
   name: git-gateway
@@ -20,27 +15,12 @@ collections:
     extension: "md"
     format: "frontmatter"
     slug: "{{name}}"
-    
-    # Resumo para visualização em lista
     summary: "{{name}} - R$ {{price}} ({{category}})"
-
-    # Agrupamento por categoria
-    view_groups:
-      - label: "Categoria"
-        field: "category"
 
     fields:
       - {label: "Layout", name: "layout", widget: "hidden", default: "produto.njk"}
       - {label: "ID", name: "id", widget: "uuid", required: true}
       
-      # Campo para Produto em Destaque
-      - label: "Produto em Destaque?"
-        name: "isFeatured"
-        widget: "boolean"
-        default: false
-        hint: "Marque 'Sim' para destacar este produto em áreas especiais do site."
-
-      # Campo para Controle de Estoque
       - label: "Produto em Estoque?"
         name: "inStock"
         widget: "boolean"
@@ -50,16 +30,7 @@ collections:
       - {label: "Nome do Produto", name: "name", widget: "string"}
       - {label: "Preço Original (Ex: 30.00)", name: "originalPrice", widget: "number", value_type: "float"}
       - {label: "Preço com Desconto (Ex: 22.00)", name: "price", widget: "number", value_type: "float"}
-      
-      # Galeria de Imagens
-      - label: "Galeria de Imagens"
-        name: "gallery"
-        widget: "list"
-        summary: "Imagem"
-        min: 1
-        fields:
-          - {label: "Imagem", name: "image", widget: "image"}
-
+      - {label: "Imagem Principal", name: "image", widget: "image"}
       - label: "Categoria"
         name: "category"
         widget: "select"
@@ -67,14 +38,11 @@ collections:
           - {label: "Roupas", value: "roupas"}
           - {label: "Maquiagens", value: "maquiagens"}
           - {label: "Acessórios", value: "acessorios"}
-          
       - {label: "Tamanho (Ex: G, 38, P/M. Deixe em branco se não aplicável)", name: "size", widget: "string", required: false}
-      
       - label: "Badge (Opcional)"
         name: "badge"
         widget: "object"
         required: false
         fields:
           - {label: "Texto do Badge (Ex: NOVIDADE, PROMOÇÃO)", name: "text", widget: "string", required: false}
-          
       - {label: "Descrição Completa do Produto", name: "body", widget: "markdown"}
