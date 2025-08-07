@@ -93,7 +93,17 @@
         .image-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1999; pointer-events: none; }
         .image-modal-content { background: var(--background-card); border-radius: 16px; box-shadow: var(--shadow-medium); width: 90%; max-width: 500px; pointer-events: auto; overflow: hidden; transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
         .modal-overlay.visible .image-modal-content { transform: scale(1); }
-        .image-modal-content img { display: block; width: 100%; height: 300px; object-fit: cover; }
+        
+        /* --- CORREÇÃO DA IMAGEM DO MODAL --- */
+        .image-modal-content img {
+            display: block;
+            width: 100%;
+            height: auto; /* Permite que a altura se ajuste para manter a proporção */
+            max-height: 70vh; /* Evita que imagens muito altas ocupem toda a tela */
+            object-fit: contain; /* Garante que a imagem inteira seja visível sem cortes */
+            margin: 0 auto; /* Centraliza a imagem se o contêiner for mais largo */
+        }
+
         .close-modal-btn { position: absolute; top: 12px; right: 12px; background: rgba(0, 0, 0, 0.3); color: white; cursor: pointer; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; z-index: 2001; }
         .close-modal-btn:hover { background: rgba(0, 0, 0, 0.6); transform: scale(1.1); }
 
@@ -260,6 +270,11 @@
             <!-- Os cards dos produtos serão inseridos aqui pelo JavaScript -->
         </section>
         
+        <!-- Contêiner para o botão "Ver Mais" -->
+        <div id="load-more-container" class="text-center mt-8">
+            <!-- O botão será inserido aqui dinamicamente pelo JavaScript -->
+        </div>
+
         <div id="no-products-message" class="text-center py-16 text-gray-600 hidden"></div>
         
         <section id="meus-pedidos" class="bg-white/60 p-6 md:p-8 rounded-2xl shadow-lg mt-12 text-center">
@@ -406,10 +421,46 @@
             
             function debounce(func, delay = 300) { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => { func.apply(this, args); }, delay); }; }
 
+            // A linha abaixo é preenchida pelo Eleventy durante o build do site.
             allProducts = {{ collections.products | getProductList }};
 
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
-            const UIElements = { productGrid: get('#product-grid'), cartDropdown: get('#cart-dropdown'), favoritesDropdown: get('#favorites-dropdown'), floatingCartBtn: get('#floating-cart-btn'), floatingFavoritesBtn: get('#floating-favorites-btn'), productDetailModal: get('#product-detail-modal'), shippingInfoModal: get('#shipping-info-modal'), modalOverlay: get('#modal-overlay'), searchInput: get('#search-input'), clearSearchBtn: get('#clear-search-btn'), searchIcon: get('#search-icon'), searchSuggestions: get('#search-suggestions'), noProductsMessage: get('#no-products-message'), loadingOverlay: get('.loading-overlay'), sortDropdownContainer: get('#sort-dropdown-container'), sortOptions: get('#sort-options'), sortCaret: get('#sort-caret'), cartFeedbackToast: get('#cart-feedback-toast'), favoritesFeedbackToast: get('#favorites-feedback-toast'), activityToast: get('#activity-toast'), welcomePopupOverlay: get('#welcome-popup-overlay'), hamburgerButton: get('#hamburger-button'), mobileNav: get('#mobile-nav'), mainHeader: get('#main-header'), floatingButtonsContainer: get('#floating-buttons-container'), scrollObserverTarget: get('#contato') };
+            
+            // --- VARIÁVEIS PARA PAGINAÇÃO ---
+            let currentlyFilteredProducts = [];
+            const productsPerPage = 10;
+            let numDisplayed = 0;
+            let loadMoreBtn;
+
+            const UIElements = { 
+                productGrid: get('#product-grid'), 
+                cartDropdown: get('#cart-dropdown'), 
+                favoritesDropdown: get('#favorites-dropdown'), 
+                floatingCartBtn: get('#floating-cart-btn'), 
+                floatingFavoritesBtn: get('#floating-favorites-btn'), 
+                productDetailModal: get('#product-detail-modal'), 
+                shippingInfoModal: get('#shipping-info-modal'), 
+                modalOverlay: get('#modal-overlay'), 
+                searchInput: get('#search-input'), 
+                clearSearchBtn: get('#clear-search-btn'), 
+                searchIcon: get('#search-icon'), 
+                searchSuggestions: get('#search-suggestions'), 
+                noProductsMessage: get('#no-products-message'), 
+                loadingOverlay: get('.loading-overlay'), 
+                sortDropdownContainer: get('#sort-dropdown-container'), 
+                sortOptions: get('#sort-options'), 
+                sortCaret: get('#sort-caret'), 
+                cartFeedbackToast: get('#cart-feedback-toast'), 
+                favoritesFeedbackToast: get('#favorites-feedback-toast'), 
+                activityToast: get('#activity-toast'), 
+                welcomePopupOverlay: get('#welcome-popup-overlay'), 
+                hamburgerButton: get('#hamburger-button'), 
+                mobileNav: get('#mobile-nav'), 
+                mainHeader: get('#main-header'), 
+                floatingButtonsContainer: get('#floating-buttons-container'), 
+                scrollObserverTarget: get('#contato'),
+                loadMoreContainer: get('#load-more-container') 
+            };
 
             const saveState = () => { localStorage.setItem('estiloChicCart', JSON.stringify(cart)); localStorage.setItem('estiloChicFavorites', JSON.stringify(favorites)); };
             const loadState = () => { try { const sc = localStorage.getItem('estiloChicCart'); if (sc) cart = JSON.parse(sc) || {}; const sf = localStorage.getItem('estiloChicFavorites'); if (sf) favorites = JSON.parse(sf) || []; } catch { cart = {}; favorites = []; } };
@@ -473,7 +524,71 @@
                 </div>`;
             };
             
-            const renderProducts = () => { const t = UIElements.searchInput.value.trim(); let p = [...allProducts]; if (activeFilter !== 'all') p = p.filter(pr => pr.category === activeFilter); if (t) { const r = fuse.search(t); const ids = new Set(r.map(i => i.item.id)); p = p.filter(pr => ids.has(pr.id)); } if (activeSort === 'price-asc') p.sort((a,b)=>a.price-b.price); else if (activeSort === 'price-desc') p.sort((a,b)=>b.price-a.price); else if (activeSort === 'name-asc') p.sort((a,b)=>a.name.localeCompare(b.name)); UIElements.productGrid.innerHTML = p.map(createProductCardHTML).join(''); UIElements.noProductsMessage.classList.toggle('hidden', p.length === 0); if (p.length === 0) UIElements.noProductsMessage.innerHTML = `<i class="ph ph-flower-lotus text-5xl text-purple-300 mb-4"></i><p class="font-semibold text-xl font-display">Nenhum tesouro encontrado</p><p class="text-gray-500">Adicione produtos ao seu catálogo para vê-los aqui.</p>`; getAll('#product-grid .product').forEach((pr, i) => { pr.style.animationDelay = `${i * 60}ms`; }); updateProductCardStates(); };
+            // --- NOVA FUNÇÃO PARA EXIBIR PRODUTOS EM LOTES ---
+            function displayMoreProducts() {
+                const productsToDisplay = currentlyFilteredProducts.slice(numDisplayed, numDisplayed + productsPerPage);
+
+                if (productsToDisplay.length === 0 && numDisplayed === 0) {
+                    UIElements.noProductsMessage.classList.remove('hidden');
+                    UIElements.noProductsMessage.innerHTML = `<i class="ph ph-flower-lotus text-5xl text-purple-300 mb-4"></i><p class="font-semibold text-xl font-display">Nenhum tesouro encontrado</p><p class="text-gray-500">Tente buscar por outro termo ou alterar os filtros.</p>`;
+                    if (loadMoreBtn) loadMoreBtn.classList.add('hidden');
+                    return;
+                }
+
+                const productsHTML = productsToDisplay.map((product, index) => {
+                    const cardHTML = createProductCardHTML(product);
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = cardHTML.trim();
+                    const productElement = tempDiv.firstChild;
+                    productElement.style.animationDelay = `${(numDisplayed + index) * 60}ms`;
+                    return productElement.outerHTML;
+                }).join('');
+
+                UIElements.productGrid.insertAdjacentHTML('beforeend', productsHTML);
+                numDisplayed += productsToDisplay.length;
+                updateProductCardStates();
+
+                // Gerenciar visibilidade do botão "Ver Mais"
+                if (!loadMoreBtn) {
+                    UIElements.loadMoreContainer.innerHTML = `<button id="load-more-btn" class="btn btn-outline-purple px-8 py-3" style="width: auto;">Ver mais</button>`;
+                    loadMoreBtn = get('#load-more-btn');
+                    loadMoreBtn.addEventListener('click', displayMoreProducts);
+                }
+
+                if (numDisplayed >= currentlyFilteredProducts.length) {
+                    loadMoreBtn.classList.add('hidden');
+                } else {
+                    loadMoreBtn.classList.remove('hidden');
+                }
+            }
+
+            // --- FUNÇÃO RENDERPRODUCTS MODIFICADA ---
+            const renderProducts = () => {
+                const searchTerm = UIElements.searchInput.value.trim();
+                let filteredProducts = [...allProducts];
+
+                if (activeFilter !== 'all') {
+                    filteredProducts = filteredProducts.filter(p => p.category === activeFilter);
+                }
+                if (searchTerm) {
+                    const results = fuse.search(searchTerm);
+                    const resultIds = new Set(results.map(r => r.item.id));
+                    filteredProducts = filteredProducts.filter(p => resultIds.has(p.id));
+                }
+
+                if (activeSort === 'price-asc') filteredProducts.sort((a, b) => a.price - b.price);
+                else if (activeSort === 'price-desc') filteredProducts.sort((a, b) => b.price - a.price);
+                else if (activeSort === 'name-asc') filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+
+                // Reseta a exibição atual
+                UIElements.productGrid.innerHTML = '';
+                UIElements.noProductsMessage.classList.add('hidden');
+                numDisplayed = 0;
+                currentlyFilteredProducts = filteredProducts;
+                
+                displayMoreProducts();
+            };
+
             const updateVisuals = () => { allProducts.forEach(p => { const e = get(`#viewing-info-${p.id}`); if (e) { if (Math.random() > 0.7) p.viewing = Math.max(0, (p.viewing || 0) + (Math.floor(Math.random() * 3) - 1)); if (p.viewing > 0) { e.innerHTML = `<div class="flex items-center gap-1 text-white text-xs font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm animate-pulse"><i class="ph-fill ph-eye text-sm"></i><span>${p.viewing}</span></div>`; } else { e.innerHTML = ''; } } }); };
             const showFeedbackToast = (type) => { const t = type === 'cart' ? UIElements.cartFeedbackToast : UIElements.favoritesFeedbackToast; let to = type === 'cart' ? cartToastTimeout : favoritesToastTimeout; clearTimeout(to); t.classList.add('show'); to = setTimeout(() => t.classList.remove('show'), 2000); if (type === 'cart') cartToastTimeout = to; else favoritesToastTimeout = to; };
             const flyToCart = (target) => { const c = target.closest('.product, .favorite-dropdown-item'); if (!c) return; const i = c.querySelector('img'); if(!i) return; const fi = i.cloneNode(true); const r1 = i.getBoundingClientRect(); const r2 = UIElements.floatingCartBtn.getBoundingClientRect(); fi.style.cssText = `position: fixed; z-index: 9999; left: ${r1.left}px; top: ${r1.top}px; width: ${r1.width}px; height: ${r1.height}px; border-radius: 0.5rem; transition: all 0.7s cubic-bezier(0.5, 0, 0.75, 0.2);`; document.body.appendChild(fi); requestAnimationFrame(() => { fi.style.left = `${r2.left + r2.width / 2 - 20}px`; fi.style.top = `${r2.top + r2.height / 2 - 20}px`; fi.style.width = '40px'; fi.style.height = '40px'; fi.style.transform = 'scale(0.2) rotate(180deg)'; fi.style.opacity = '0'; }); setTimeout(() => { fi.remove(); UIElements.floatingCartBtn.classList.add('shake'); setTimeout(() => UIElements.floatingCartBtn.classList.remove('shake'), 500); }, 700); };
@@ -484,6 +599,7 @@
             const checkButtonsVisibility = () => { const hasText = UIElements.searchInput.value.trim() !== ''; if(UIElements.clearSearchBtn) UIElements.clearSearchBtn.classList.toggle('hidden', !hasText); if(UIElements.searchIcon) UIElements.searchIcon.classList.toggle('hidden', hasText); };
             const setupActivityNotifications = () => { const toast = UIElements.activityToast; if (!toast || allProducts.length === 0) return; const names = ['Ana', 'Mariana', 'Júlia', 'Beatriz', 'Larissa', 'Maria', 'Alice', 'Helena', 'Laura', 'Manuela', 'Valentina', 'Sophia', 'Isabella', 'Lívia', 'Giovanna', 'Yasmin', 'Eloá', 'Clara', 'Cecília', 'Liz', 'Maitê', 'Antonella', 'Elisa', 'Gabriela', 'Luiza', 'Amanda', 'Bruna', 'Camila', 'Fernanda', 'Patrícia', 'Sandra', 'Jéssica', 'Letícia', 'Aline']; const cities = [ 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'Macaé', 'Itaperuna', 'Rio de Janeiro' ]; const actions = [ { verb: 'acabou de comprar', icon: 'ph-fill ph-shopping-cart-simple', color: 'var(--purple-dark)' }, { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' } ]; const showRandom = () => { if (document.hidden || allProducts.length === 0) return; const name = names[Math.floor(Math.random() * names.length)]; const city = cities[Math.floor(Math.random() * cities.length)]; const action = actions[Math.floor(Math.random() * actions.length)]; const product = allProducts[Math.floor(Math.random() * allProducts.length)]; toast.innerHTML = `<div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full animate-icon-pulse" style="background-color: ${action.color};"><i class="${action.icon} text-white text-xl"></i></div><div><p><strong>${name}</strong> de ${city}</p><p class="text-sm" style="color: var(--text-secondary);">${action.verb} um(a) <strong>${product.name}</strong></p></div>`; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 5000); }; const startCycle = () => { const delay = Math.random() * (20000 - 8000) + 8000; setTimeout(() => { showRandom(); startCycle(); }, delay); }; setTimeout(startCycle, 7000); };
             const setupObservers = () => { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { UIElements.floatingButtonsContainer.classList.toggle('hidden', entry.isIntersecting); }); }, { threshold: 0.1 }); if (UIElements.scrollObserverTarget) { observer.observe(UIElements.scrollObserverTarget); } };
+            
             function setupEventListeners() {
                 UIElements.hamburgerButton.addEventListener('click', () => { UIElements.hamburgerButton.classList.toggle('menu-open'); UIElements.mobileNav.classList.toggle('menu-open'); });
                 UIElements.modalOverlay.addEventListener('click', (e) => { if (e.target === UIElements.modalOverlay) closeAllModals(); });
@@ -525,8 +641,12 @@
                     if (stateChanged) updateApp();
                 });
                 
-                const debouncedSearch = debounce(() => { showSearchSuggestions(UIElements.searchInput.value); renderProducts(); checkButtonsVisibility(); }, 350);
-                UIElements.searchInput.addEventListener('input', debouncedSearch);
+                const debouncedRender = debounce(() => renderProducts(), 350);
+                UIElements.searchInput.addEventListener('input', () => {
+                    showSearchSuggestions(UIElements.searchInput.value);
+                    debouncedRender();
+                    checkButtonsVisibility();
+                });
                 UIElements.searchInput.addEventListener('focus', () => showSearchSuggestions(UIElements.searchInput.value));
                 if (UIElements.clearSearchBtn) UIElements.clearSearchBtn.addEventListener('click', resetAllFilters);
                 
