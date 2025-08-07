@@ -1,4 +1,4 @@
-# admin/config.yml - COMPLETO E ATUALIZADO (Tradução + Organização)
+# admin/config.yml - COMPLETO E ATUALIZADO (Tradução + Organização + Sumário Limpo)
 
 locale: 'pt'
 
@@ -17,7 +17,8 @@ collections:
     extension: "md"
     format: "frontmatter"
     slug: "{{name}}"
-    summary: "{{name}} - R$ {{price}} ({{category}})"
+    # MUDANÇA AQUI: Removemos a categoria do sumário para uma visualização mais limpa
+    summary: "{{name}} - R$ {{price}}"
 
     # Agrupa os produtos pela categoria na tela principal
     view_groups:
