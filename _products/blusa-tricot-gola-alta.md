@@ -1,7 +1,7 @@
 ---
 layout: produto.njk
 id: "6"
-inStock: false
+inStock: true
 dateAdded: 2025-07-27T09:30:00.000Z
 name: Blusa tricot gola alta
 originalPrice: 25
