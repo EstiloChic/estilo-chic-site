@@ -1,7 +1,7 @@
 ---
 layout: produto.njk
 id: "7"
-inStock: false
+inStock: true
 dateAdded: 2025-07-29T11:00:00.000Z
 name: Batom matte
 originalPrice: 15
