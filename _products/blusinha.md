@@ -1,6 +1,6 @@
 ---
 layout: produto.njk
-inStock: true
+inStock: false
 dateAdded: 2025-08-07T22:23:00.000-03:00
 name: Blusinha
 originalPrice: 35
