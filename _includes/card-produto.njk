@@ -1,0 +1,43 @@
+<!-- --- CONTEÚDO PARA: _includes/card-produto.njk --- -->
+
+<div class="product-card bg-white rounded-lg shadow-md p-4 flex flex-col justify-between"
+     data-id="{{ product.data.id }}"
+     data-name="{{ product.data.name }}"
+     data-price="{{ product.data.price }}"
+     data-original-price="{{ product.data.originalPrice }}"
+     data-image="{{ product.data.image }}"
+     data-category="{{ product.data.category }}"
+     data-size="{{ product.data.size }}"
+     data-description="{{ product.data.body | escape }}"
+     data-in-stock="{{ product.data.inStock }}">
+
+    <div class="relative">
+        <img src="{{ product.data.image }}" alt="{{ product.data.name }}" class="w-full h-48 object-cover rounded-t-lg">
+        
+        {% if product.data.badge.text %}
+        <span class="absolute top-2 left-2 bg-pink-500 text-white text-xs font-bold px-2 py-1 rounded">{{ product.data.badge.text }}</span>
+        {% endif %}
+        <button class="absolute top-2 right-2 text-gray-400 hover:text-red-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+        </button>
+    </div>
+    <div class="mt-4 flex-grow">
+        <h3 class="text-lg font-semibold text-gray-800">{{ product.data.name }}</h3>
+        {% if product.data.size %}
+        <p class="text-sm text-gray-500 mt-1">Tamanho: {{ product.data.size }}</p>
+        {% endif %}
+    </div>
+    <div class="mt-4">
+        {% if product.data.originalPrice %}
+        <p class="text-sm text-gray-500 line-through">R$ {{ product.data.originalPrice | formatPrice }}</p>
+        {% endif %}
+        <p class="text-xl font-bold text-purple-600">R$ {{ product.data.price | formatPrice }}</p>
+        <p class="text-xs text-green-600">Dinheiro a Pix</p>
+    </div>
+    <div class="mt-4">
+        <button class="w-full bg-purple-100 text-purple-700 font-bold py-2 px-4 rounded hover:bg-purple-200 transition-colors" onclick="openModal(this.closest('.product-card'))">Adicionar</button>
+        <button class="w-full bg-green-500 text-white font-bold py-2 px-4 rounded mt-2 hover:bg-green-600 transition-colors">Comprar</button>
+    </div>
+</div>
