@@ -1,0 +1,30 @@
+<!-- --- CONTEÚDO PARA: _includes/head.njk --- -->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estilo Chic - Moda Feminina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    body { font-family: 'Poppins', sans-serif; }
+    .filter-btn {
+        padding: 8px 16px;
+        border-radius: 9999px;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+        border: 1px solid transparent;
+    }
+    .filter-btn.active {
+        background-color: #6a1b9a; /* Roxo */
+        color: white;
+    }
+    .filter-btn:not(.active) {
+        background-color: #f3e8ff; /* Roxo bem claro */
+        color: #6a1b9a;
+    }
+     .filter-btn:not(.active):hover {
+        background-color: #e9d5ff; /* Roxo um pouco mais forte no hover */
+    }
+</style>
