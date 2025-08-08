@@ -1,4 +1,4 @@
-# admin/config.yml - COMPLETO E ATUALIZADO
+# admin/config.yml - COMPLETO E ATUALIZADO (Tradução + Organização)
 
 locale: 'pt'
 
@@ -19,16 +19,23 @@ collections:
     slug: "{{name}}"
     summary: "{{name}} - R$ {{price}} ({{category}})"
 
+    # Agrupa os produtos pela categoria na tela principal
+    view_groups:
+      - label: Categoria
+        field: category
+
+    # Define que os produtos podem ser ordenados por nome, data ou preço.
+    # Por padrão, ordena por nome em ordem crescente (A-Z).
+    sortable_fields: ['name', 'dateAdded', 'price']
+    sort: "name:asc"
+
     fields:
       - {label: "Layout", name: "layout", widget: "hidden", default: "produto.njk"}
       - {label: "ID", name: "id", widget: "uuid", required: true}
-      
-      # MUDANÇA AQUI: Renomeado para controle de estoque
       - label: "Produto em Estoque?"
         name: "inStock"
         widget: "boolean"
         default: true
-
       - {label: "Data de Adição", name: "dateAdded", widget: "datetime"}
       - {label: "Nome do Produto", name: "name", widget: "string"}
       - {label: "Preço Original (Ex: 30.00)", name: "originalPrice", widget: "number", value_type: "float"}
@@ -49,4 +56,3 @@ collections:
         fields:
           - {label: "Texto do Badge (Ex: NOVIDADE, PROMOÇÃO)", name: "text", widget: "string", required: false}
       - {label: "Descrição Completa do Produto", name: "body", widget: "markdown"}
-
