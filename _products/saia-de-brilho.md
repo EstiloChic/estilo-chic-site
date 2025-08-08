@@ -1,7 +1,7 @@
 ---
 layout: produto.njk
 id: "1"
-inStock: true
+inStock: false
 dateAdded: 2025-07-30T10:00:00.000Z
 name: Saia de brilho
 originalPrice: 40
