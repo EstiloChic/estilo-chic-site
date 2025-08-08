@@ -1,6 +1,6 @@
 # admin/config.yml - COMPLETO E ATUALIZADO
 
-locale: 'pt_br'
+locale: 'pt'
 
 backend:
   name: git-gateway
@@ -49,3 +49,4 @@ collections:
         fields:
           - {label: "Texto do Badge (Ex: NOVIDADE, PROMOÇÃO)", name: "text", widget: "string", required: false}
       - {label: "Descrição Completa do Produto", name: "body", widget: "markdown"}
+
