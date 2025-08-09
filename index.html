@@ -99,7 +99,7 @@
         .floating-buttons-container.hidden { opacity: 0; visibility: hidden; transform: translateY(20px); }
         .floating-cart, .floating-favorites { width: 55px; height: 55px; background: var(--purple-dark); box-shadow: var(--shadow-medium); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: all 0.3s ease; }
         .floating-cart:hover, .floating-favorites:hover { background: #4a0e6b; transform: scale(1.1); }
-        .floating-cart.active, .floating-favorites.active { background: #8e24aa; }
+        .floating-cart.active, .floating-favorites.active { background-color: var(--purple-dark); }
         .cart-count { position: absolute; top: -2px; right: -2px; background: var(--accent-pink); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid var(--purple-dark); }
         .floating-cart.shake, .floating-favorites.shake { animation: shake 0.5s ease; }
 
@@ -171,16 +171,27 @@
 
     <header id="main-header" class="bg-[#6a1b9a] shadow-md sticky top-0 z-50">
         <div>
-            <div class="max-w-6xl mx-auto flex items-center p-2 h-14 px-4 gap-3 relative">
-                <button id="hamburger-button" class="text-white hover:text-purple-200 transition flex-shrink-0 rounded-md p-1">
+            <div class="max-w-6xl mx-auto flex items-center justify-between p-2 h-14 px-4 gap-3 relative">
+                
+                <!-- Menu Hambúrguer (só aparece em telas pequenas) -->
+                <button id="hamburger-button" class="md:hidden text-white hover:text-purple-200 transition flex-shrink-0 rounded-md p-1">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="stroke-current">
                         <path id="top-line" d="M4 6H20" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path id="middle-line" d="M4 12H20" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path id="bottom-line" d="M4 18H20" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </button>
+
+                <!-- Menu de Navegação para Desktop (só aparece em telas grandes) -->
+                <nav class="hidden md:flex items-center gap-6">
+                    <a href="#categorias" class="text-sm font-medium text-white hover:text-purple-200 transition">Coleções</a>
+                    <a href="#encomendas" class="text-sm font-medium text-white hover:text-purple-200 transition">Encomendas</a>
+                    <a href="#sobre" class="text-sm font-medium text-white hover:text-purple-200 transition">Sobre</a>
+                    <a href="#contato" class="text-sm font-medium text-white hover:text-purple-200 transition">Contato</a>
+                </nav>
                 
-                <div class="search-container relative flex-grow">
+                <!-- Barra de Pesquisa -->
+                <div class="search-container relative flex-grow md:flex-grow-0 md:max-w-xs">
                      <input type="text" class="w-full pl-4 pr-11 py-2 bg-white text-purple-800 text-sm border-2 border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition placeholder:text-purple-400 shadow-sm" placeholder="O que você procura?" id="search-input">
                      <i id="search-icon" class="ph ph-magnifying-glass text-lg absolute right-4 top-1/2 -translate-y-1/2 text-purple-400 z-10 pointer-events-none"></i>
                      <button id="clear-search-btn" class="absolute right-4 top-1/2 -translate-y-1/2 text-purple-400 hover:text-purple-600 transition hidden" aria-label="Limpar busca">
@@ -190,7 +201,9 @@
                 </div>
             </div>
         </div>
-        <nav id="mobile-nav" class="bg-[#6a1b9a] absolute w-full shadow-lg relative header-bg-pattern">
+
+        <!-- Menu de Navegação para Mobile (agora com a classe md:hidden) -->
+        <nav id="mobile-nav" class="md:hidden bg-[#6a1b9a] absolute w-full shadow-lg relative header-bg-pattern">
             <a href="#categorias" class="mobile-nav-link group flex items-center text-white text-sm font-medium px-4 py-3 hover:bg-white/10 transition relative z-10"><i class="ph ph-squares-four mr-3 text-lg transition-transform group-hover:scale-110 group-hover:rotate-3"></i>Coleções</a>
             <a href="#" id="mobile-favorites-menu-link" class="mobile-nav-link group flex items-center text-white text-sm font-medium px-4 py-3 hover:bg-white/10 transition relative z-10"><i class="ph ph-heart mr-3 text-lg transition-transform group-hover:scale-110 group-hover:rotate-3"></i>Favoritos</a>
             <a href="#" id="mobile-cart-menu-link" class="mobile-nav-link group flex items-center text-white text-sm font-medium px-4 py-3 hover:bg-white/10 transition relative z-10"><i class="ph ph-shopping-cart mr-3 text-lg transition-transform group-hover:scale-110 group-hover:rotate-3"></i>Meu Carrinho</a>
@@ -689,4 +702,3 @@
     </script>
 </body>
 </html>
-
