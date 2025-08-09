@@ -153,27 +153,11 @@
         .product.out-of-stock .product-image { filter: grayscale(80%); cursor: default; }
         .btn-sold-out { background-color: #e2e8f0; color: #718096; border-color: #cbd5e0; cursor: not-allowed !important; width: 100%; }
 
-        /* ========= INÍCIO: ESTILOS PARA AS NOVAS CATEGORIAS VISUAIS ========= */
-        .visual-category-link { 
-            transition: transform 0.2s ease; 
-            text-decoration: none;
-        }
-        .visual-category-link:hover { 
-            transform: translateY(-4px); 
-        }
-        .visual-category-link .img-container { 
-            border: 3px solid transparent; 
-            transition: border-color 0.2s ease; 
-        }
-        .visual-category-link.active .img-container { 
-            border-color: var(--purple-medium); 
-        }
-        .visual-category-link.active span { 
-            color: var(--purple-dark); 
-            font-weight: 600; 
-        }
-        /* ========= FIM: ESTILOS PARA AS NOVAS CATEGORIAS VISUAIS ========= */
-
+        .visual-category-link { transition: transform 0.2s ease; text-decoration: none; }
+        .visual-category-link:hover { transform: translateY(-4px); }
+        .visual-category-link .img-container { border: 3px solid transparent; transition: border-color 0.2s ease; }
+        .visual-category-link.active .img-container { border-color: var(--purple-medium); }
+        .visual-category-link.active span { color: var(--purple-dark); font-weight: 600; }
     </style>
 </head>
 <body>
@@ -237,7 +221,6 @@
            
             <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                 
-                <!-- ========= INÍCIO: SEÇÃO DE FILTROS VISUAIS (SUBSTITUIÇÃO) ========= -->
                 <div id="visual-categories" class="w-full md:w-auto">
                     <div class="flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar pt-2 pb-4 sm:justify-center">
                         <a href="#" class="visual-category-link flex-shrink-0 w-24 text-center group" data-category="all">
@@ -260,7 +243,6 @@
                         </a>
                     </div>
                 </div>
-                <!-- ========= FIM: SEÇÃO DE FILTROS VISUAIS (SUBSTITUIÇÃO) ========= -->
 
                 <div class="relative flex-shrink-0" id="sort-dropdown-container">
                     <button id="sort-button" class="flex items-center justify-between bg-white text-gray-700 text-sm px-4 py-2 rounded-full shadow-sm border border-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-400 transition">
@@ -288,7 +270,6 @@
             <!-- Os cards dos produtos serão inseridos aqui pelo JavaScript -->
         </section>
         
-        <!-- Contêiner para o botão "Ver Mais" -->
         <div id="load-more-container" class="text-center mt-8">
             <!-- O botão será inserido aqui dinamicamente pelo JavaScript -->
         </div>
@@ -444,7 +425,6 @@
 
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
             
-            // --- VARIÁVEIS PARA PAGINAÇÃO ---
             let currentlyFilteredProducts = [];
             const productsPerPage = 10;
             let numDisplayed = 0;
@@ -478,7 +458,6 @@
                 floatingButtonsContainer: get('#floating-buttons-container'), 
                 scrollObserverTarget: get('#contato'),
                 loadMoreContainer: get('#load-more-container'),
-                // --- MUDANÇA: Referência aos novos links de categoria ---
                 visualCategoryLinks: getAll('.visual-category-link') 
             };
 
@@ -534,7 +513,7 @@
                                 <i class="heart-icon ph-fill ph-heart text-2xl pointer-events-none"></i>
                             </button>
                         </div>
-                        <div id="viewing-info-${product.id}" class="absolute bottom-2 left-2 h-5"></div>
+                        ${!isOutOfStock ? `<div id="viewing-info-${product.id}" class="absolute bottom-2 left-2 h-5"></div>` : ''}
                     </div>
                     <div class="p-3 flex flex-col flex-grow text-center">
                         <h3 class="text-base font-semibold text-gray-800 truncate mb-1">${product.name}</h3>
@@ -662,7 +641,6 @@
                 UIElements.searchInput.addEventListener('focus', () => showSearchSuggestions(UIElements.searchInput.value));
                 if (UIElements.clearSearchBtn) UIElements.clearSearchBtn.addEventListener('click', resetAllFilters);
                 
-                // --- MUDANÇA: Adiciona o evento de clique para os novos links de categoria ---
                 UIElements.visualCategoryLinks.forEach(link => {
                     link.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -692,7 +670,6 @@
                 setupEventListeners();
                 setupObservers();
                 
-                // --- MUDANÇA: Define o filtro "Todos" como ativo na inicialização ---
                 get('.visual-category-link[data-category="all"]').classList.add('active');
                 get('.sort-option[data-value="default"]').classList.add('font-bold');
                 
