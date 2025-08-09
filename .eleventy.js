@@ -1,5 +1,3 @@
-// .eleventy.js - COMPLETO E ATUALIZADO
-
 const yaml = require("js-yaml");
 
 module.exports = function(eleventyConfig) {
@@ -8,7 +6,6 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("assets/uploads");
 
   eleventyConfig.addCollection("products", function(collectionApi) {
-    // REMOVEMOS O FILTRO! Agora todos os produtos são enviados para o site.
     return collectionApi.getFilteredByGlob("_products/*.md")
       .sort((a, b) => {
         return new Date(b.data.dateAdded) - new Date(a.data.dateAdded);
@@ -20,6 +17,7 @@ module.exports = function(eleventyConfig) {
     return `R$ ${price.toFixed(2).replace('.', ',')}`;
   });
 
+  // Filtro ATUALIZADO para garantir que todos os dados necessários sejam passados para o front-end
   eleventyConfig.addFilter("getProductList", function(collection) {
     if (!collection) {
       return "[]";
@@ -27,13 +25,8 @@ module.exports = function(eleventyConfig) {
     const productList = collection.map(product => {
       if (!product || !product.data) return null;
       
-      const rawId = product.data.id || product.url;
-      const safeId = String(rawId)
-        .replace(/^\/|\/$/g, '')
-        .replace(/\//g, '-');
-
-      const cleanProduct = {
-        id: safeId,
+      return {
+        id: product.fileSlug, // Usando o nome do arquivo como um ID único e confiável
         name: product.data.name,
         price: product.data.price,
         originalPrice: product.data.originalPrice,
@@ -41,14 +34,11 @@ module.exports = function(eleventyConfig) {
         category: product.data.category,
         badge: product.data.badge,
         dateAdded: product.data.dateAdded,
-        url: product.url,
         description: product.templateContent ? product.templateContent.trim().replace(/<p>|<\/p>/g, "") : "",
         size: product.data.size || null,
-        // PASSANDO A INFORMAÇÃO DE ESTOQUE PARA O JAVASCRIPT DA PÁGINA
-        inStock: product.data.inStock
+        inStock: product.data.inStock !== false // Garante que se 'inStock' não for definido, ele seja 'true'
       };
-      return cleanProduct;
-    }).filter(p => p);
+    }).filter(p => p); // Remove qualquer item nulo que possa ter ocorrido
 
     return JSON.stringify(productList);
   });
