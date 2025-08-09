@@ -10,6 +10,8 @@ category: roupas
 size: M
 badge:
   text: Mais Vendido
+gallery:
+  - {}
 title: Saia de brilho
 isFeatured: true
 tags: products
