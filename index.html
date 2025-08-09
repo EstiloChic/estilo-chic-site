@@ -1,7 +1,3 @@
----
-layout: false
----
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -20,6 +16,7 @@ layout: false
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
     
     <style>
         :root {
@@ -65,12 +62,26 @@ layout: false
         .mobile-social-link:hover { background-color: rgba(255, 255, 255, 0.2); transform: scale(1.1); }
 
         .section-title { font-family: var(--font-display); color: var(--text-primary); font-weight: 700; }
-        .section-subtitle { color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem auto; }
+        .section-subtitle { color: var(--text-secondary); max-width: 600px; margin: 0 auto 2.5rem auto; }
 
-        .product { background: var(--background-card); border: 1px solid #e0d8f0; border-radius: 16px; box-shadow: var(--shadow-subtle); transition: transform 0.4s ease, box-shadow 0.4s ease; animation: fadeInUp 0.5s ease forwards; opacity: 0; }
+        .product { background: var(--background-card); border: 1px solid #e0d8f0; border-radius: 16px; box-shadow: var(--shadow-subtle); transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease; animation: fadeInUp 0.5s ease forwards; opacity: 0; }
         .product:hover:not(.out-of-stock) { transform: translateY(-8px); box-shadow: var(--shadow-medium); }
         .product.new-since-last-visit { animation: new-glow 1.2s ease-out forwards 0.5s, fadeInUp 0.5s ease forwards; }
-        .product-image { border-top-left-radius: 15px; border-top-right-radius: 15px; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease; cursor: pointer; }
+        
+        /* --- CORREÇÃO 1: Adiciona o arredondamento ao contêiner da imagem --- */
+        .product > .relative {
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+        }
+
+        .product-image { 
+            /* --- CORREÇÃO 2: Remove o arredondamento daqui, pois agora é controlado pelo contêiner --- */
+            /* border-top-left-radius: 15px; */
+            /* border-top-right-radius: 15px; */
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease; 
+            cursor: pointer; 
+        }
+
         .product:hover:not(.out-of-stock) .product-image { transform: scale(1.05); }
         .product-badge { position: absolute; top: 12px; left: 12px; color: white; padding: 3px 12px; font-size: 0.7rem; font-weight: 500; border-radius: 99px; text-transform: uppercase; background: var(--accent-pink); }
         .toggle-favorite-btn { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); transition: all 0.3s ease; }
@@ -86,18 +97,24 @@ layout: false
         .btn-buy:hover { background-color: #dcfce7; }
         .btn-outline-purple { background-color: var(--purple-faint); border-color: var(--purple-light); color: var(--purple-dark); }
         .btn-outline-purple:hover { background-color: var(--purple-light); }
-        .btn-sold-out { background-color: #e2e8f0; color: #718096; border-color: #cbd5e0; cursor: not-allowed !important; }
         
-        #sort-button { height: 38px; }
-        #sort-options { border: 1px solid #e0d8f0; box-shadow: var(--shadow-medium); }
-        .sort-option.font-bold { color: var(--purple-dark); background-color: #f3e8ff; }
+        .filter-btn { transition: all 0.3s ease; background-color: var(--background-card); color: var(--text-secondary); border: 1px solid var(--purple-light); box-shadow: var(--shadow-subtle); border-radius: 99px; }
+        .filter-btn:hover:not(.filter-active) { transform: translateY(-2px); background-color: #f3e8ff; }
+        .filter-btn.filter-active { background-color: var(--purple-dark); color: white; border-color: var(--purple-dark); transform: translateY(-2px); box-shadow: var(--shadow-medium); }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(58, 45, 70, 0.5); backdrop-filter: blur(10px); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.4s ease; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         .image-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1999; pointer-events: none; }
         .image-modal-content { background: var(--background-card); border-radius: 16px; box-shadow: var(--shadow-medium); width: 90%; max-width: 500px; pointer-events: auto; overflow: hidden; transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
         .modal-overlay.visible .image-modal-content { transform: scale(1); }
-        .image-modal-content img { display: block; width: 100%; height: 300px; object-fit: cover; }
+        .image-modal-content img {
+            display: block;
+            width: 100%;
+            height: auto; 
+            max-height: 70vh; 
+            object-fit: contain;
+            margin: 0 auto;
+        }
         .close-modal-btn { position: absolute; top: 12px; right: 12px; background: rgba(0, 0, 0, 0.3); color: white; cursor: pointer; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; z-index: 2001; }
         .close-modal-btn:hover { background: rgba(0, 0, 0, 0.6); transform: scale(1.1); }
 
@@ -155,13 +172,20 @@ layout: false
         .info-modal-content { background: var(--background-card); border-radius: 16px; box-shadow: var(--shadow-medium); width: 90%; max-width: 450px; pointer-events: auto; transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); text-align: left; }
         .modal-overlay.visible .info-modal-content { transform: scale(1); }
 
-        .visual-category-link { transition: transform 0.2s ease; }
-        .visual-category-link:hover { transform: translateY(-4px); }
-        .visual-category-link .img-container { border: 3px solid transparent; transition: border-color 0.2s ease; }
-        .visual-category-link.active .img-container { border-color: var(--purple-medium); }
-        .visual-category-link.active span { color: var(--purple-dark); font-weight: 600; }
-        .product.out-of-stock { opacity: 0.7; }
-        .product.out-of-stock .product-image { filter: grayscale(80%); cursor: default; }
+        .product.out-of-stock {
+            opacity: 0.7;
+        }
+        .product.out-of-stock .product-image {
+            filter: grayscale(80%);
+            cursor: default;
+        }
+        .btn-sold-out {
+            background-color: #e2e8f0;
+            color: #718096;
+            border-color: #cbd5e0;
+            cursor: not-allowed !important;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -204,45 +228,33 @@ layout: false
             <a href="#sobre" class="mobile-nav-link group flex items-center text-white text-sm font-medium px-4 py-3 hover:bg-white/10 transition relative z-10"><i class="ph ph-info mr-3 text-lg transition-transform group-hover:scale-110 group-hover:rotate-3"></i>Sobre</a>
             <div class="px-4 py-4 border-t border-purple-500/50 relative z-10">
                 <div class="flex justify-center gap-6">
-                    <a href="https://www.instagram.com/estilochicccc" target="_blank" rel="noopener noreferrer" class="mobile-social-link instagram" aria-label="Instagram"><i class="ph ph-instagram-logo text-2xl"></i></a>
-                    <a href="https://wa.me/5522998802545" target="_blank" rel="noopener noreferrer" class="mobile-social-link whatsapp" aria-label="WhatsApp"><i class="ph ph-whatsapp-logo text-2xl"></i></a>
+                    <a href="https://www.instagram.com/estilochicccc" target="_blank" rel="noopener noreferrer" class="mobile-social-link instagram" aria-label="Instagram">
+                        <i class="ph ph-instagram-logo text-2xl"></i>
+                    </a>
+                    <a href="https://wa.me/5522998802545" target="_blank" rel="noopener noreferrer" class="mobile-social-link whatsapp" aria-label="WhatsApp">
+                        <i class="ph ph-whatsapp-logo text-2xl"></i>
+                    </a>
                 </div>
             </div>
         </nav>
     </header>
     
-    <main class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8" id="inicio">
+    <main class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 pt-8" id="inicio">
         
         <section class="relative z-20" id="categorias">
-            <div class="text-center pt-8">
+            <div class="text-center mb-8">
                  <h1 class="section-title text-3xl md:text-4xl mb-2">Nossas Coleções</h1>
-                 <p class="section-subtitle">Peças selecionadas com carinho para realçar sua beleza.</p>
-            </div>
-
-            <div id="visual-categories" class="mb-6">
-                <div class="flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar pt-2 pb-4 sm:justify-center">
-                    <a href="#" class="visual-category-link flex-shrink-0 w-24 text-center group" data-category="all">
-                        <div class="img-container w-20 h-20 rounded-full mx-auto flex items-center justify-center bg-white shadow-sm border-2 border-purple-100 p-1">
-                            <i class="ph-fill ph-squares-four text-4xl text-purple-500"></i>
-                        </div>
-                        <span class="mt-2 block text-sm font-medium text-gray-700">Todos</span>
-                    </a>
-                    <a href="#" class="visual-category-link flex-shrink-0 w-24 text-center group" data-category="roupas">
-                        <div class="img-container w-20 h-20 rounded-full mx-auto p-1"><img src="https://i.postimg.cc/VLY3LVyh/roupas-estilo-chic-1.jpg" alt="Roupas" class="w-full h-full rounded-full object-cover"></div>
-                        <span class="mt-2 block text-sm font-medium text-gray-700">Roupas</span>
-                    </a>
-                    <a href="#" class="visual-category-link flex-shrink-0 w-24 text-center group" data-category="maquiagens">
-                        <div class="img-container w-20 h-20 rounded-full mx-auto p-1"><img src="https://i.postimg.cc/MKdgcmqp/maquiagem-estilo-chic-1.jpg" alt="Maquiagens" class="w-full h-full rounded-full object-cover"></div>
-                        <span class="mt-2 block text-sm font-medium text-gray-700">Maquiagens</span>
-                    </a>
-                    <a href="#" class="visual-category-link flex-shrink-0 w-24 text-center group" data-category="acessorios">
-                        <div class="img-container w-20 h-20 rounded-full mx-auto p-1"><img src="https://i.postimg.cc/x18hLN1y/acessorios-estilo-chic-1.jpg" alt="Acessórios" class="w-full h-full rounded-full object-cover"></div>
-                        <span class="mt-2 block text-sm font-medium text-gray-700">Acessórios</span>
-                    </a>
-                </div>
+                 <p class="section-subtitle text-sm md:text-base">Peças selecionadas com carinho para realçar sua beleza em cada detalhe.</p>
             </div>
            
-            <div class="flex flex-col md:flex-row justify-end items-center mb-6 gap-4">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                <div id="filter-buttons" class="flex gap-3 overflow-x-auto no-scrollbar pb-2 pt-1 w-full md:w-auto">
+                    <button class="filter-btn flex-shrink-0 px-5 py-2 text-sm" data-category="all">Todos</button>
+                    <button class="filter-btn flex-shrink-0 px-5 py-2 text-sm" data-category="roupas">Roupas</button>
+                    <button class="filter-btn flex-shrink-0 px-5 py-2 text-sm" data-category="maquiagens">Maquiagens</button>
+                    <button class="filter-btn flex-shrink-0 px-5 py-2 text-sm" data-category="acessorios">Acessórios</button>
+                </div>
+
                 <div class="relative flex-shrink-0" id="sort-dropdown-container">
                     <button id="sort-button" class="flex items-center justify-between bg-white text-gray-700 text-sm px-4 py-2 rounded-full shadow-sm border border-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-400 transition">
                         <span id="sort-button-text" class="whitespace-nowrap">Ordenar: Padrão</span>
@@ -257,6 +269,7 @@ layout: false
                 </div>
             </div>
 
+            <!-- Banner de Frete -->
             <div class="bg-purple-50 border border-purple-200 text-purple-800 rounded-xl p-4 flex items-center gap-4 mb-8 text-sm sm:text-base">
                 <i class="ph-fill ph-truck text-3xl text-purple-600"></i>
                 <p><strong>Frete grátis</strong> para São Francisco e região. Para outras localidades, frete a combinar!</p>
@@ -264,21 +277,20 @@ layout: false
             </div>
         </section>
 
-        <section class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6" id="product-grid">
-            <!-- Os produtos serão renderizados aqui pelo JavaScript -->
+        <section class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4" id="product-grid">
+            <!-- Os cards dos produtos serão inseridos aqui pelo JavaScript -->
         </section>
         
-        <div id="show-more-container" class="text-center mt-8 hidden">
-            <button id="show-more-btn" class="btn btn-outline-purple py-3 px-8 text-base" style="width: auto;">
-                Mostrar Mais <i class="ph ph-caret-down ml-2"></i>
-            </button>
+        <!-- Contêiner para o botão "Ver Mais" -->
+        <div id="load-more-container" class="text-center mt-8">
+            <!-- O botão será inserido aqui dinamicamente pelo JavaScript -->
         </div>
-        
+
         <div id="no-products-message" class="text-center py-16 text-gray-600 hidden"></div>
         
         <section id="meus-pedidos" class="bg-white/60 p-6 md:p-8 rounded-2xl shadow-lg mt-12 text-center">
             <h2 class="section-title text-3xl md:text-4xl mb-3">Acompanhe seus Pedidos</h2>
-            <p class="section-subtitle">Fale conosco para saber o status da sua compra.</p>
+            <p class="section-subtitle text-sm md:text-base mb-8">Fale conosco para saber o status da sua compra.</p>
             <a href="https://wa.me/5522998802545?text=Olá!%20Gostaria%20de%20saber%20sobre%20o%20status%20do%20meu%20pedido." target="_blank" class="btn btn-buy py-3 px-8 text-base" style="width: auto;">
                  <i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i> Consultar Pedido
             </a>
@@ -286,7 +298,7 @@ layout: false
         
         <section id="encomendas" class="bg-white/60 p-6 md:p-8 rounded-2xl shadow-lg mt-12 text-center">
             <h2 class="section-title text-3xl md:text-4xl mb-3">Sua Ideia, Nossa Criação</h2>
-            <p class="section-subtitle">Não encontrou o que sonhava? Nós realizamos.</p>
+            <p class="section-subtitle text-sm md:text-base mb-8">Não encontrou o que sonhava? Nós realizamos.</p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-8 max-w-4xl mx-auto">
                 <div class="step-item"><div class="step-icon"><i class="ph-fill ph-chat-circle-dots text-2xl"></i></div><div><h4 class="font-bold text-base text-gray-800">1. Inicie a Conversa</h4><p class="text-xs text-gray-600">Nos chame no WhatsApp.</p></div></div>
                 <div class="step-item"><div class="step-icon"><i class="ph-fill ph-paint-brush text-2xl"></i></div><div><h4 class="font-bold text-base text-gray-800">2. Descreva sua Ideia</h4><p class="text-xs text-gray-600">Envie detalhes e referências.</p></div></div>
@@ -300,7 +312,7 @@ layout: false
         <a href="https://www.instagram.com/estilochicccc" target="_blank" rel="noopener noreferrer">
             <section id="instagram" class="bg-white/60 p-6 md:p-10 rounded-2xl shadow-lg mt-12 text-center overflow-hidden">
                 <h2 class="section-title text-3xl md:text-4xl mb-2">Siga nosso Estilo</h2>
-                <p class="section-subtitle !mb-6">Inspirações, novidades e os bastidores do nosso mundo.</p>
+                <p class="section-subtitle text-sm md:text-base !mb-6">Inspirações, novidades e os bastidores do nosso mundo.</p>
                 <div class="btn btn-outline-purple py-3 px-8 text-base inline-flex" style="width: auto;">
                     <i class="ph-fill ph-instagram-logo mr-2"></i> @estilochicccc
                 </div>
@@ -362,17 +374,74 @@ layout: false
     <div id="welcome-popup-overlay" class="welcome-popup-overlay"><div class="welcome-popup"><button id="close-popup" class="close-popup-btn"><i class="ph ph-x"></i></button><i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i><h2 class="section-title text-2xl mb-2">Um presente para você!</h2><p class="text-gray-600 mb-6">É sua primeira vez aqui? Ganhe <strong>5% de desconto</strong> no seu primeiro pedido!</p><a href="https://wa.me/5522998802545?text=Olá!%20Vim%20pelo%20site%20e%20quero%20meu%20cupom%20de%205%25%20OFF%20de%20boas-vindas!" target="_blank" id="claim-coupon-btn" class="btn btn-buy py-3"><i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>Resgatar Cupom</a></div></div>
     
     <script>
+        let allProducts = [];
+        
+        function showProductDetailModal(productId) {
+            const get = (selector) => document.querySelector(selector);
+            const UIElements = { productDetailModal: get('#product-detail-modal'), modalOverlay: get('#modal-overlay') };
+            const cart = JSON.parse(localStorage.getItem('estiloChicCart') || '{}');
+
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) {
+                console.error("Produto não encontrado:", productId);
+                return;
+            }
+
+            const isInCart = cart[product.id] > 0;
+            UIElements.productDetailModal.innerHTML = `
+                <div class="image-modal-content">
+                    <button class="close-modal-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
+                    <img src="${product.image}" alt="${product.name}">
+                    <div class="p-4 sm:p-6 text-left">
+                        <h3 class="text-2xl font-bold font-display text-gray-800 mb-2">${product.name}</h3>
+                        <p class="text-sm text-gray-600 mb-4">${product.description || ''}</p>
+                        
+                        <div class="mt-4 p-3 bg-green-50/80 rounded-lg text-sm text-green-800 flex items-center gap-3">
+                            <i class="ph-fill ph-truck text-2xl"></i>
+                            <div>
+                                <strong>Frete grátis para São Francisco e região.</strong>
+                                <span class="block text-xs">Demais localidades, frete a combinar.</span>
+                            </div>
+                            <i class="ph-fill ph-info text-xl ml-auto info-icon open-shipping-info-modal" title="Saiba mais sobre a entrega"></i>
+                        </div>
+
+                        <div class="border-t border-purple-100 my-4"></div>
+
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="flex flex-col items-start">
+                                <p class="text-3xl font-bold text-purple-700">R$ ${Number(product.price).toFixed(2).replace('.', ',')}</p>
+                                <span class="text-lg text-gray-400 line-through -mt-1">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
+                            </div>
+                            <div class="flex flex-col gap-2 text-sm w-36">
+                                <button class="btn ${isInCart ? 'btn-add-success':'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
+                                    ${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado':'Adicionar'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            
+            UIElements.modalOverlay.classList.add('visible');
+            UIElements.productDetailModal.classList.remove('hidden');
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
-            const allProducts = {{ collections.products | getProductList | safe }};
 
             const get = (selector) => document.querySelector(selector);
             const getAll = (selector) => document.querySelectorAll(selector);
             
             function debounce(func, delay = 300) { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => { func.apply(this, args); }, delay); }; }
 
+            // A linha abaixo é preenchida pelo Eleventy durante o build do site.
+            allProducts = {{ collections.products | getProductList }};
+
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
-            let visibleProductsCount = 10;
-            const PRODUCTS_PER_PAGE = 10;
+            
+            // --- VARIÁVEIS PARA PAGINAÇÃO ---
+            let currentlyFilteredProducts = [];
+            const productsPerPage = 10;
+            let numDisplayed = 0;
+            let loadMoreBtn;
 
             const UIElements = { 
                 productGrid: get('#product-grid'), 
@@ -401,8 +470,7 @@ layout: false
                 mainHeader: get('#main-header'), 
                 floatingButtonsContainer: get('#floating-buttons-container'), 
                 scrollObserverTarget: get('#contato'),
-                showMoreContainer: get('#show-more-container'),
-                visualCategoryLinks: getAll('.visual-category-link')
+                loadMoreContainer: get('#load-more-container') 
             };
 
             const saveState = () => { localStorage.setItem('estiloChicCart', JSON.stringify(cart)); localStorage.setItem('estiloChicFavorites', JSON.stringify(favorites)); };
@@ -418,74 +486,134 @@ layout: false
             const renderFavorites = () => { if (favorites.length === 0) { UIElements.favoritesDropdown.innerHTML = `<div class="text-center p-4"><i class="ph ph-heart text-4xl text-gray-300 mb-2"></i><p class="font-semibold text-gray-700">Lista de favoritos vazia.</p></div>`; return; } let h = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-purple-800">Meus Favoritos</h3><button class="clear-favorites-btn text-xs bg-red-100 text-red-600 font-semibold hover:bg-red-200 px-3 py-1 rounded-full">Limpar</button></div>`; favorites.forEach(id => { const p = allProducts.find(pr => pr.id === id); if (!p) return; h += `<div class="favorite-dropdown-item flex items-center gap-4 py-3"><img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-grow"><p class="font-semibold text-sm">${p.name}</p><p class="text-xs text-purple-600 font-medium">R$ ${Number(p.price).toFixed(2).replace('.',',')}</p></div><div class="flex items-center gap-2"><button class="add-to-cart-from-fav-btn icon-btn-circle bg-purple-100 text-purple-700 hover:bg-purple-600" data-id="${id}"><i class="ph ph-shopping-cart-simple pointer-events-none"></i></button><button class="remove-from-favorites-btn icon-btn-circle" data-id="${id}"><i class="ph ph-trash text-base pointer-events-none"></i></button></div></div>`; }); UIElements.favoritesDropdown.innerHTML = h; };
             const updateProductCardStates = () => { getAll('#product-grid .product').forEach(c => { const id = c.dataset.id; const i = cart[id] > 0; const b = c.querySelector('.add-to-cart-btn'); if (b) { b.innerHTML = i ? `<i class="ph-bold ph-check mr-1"></i> Adicionado` : 'Adicionar'; b.classList.remove('btn-add-default', 'btn-add-success'); b.classList.add(i ? 'btn-add-success' : 'btn-add-default'); } const f = c.querySelector('.heart-icon'); if (f) f.classList.toggle('active', favorites.includes(id)); }); };
             const updateApp = () => { saveState(); updateCounters(); renderCart(); renderFavorites(); updateProductCardStates(); };
+            
             const createProductCardHTML = (product) => {
                 const isInCart = cart[product.id] > 0;
                 const whatsAppURL = `https://wa.me/5522998802545?text=${encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name}`)}`;
                 const isNew = lastVisit && (new Date(product.dateAdded).getTime() > lastVisit);
                 const isOutOfStock = product.inStock === false;
 
-                const priceHTML = `<div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2"><span class="text-gray-500 line-through whitespace-nowrap">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span><span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ ${Number(product.price).toFixed(2).replace('.',',')}</span></div>`;
+                const priceHTML = `
+                    <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
+                        <span class="text-gray-500 line-through whitespace-nowrap">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
+                        <span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ ${Number(product.price).toFixed(2).replace('.',',')}</span>
+                    </div>`;
                 const paymentHTML = `<div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>`;
-                
+
                 const buttonsHTML = isOutOfStock
-                  ? `<div class="mt-auto"><button class="btn btn-sold-out" disabled><i class="ph ph-x-circle mr-2"></i>Esgotado</button></div>`
-                  : `<div class="mt-auto">${priceHTML}${paymentHTML}<div class="flex flex-col gap-2 text-sm"><button class="btn ${isInCart ? 'btn-add-success' : 'btn-add-default'} add-to-cart-btn" data-id="${product.id}">${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado' : 'Adicionar'}</button><a href="${whatsAppURL}" target="_blank" class="btn btn-buy">Comprar</a></div></div>`;
+                  ? `<div class="mt-auto pt-4">
+                       <button class="btn btn-sold-out" disabled><i class="ph ph-x-circle mr-2"></i>Esgotado</button>
+                     </div>`
+                  : `<div class="mt-auto">
+                       ${priceHTML}
+                       ${paymentHTML}
+                       <div class="flex flex-col gap-2 text-sm">
+                           <button class="btn ${isInCart ? 'btn-add-success' : 'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
+                               ${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado' : 'Adicionar'}
+                           </button>
+                           <a href="${whatsAppURL}" target="_blank" class="btn btn-buy">Comprar</a>
+                       </div>
+                     </div>`;
+                
+                return `
+                <div class="product flex flex-col group ${isOutOfStock ? 'out-of-stock' : ''} ${isNew ? 'new-since-last-visit' : ''}" data-id="${product.id}" data-category="${product.category}" tabindex="0">
+                    <div class="relative overflow-hidden">
+                        <img loading="lazy" src="${product.image}" alt="${product.name}" class="product-image w-full h-48 sm:h-64 object-cover" ${!isOutOfStock ? `onclick="showProductDetailModal('${product.id}')"` : ''}>
+                        ${product.badge ? `<div class="product-badge">${product.badge.text}</div>` : ''}
+                        <div class="absolute top-3 right-3">
+                            <button class="toggle-favorite-btn w-10 h-10 rounded-full flex items-center justify-center" data-id="${product.id}">
+                                <i class="heart-icon ph-fill ph-heart text-2xl pointer-events-none"></i>
+                            </button>
+                        </div>
+                        <div id="viewing-info-${product.id}" class="absolute bottom-2 left-2 h-5"></div>
+                    </div>
+                    <div class="p-3 flex flex-col flex-grow text-center">
+                        <h3 class="text-base font-semibold text-gray-800 truncate mb-1">${product.name}</h3>
+                        <p class="text-xs text-gray-500 min-h-[16px] mb-3">${product.size ? `Tamanho: ${product.size}` : '&nbsp;'}</p>
+                        ${buttonsHTML}
+                    </div>
+                </div>`;
+            };
+            
+            // --- NOVA FUNÇÃO PARA EXIBIR PRODUTOS EM LOTES ---
+            function displayMoreProducts() {
+                const productsToDisplay = currentlyFilteredProducts.slice(numDisplayed, numDisplayed + productsPerPage);
 
-                return `<div class="product flex flex-col group ${isOutOfStock ? 'out-of-stock' : ''} ${isNew ? 'new-since-last-visit' : ''}" data-id="${product.id}" data-category="${product.category}" tabindex="0"><div class="relative overflow-hidden rounded-t-lg"><a href="${product.url}" class="block"><img loading="lazy" src="${product.image}" alt="${product.name}" class="product-image w-full h-48 sm:h-64 object-cover"></a>${product.badge ? `<div class="product-badge">${product.badge.text}</div>` : ''}<div class="absolute top-3 right-3"><button class="toggle-favorite-btn w-10 h-10 rounded-full flex items-center justify-center" data-id="${product.id}"><i class="heart-icon ph-fill ph-heart text-2xl pointer-events-none"></i></button></div></div><div class="p-3 flex flex-col flex-grow text-center"><h3 class="text-base font-semibold text-gray-800 truncate mb-1">${product.name}</h3><p class="text-xs text-gray-500 min-h-[16px] mb-3">${product.size ? `Tamanho: ${product.size}` : '&nbsp;'}</p>${buttonsHTML}</div></div>`;
+                if (productsToDisplay.length === 0 && numDisplayed === 0) {
+                    UIElements.noProductsMessage.classList.remove('hidden');
+                    UIElements.noProductsMessage.innerHTML = `<i class="ph ph-flower-lotus text-5xl text-purple-300 mb-4"></i><p class="font-semibold text-xl font-display">Nenhum tesouro encontrado</p><p class="text-gray-500">Tente buscar por outro termo ou alterar os filtros.</p>`;
+                    if (loadMoreBtn) loadMoreBtn.classList.add('hidden');
+                    return;
+                }
+
+                const productsHTML = productsToDisplay.map((product, index) => {
+                    const cardHTML = createProductCardHTML(product);
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = cardHTML.trim();
+                    const productElement = tempDiv.firstChild;
+                    productElement.style.animationDelay = `${(numDisplayed + index) * 60}ms`;
+                    return productElement.outerHTML;
+                }).join('');
+
+                UIElements.productGrid.insertAdjacentHTML('beforeend', productsHTML);
+                numDisplayed += productsToDisplay.length;
+                updateProductCardStates();
+
+                // Gerenciar visibilidade do botão "Ver Mais"
+                if (!loadMoreBtn) {
+                    UIElements.loadMoreContainer.innerHTML = `<button id="load-more-btn" class="btn btn-outline-purple px-8 py-3" style="width: auto;">Ver mais</button>`;
+                    loadMoreBtn = get('#load-more-btn');
+                    loadMoreBtn.addEventListener('click', displayMoreProducts);
+                }
+
+                if (numDisplayed >= currentlyFilteredProducts.length) {
+                    loadMoreBtn.classList.add('hidden');
+                } else {
+                    loadMoreBtn.classList.remove('hidden');
+                }
+            }
+
+            // --- FUNÇÃO RENDERPRODUCTS MODIFICADA ---
+            const renderProducts = () => {
+                const searchTerm = UIElements.searchInput.value.trim();
+                let filteredProducts = [...allProducts];
+
+                if (activeFilter !== 'all') {
+                    filteredProducts = filteredProducts.filter(p => p.category === activeFilter);
+                }
+                if (searchTerm) {
+                    const results = fuse.search(searchTerm);
+                    const resultIds = new Set(results.map(r => r.item.id));
+                    filteredProducts = filteredProducts.filter(p => resultIds.has(p.id));
+                }
+
+                if (activeSort === 'price-asc') filteredProducts.sort((a, b) => a.price - b.price);
+                else if (activeSort === 'price-desc') filteredProducts.sort((a, b) => b.price - a.price);
+                else if (activeSort === 'name-asc') filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+
+                // Reseta a exibição atual
+                UIElements.productGrid.innerHTML = '';
+                UIElements.noProductsMessage.classList.add('hidden');
+                numDisplayed = 0;
+                currentlyFilteredProducts = filteredProducts;
+                
+                displayMoreProducts();
             };
 
-            const renderProducts = () => { 
-                const t = UIElements.searchInput.value.trim(); 
-                let p = [...allProducts]; 
-                
-                if (activeFilter !== 'all') p = p.filter(pr => pr.category === activeFilter);
-                if (t) { const r = fuse.search(t); const ids = new Set(r.map(i => i.item.id)); p = p.filter(pr => ids.has(pr.id)); } 
-                if (activeSort === 'price-asc') p.sort((a,b)=>a.price-b.price);
-                else if (activeSort === 'price-desc') p.sort((a,b)=>b.price-a.price);
-                else if (activeSort === 'name-asc') p.sort((a,b)=>a.name.localeCompare(b.name));
-                
-                const productsToShow = p.slice(0, visibleProductsCount);
-                UIElements.productGrid.innerHTML = productsToShow.map(createProductCardHTML).join('');
-                 
-                UIElements.noProductsMessage.classList.toggle('hidden', p.length > 0); 
-                if (p.length === 0) UIElements.noProductsMessage.innerHTML = `<i class="ph ph-flower-lotus text-5xl text-purple-300 mb-4"></i><p class="font-semibold text-xl font-display">Nenhum tesouro encontrado</p>`;
-                
-                UIElements.showMoreContainer.classList.toggle('hidden', p.length <= visibleProductsCount || p.length === 0);
-                updateProductCardStates(); 
-            };
-
-            const updateVisuals = () => { allProducts.forEach(p => { const e = get(`#viewing-info-${p.id}`); if (e) { if (Math.random() > 0.7) p.viewing = Math.max(0, (p.viewing || 0) + (Math.floor(Math.random() * 3) - 1)); e.innerHTML = (p.viewing > 1) ? `<div class="flex items-center gap-1 text-white text-xs font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm animate-pulse"><i class="ph-fill ph-eye text-sm"></i><span>${p.viewing}</span></div>` : ''; } }); };
+            const updateVisuals = () => { allProducts.forEach(p => { const e = get(`#viewing-info-${p.id}`); if (e) { if (Math.random() > 0.7) p.viewing = Math.max(0, (p.viewing || 0) + (Math.floor(Math.random() * 3) - 1)); if (p.viewing > 0) { e.innerHTML = `<div class="flex items-center gap-1 text-white text-xs font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm animate-pulse"><i class="ph-fill ph-eye text-sm"></i><span>${p.viewing}</span></div>`; } else { e.innerHTML = ''; } } }); };
             const showFeedbackToast = (type) => { const t = type === 'cart' ? UIElements.cartFeedbackToast : UIElements.favoritesFeedbackToast; let to = type === 'cart' ? cartToastTimeout : favoritesToastTimeout; clearTimeout(to); t.classList.add('show'); to = setTimeout(() => t.classList.remove('show'), 2000); if (type === 'cart') cartToastTimeout = to; else favoritesToastTimeout = to; };
             const flyToCart = (target) => { const c = target.closest('.product, .favorite-dropdown-item'); if (!c) return; const i = c.querySelector('img'); if(!i) return; const fi = i.cloneNode(true); const r1 = i.getBoundingClientRect(); const r2 = UIElements.floatingCartBtn.getBoundingClientRect(); fi.style.cssText = `position: fixed; z-index: 9999; left: ${r1.left}px; top: ${r1.top}px; width: ${r1.width}px; height: ${r1.height}px; border-radius: 0.5rem; transition: all 0.7s cubic-bezier(0.5, 0, 0.75, 0.2);`; document.body.appendChild(fi); requestAnimationFrame(() => { fi.style.left = `${r2.left + r2.width / 2 - 20}px`; fi.style.top = `${r2.top + r2.height / 2 - 20}px`; fi.style.width = '40px'; fi.style.height = '40px'; fi.style.transform = 'scale(0.2) rotate(180deg)'; fi.style.opacity = '0'; }); setTimeout(() => { fi.remove(); UIElements.floatingCartBtn.classList.add('shake'); setTimeout(() => UIElements.floatingCartBtn.classList.remove('shake'), 500); }, 700); };
             const setupWelcomePopup = () => { const o = UIElements.welcomePopupOverlay; if (!o) return; const c = () => { o.classList.remove('show'); localStorage.setItem('estiloChicVisitedBefore', 'true'); }; if (!localStorage.getItem('estiloChicVisitedBefore')) setTimeout(() => o.classList.add('show'), 5000); get('#close-popup').addEventListener('click', c); get('#claim-coupon-btn').addEventListener('click', c); o.addEventListener('click', (e) => { if (e.target === o) c(); }); };
             const hideSearchSuggestions = () => { if (UIElements.searchSuggestions) { UIElements.searchSuggestions.classList.add('hidden'); UIElements.searchSuggestions.innerHTML = ''; } };
             const showSearchSuggestions = (term) => { if (!UIElements.searchSuggestions || term.trim() === '') return hideSearchSuggestions(); const results = fuse.search(term).slice(0, 5); if (results.length === 0) return hideSearchSuggestions(); UIElements.searchSuggestions.innerHTML = results.map(({ item }) => `<div class="suggestion-item" data-name="${item.name}"><span>${item.name}</span></div>`).join(''); UIElements.searchSuggestions.classList.remove('hidden'); };
-            
-            const handleFilterClick = (category) => {
-                visibleProductsCount = PRODUCTS_PER_PAGE;
-                activeFilter = category;
-                UIElements.visualCategoryLinks.forEach(link => link.classList.toggle('active', link.dataset.category === category));
-                renderProducts();
-            };
-
-            const resetAllFilters = () => { visibleProductsCount = PRODUCTS_PER_PAGE; handleFilterClick('all'); UIElements.searchInput.value = ''; hideSearchSuggestions(); checkButtonsVisibility(); };
-            
+            const resetAllFilters = () => { activeFilter = 'all'; UIElements.searchInput.value = ''; getAll('#filter-buttons button').forEach(btn => btn.classList.remove('filter-active')); get('#filter-buttons button[data-category="all"]').classList.add('filter-active'); hideSearchSuggestions(); renderProducts(); checkButtonsVisibility(); };
             const checkButtonsVisibility = () => { const hasText = UIElements.searchInput.value.trim() !== ''; if(UIElements.clearSearchBtn) UIElements.clearSearchBtn.classList.toggle('hidden', !hasText); if(UIElements.searchIcon) UIElements.searchIcon.classList.toggle('hidden', hasText); };
-            const setupActivityNotifications = () => { const toast = UIElements.activityToast; if (!toast || allProducts.length === 0) return; const names = ['Ana', 'Mariana', 'Júlia', 'Beatriz', 'Larissa', 'Maria', 'Alice', 'Helena', 'Laura', 'Manuela', 'Valentina', 'Sophia', 'Isabella', 'Lívia', 'Giovanna', 'Yasmin', 'Eloá', 'Clara', 'Cecília', 'Liz', 'Maitê', 'Antonella', 'Elisa', 'Gabriela', 'Luiza', 'Amanda', 'Bruna', 'Camila', 'Fernanda', 'Patrícia', 'Sandra', 'Jéssica', 'Letícia', 'Aline']; const cities = [ 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'Macaé', 'Itaperuna', 'Rio de Janeiro' ]; const actions = [ { verb: 'acabou de comprar', icon: 'ph-fill ph-shopping-cart-simple', color: 'var(--purple-dark)' }, { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' } ]; const showRandom = () => { if (document.hidden || allProducts.length === 0) return; const name = names[Math.floor(Math.random() * names.length)]; const city = cities[Math.floor(Math.random() * cities.length)]; const action = actions[Math.floor(Math.random() * actions.length)]; const product = allProducts[Math.floor(Math.random() * allProducts.length)]; toast.innerHTML = `<div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full animate-icon-pulse" style="background-color: ${action.color};"><i class="${action.icon} text-white text-xl"></i></div><div><p><strong>${name}</strong> de ${city}</p><p class="text-sm" style="color: var(--text-secondary);">${action.verb} um(a) <strong>${product.name}</strong></p></div>`; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 5000); }; const startCycle = () => { const delay = Math.random() * (20000 - 8000) + 8000; setTimeout(() => { showRandom(); startCycle(); }, delay); }; setTimeout(startCycle, 7000); };
+            const setupActivityNotifications = () => { const toast = UIElements.activityToast; if (!toast || allProducts.length === 0) return; const names = ['Ana', 'Mariana', 'Júlia', 'Beatriz', 'Larissa', 'Maria', 'Alice', 'Helena', 'Laura', 'Manuela', 'Valentina', 'Sophia', 'Isabella', 'Lívia', 'Giovanna', 'Yasmin', 'Eloá', 'Clara', 'Cecília', 'Liz', 'Maitê', 'Antonella', 'Elisa', 'Gabriela', 'Luiza', 'Amanda', 'Bruna', 'Camila', 'Fernanda', 'Patrícia', 'Sandra', 'Jéssica', 'Letícia', 'Aline']; const cities = [ 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'Macaé', 'Itaperuna', 'Rio de Janeiro' ]; const actions = [ { verb: 'acabou de comprar', icon: 'ph-fill ph-shopping-cart-simple', color: 'var(--purple-dark)' }, { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' } ]; const showRandom = () => { if (document.hidden || allProducts.length === 0) return; const name = names[Math.floor(Math.random() * names.length)]; const city = cities[Math.floor(Math.random() * cities.length)]; const action = actions[Math.floor(Math.random() * actions.length)]; const product = allProducts[Math.floor(Math.random() * allProducts.length)]; toast.innerHTML = `<div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full animate-icon-pulse" style="background-color: ${action.color};"><i class="${action.icon} text-white text-xl"></i></div><div><p><strong>${name}</strong> de ${city}</p><p class="text-sm" style="color: var(--text-secondary);">${action.verb} um(a) <strong>${product.name}</strong></p></div>`; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 5000); }; const startCycle = () => { const delay = Math.random() * (20000 - 8000) + 8000; setTimeout(() => { showRandom(); startCycle(); }, delay); }; setTimeout(startCycle, 7000); };
             const setupObservers = () => { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { UIElements.floatingButtonsContainer.classList.toggle('hidden', entry.isIntersecting); }); }, { threshold: 0.1 }); if (UIElements.scrollObserverTarget) { observer.observe(UIElements.scrollObserverTarget); } };
-
+            
             function setupEventListeners() {
                 UIElements.hamburgerButton.addEventListener('click', () => { UIElements.hamburgerButton.classList.toggle('menu-open'); UIElements.mobileNav.classList.toggle('menu-open'); });
                 UIElements.modalOverlay.addEventListener('click', (e) => { if (e.target === UIElements.modalOverlay) closeAllModals(); });
-                
-                if (UIElements.showMoreContainer) {
-                    UIElements.showMoreContainer.addEventListener('click', (e) => {
-                        if (e.target.id === 'show-more-btn') {
-                            visibleProductsCount = allProducts.length; 
-                            renderProducts();
-                        }
-                    });
-                }
                 
                 document.body.addEventListener('click', (e) => {
                     const target = e.target;
@@ -494,7 +622,7 @@ layout: false
                     if (target.closest('.open-shipping-info-modal')) { UIElements.modalOverlay.classList.add('visible'); UIElements.shippingInfoModal.classList.remove('hidden'); return; }
                     if (target.closest('#shipping-info-modal .close-modal-btn') || target.closest('#close-shipping-info-btn')) { closeShippingInfoModal(); return; }
                     if (target.closest('#product-detail-modal .close-modal-btn')) { closeAllModals(); return; }
-                    
+                                        
                     if (!target.closest('.search-container')) hideSearchSuggestions();
                     if (!target.closest('#sort-dropdown-container')) { UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); }
                     
@@ -515,38 +643,26 @@ layout: false
                         if (target.id === 'mobile-favorites-menu-link') { e.preventDefault(); openFavorites(); }
                         if (target.id === 'mobile-cart-menu-link') { e.preventDefault(); openCart(); }
                     }
-                    // INÍCIO DO TRECHO SUBSTITUÍDO
                     if (target.closest('#floating-cart-btn')) { cartOpen ? closeCart() : openCart(); }
                     if (target.closest('#floating-favorites-btn')) { favoritesOpen ? closeFavorites() : openFavorites(); }
                     if (target.closest('#sort-button')) { UIElements.sortOptions.classList.toggle('hidden'); UIElements.sortCaret.classList.toggle('rotate-180'); }
-                    if (target.closest('.suggestion-item')) { visibleProductsCount = PRODUCTS_PER_PAGE; UIElements.searchInput.value = target.closest('.suggestion-item').dataset.name; hideSearchSuggestions(); renderProducts(); checkButtonsVisibility();}
+                    if (target.closest('.suggestion-item')) { UIElements.searchInput.value = target.closest('.suggestion-item').dataset.name; hideSearchSuggestions(); renderProducts(); checkButtonsVisibility();}
                     if (UIElements.mobileNav.classList.contains('menu-open') && !target.closest('#main-header')) { UIElements.hamburgerButton.click(); }
                     
                     if (stateChanged) updateApp();
                 });
                 
-                UIElements.visualCategoryLinks.forEach(link => {
-                    link.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        handleFilterClick(link.dataset.category);
-                    });
-                });
-                
-                const debouncedRender = debounce(() => {
-                    visibleProductsCount = PRODUCTS_PER_PAGE;
-                    renderProducts();
-                }, 350);
-
+                const debouncedRender = debounce(() => renderProducts(), 350);
                 UIElements.searchInput.addEventListener('input', () => {
                     showSearchSuggestions(UIElements.searchInput.value);
                     debouncedRender();
                     checkButtonsVisibility();
                 });
-
                 UIElements.searchInput.addEventListener('focus', () => showSearchSuggestions(UIElements.searchInput.value));
                 if (UIElements.clearSearchBtn) UIElements.clearSearchBtn.addEventListener('click', resetAllFilters);
                 
-                getAll('.sort-option').forEach(o => o.addEventListener('click', (e) => { e.preventDefault(); visibleProductsCount = PRODUCTS_PER_PAGE; get('#sort-button-text').textContent = `Ordenar: ${o.textContent}`; activeSort = o.dataset.value; getAll('.sort-option').forEach(opt => opt.classList.remove('font-bold')); o.classList.add('font-bold'); UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); renderProducts(); }));
+                getAll('#filter-buttons button').forEach(b => b.addEventListener('click', function() { getAll('#filter-buttons button').forEach(btn => btn.classList.remove('filter-active')); this.classList.add('filter-active'); activeFilter = this.dataset.category; renderProducts(); }));
+                getAll('.sort-option').forEach(o => o.addEventListener('click', (e) => { e.preventDefault(); get('#sort-button-text').textContent = `Ordenar: ${o.textContent}`; activeSort = o.dataset.value; getAll('.sort-option').forEach(opt => opt.classList.remove('font-bold')); o.classList.add('font-bold'); UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); renderProducts(); }));
             }
 
             function init() {
@@ -565,18 +681,20 @@ layout: false
 
                 setupEventListeners();
                 setupObservers();
-                handleFilterClick('all');
+                
+                get('#filter-buttons button[data-category="all"]').classList.add('filter-active');
                 get('.sort-option[data-value="default"]').classList.add('font-bold');
                 
+                renderProducts(); 
                 updateApp();
                 checkButtonsVisibility();
                 setupWelcomePopup();
                 setupActivityNotifications();
+                
                 setInterval(updateVisuals, 4000);
                 
                 UIElements.loadingOverlay.classList.add('hidden');
             }
-            // FIM DO TRECHO SUBSTITUÍDO
             
             init();
         });
