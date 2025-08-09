@@ -62,26 +62,14 @@
         .mobile-social-link:hover { background-color: rgba(255, 255, 255, 0.2); transform: scale(1.1); }
 
         .section-title { font-family: var(--font-display); color: var(--text-primary); font-weight: 700; }
-        .section-subtitle { color: var(--text-secondary); max-width: 600px; margin: 0 auto 2.5rem auto; }
+        .section-subtitle { color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem auto; }
 
         .product { background: var(--background-card); border: 1px solid #e0d8f0; border-radius: 16px; box-shadow: var(--shadow-subtle); transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease; animation: fadeInUp 0.5s ease forwards; opacity: 0; }
         .product:hover:not(.out-of-stock) { transform: translateY(-8px); box-shadow: var(--shadow-medium); }
         .product.new-since-last-visit { animation: new-glow 1.2s ease-out forwards 0.5s, fadeInUp 0.5s ease forwards; }
         
-        /* --- CORREÇÃO 1: Adiciona o arredondamento ao contêiner da imagem --- */
-        .product > .relative {
-            border-top-left-radius: 16px;
-            border-top-right-radius: 16px;
-        }
-
-        .product-image { 
-            /* --- CORREÇÃO 2: Remove o arredondamento daqui, pois agora é controlado pelo contêiner --- */
-            /* border-top-left-radius: 15px; */
-            /* border-top-right-radius: 15px; */
-            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease; 
-            cursor: pointer; 
-        }
-
+        .product > .relative { border-top-left-radius: 16px; border-top-right-radius: 16px; }
+        .product-image { transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease; cursor: pointer; }
         .product:hover:not(.out-of-stock) .product-image { transform: scale(1.05); }
         .product-badge { position: absolute; top: 12px; left: 12px; color: white; padding: 3px 12px; font-size: 0.7rem; font-weight: 500; border-radius: 99px; text-transform: uppercase; background: var(--accent-pink); }
         .toggle-favorite-btn { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); transition: all 0.3s ease; }
@@ -98,23 +86,12 @@
         .btn-outline-purple { background-color: var(--purple-faint); border-color: var(--purple-light); color: var(--purple-dark); }
         .btn-outline-purple:hover { background-color: var(--purple-light); }
         
-        .filter-btn { transition: all 0.3s ease; background-color: var(--background-card); color: var(--text-secondary); border: 1px solid var(--purple-light); box-shadow: var(--shadow-subtle); border-radius: 99px; }
-        .filter-btn:hover:not(.filter-active) { transform: translateY(-2px); background-color: #f3e8ff; }
-        .filter-btn.filter-active { background-color: var(--purple-dark); color: white; border-color: var(--purple-dark); transform: translateY(-2px); box-shadow: var(--shadow-medium); }
-
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(58, 45, 70, 0.5); backdrop-filter: blur(10px); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.4s ease; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         .image-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1999; pointer-events: none; }
         .image-modal-content { background: var(--background-card); border-radius: 16px; box-shadow: var(--shadow-medium); width: 90%; max-width: 500px; pointer-events: auto; overflow: hidden; transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
         .modal-overlay.visible .image-modal-content { transform: scale(1); }
-        .image-modal-content img {
-            display: block;
-            width: 100%;
-            height: auto; 
-            max-height: 70vh; 
-            object-fit: contain;
-            margin: 0 auto;
-        }
+        .image-modal-content img { display: block; width: 100%; height: auto; max-height: 70vh; object-fit: contain; margin: 0 auto; }
         .close-modal-btn { position: absolute; top: 12px; right: 12px; background: rgba(0, 0, 0, 0.3); color: white; cursor: pointer; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; z-index: 2001; }
         .close-modal-btn:hover { background: rgba(0, 0, 0, 0.6); transform: scale(1.1); }
 
@@ -172,20 +149,31 @@
         .info-modal-content { background: var(--background-card); border-radius: 16px; box-shadow: var(--shadow-medium); width: 90%; max-width: 450px; pointer-events: auto; transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); text-align: left; }
         .modal-overlay.visible .info-modal-content { transform: scale(1); }
 
-        .product.out-of-stock {
-            opacity: 0.7;
+        .product.out-of-stock { opacity: 0.7; }
+        .product.out-of-stock .product-image { filter: grayscale(80%); cursor: default; }
+        .btn-sold-out { background-color: #e2e8f0; color: #718096; border-color: #cbd5e0; cursor: not-allowed !important; width: 100%; }
+
+        /* ========= INÍCIO: ESTILOS PARA AS NOVAS CATEGORIAS VISUAIS ========= */
+        .visual-category-link { 
+            transition: transform 0.2s ease; 
+            text-decoration: none;
         }
-        .product.out-of-stock .product-image {
-            filter: grayscale(80%);
-            cursor: default;
+        .visual-category-link:hover { 
+            transform: translateY(-4px); 
         }
-        .btn-sold-out {
-            background-color: #e2e8f0;
-            color: #718096;
-            border-color: #cbd5e0;
-            cursor: not-allowed !important;
-            width: 100%;
+        .visual-category-link .img-container { 
+            border: 3px solid transparent; 
+            transition: border-color 0.2s ease; 
         }
+        .visual-category-link.active .img-container { 
+            border-color: var(--purple-medium); 
+        }
+        .visual-category-link.active span { 
+            color: var(--purple-dark); 
+            font-weight: 600; 
+        }
+        /* ========= FIM: ESTILOS PARA AS NOVAS CATEGORIAS VISUAIS ========= */
+
     </style>
 </head>
 <body>
@@ -244,16 +232,35 @@
         <section class="relative z-20" id="categorias">
             <div class="text-center mb-8">
                  <h1 class="section-title text-3xl md:text-4xl mb-2">Nossas Coleções</h1>
-                 <p class="section-subtitle text-sm md:text-base">Peças selecionadas com carinho para realçar sua beleza em cada detalhe.</p>
+                 <p class="section-subtitle text-sm md:text-base">Peças selecionadas com carinho para realçar sua beleza.</p>
             </div>
            
             <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                <div id="filter-buttons" class="flex gap-3 overflow-x-auto no-scrollbar pb-2 pt-1 w-full md:w-auto">
-                    <button class="filter-btn flex-shrink-0 px-5 py-2 text-sm" data-category="all">Todos</button>
-                    <button class="filter-btn flex-shrink-0 px-5 py-2 text-sm" data-category="roupas">Roupas</button>
-                    <button class="filter-btn flex-shrink-0 px-5 py-2 text-sm" data-category="maquiagens">Maquiagens</button>
-                    <button class="filter-btn flex-shrink-0 px-5 py-2 text-sm" data-category="acessorios">Acessórios</button>
+                
+                <!-- ========= INÍCIO: SEÇÃO DE FILTROS VISUAIS (SUBSTITUIÇÃO) ========= -->
+                <div id="visual-categories" class="w-full md:w-auto">
+                    <div class="flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar pt-2 pb-4 sm:justify-center">
+                        <a href="#" class="visual-category-link flex-shrink-0 w-24 text-center group" data-category="all">
+                            <div class="img-container w-20 h-20 rounded-full mx-auto flex items-center justify-center bg-white shadow-sm border-2 border-purple-100 p-1">
+                                <i class="ph-fill ph-squares-four text-4xl text-purple-500"></i>
+                            </div>
+                            <span class="mt-2 block text-sm font-medium text-gray-700">Todos</span>
+                        </a>
+                        <a href="#" class="visual-category-link flex-shrink-0 w-24 text-center group" data-category="roupas">
+                            <div class="img-container w-20 h-20 rounded-full mx-auto p-1"><img src="https://i.postimg.cc/VLY3LVyh/roupas-estilo-chic-1.jpg" alt="Roupas" class="w-full h-full rounded-full object-cover"></div>
+                            <span class="mt-2 block text-sm font-medium text-gray-700">Roupas</span>
+                        </a>
+                        <a href="#" class="visual-category-link flex-shrink-0 w-24 text-center group" data-category="maquiagens">
+                            <div class="img-container w-20 h-20 rounded-full mx-auto p-1"><img src="https://i.postimg.cc/MKdgcmqp/maquiagem-estilo-chic-1.jpg" alt="Maquiagens" class="w-full h-full rounded-full object-cover"></div>
+                            <span class="mt-2 block text-sm font-medium text-gray-700">Maquiagens</span>
+                        </a>
+                        <a href="#" class="visual-category-link flex-shrink-0 w-24 text-center group" data-category="acessorios">
+                            <div class="img-container w-20 h-20 rounded-full mx-auto p-1"><img src="https://i.postimg.cc/x18hLN1y/acessorios-estilo-chic-1.jpg" alt="Acessórios" class="w-full h-full rounded-full object-cover"></div>
+                            <span class="mt-2 block text-sm font-medium text-gray-700">Acessórios</span>
+                        </a>
+                    </div>
                 </div>
+                <!-- ========= FIM: SEÇÃO DE FILTROS VISUAIS (SUBSTITUIÇÃO) ========= -->
 
                 <div class="relative flex-shrink-0" id="sort-dropdown-container">
                     <button id="sort-button" class="flex items-center justify-between bg-white text-gray-700 text-sm px-4 py-2 rounded-full shadow-sm border border-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-400 transition">
@@ -470,7 +477,9 @@
                 mainHeader: get('#main-header'), 
                 floatingButtonsContainer: get('#floating-buttons-container'), 
                 scrollObserverTarget: get('#contato'),
-                loadMoreContainer: get('#load-more-container') 
+                loadMoreContainer: get('#load-more-container'),
+                // --- MUDANÇA: Referência aos novos links de categoria ---
+                visualCategoryLinks: getAll('.visual-category-link') 
             };
 
             const saveState = () => { localStorage.setItem('estiloChicCart', JSON.stringify(cart)); localStorage.setItem('estiloChicFavorites', JSON.stringify(favorites)); };
@@ -535,7 +544,6 @@
                 </div>`;
             };
             
-            // --- NOVA FUNÇÃO PARA EXIBIR PRODUTOS EM LOTES ---
             function displayMoreProducts() {
                 const productsToDisplay = currentlyFilteredProducts.slice(numDisplayed, numDisplayed + productsPerPage);
 
@@ -559,7 +567,6 @@
                 numDisplayed += productsToDisplay.length;
                 updateProductCardStates();
 
-                // Gerenciar visibilidade do botão "Ver Mais"
                 if (!loadMoreBtn) {
                     UIElements.loadMoreContainer.innerHTML = `<button id="load-more-btn" class="btn btn-outline-purple px-8 py-3" style="width: auto;">Ver mais</button>`;
                     loadMoreBtn = get('#load-more-btn');
@@ -573,7 +580,6 @@
                 }
             }
 
-            // --- FUNÇÃO RENDERPRODUCTS MODIFICADA ---
             const renderProducts = () => {
                 const searchTerm = UIElements.searchInput.value.trim();
                 let filteredProducts = [...allProducts];
@@ -591,7 +597,6 @@
                 else if (activeSort === 'price-desc') filteredProducts.sort((a, b) => b.price - a.price);
                 else if (activeSort === 'name-asc') filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
 
-                // Reseta a exibição atual
                 UIElements.productGrid.innerHTML = '';
                 UIElements.noProductsMessage.classList.add('hidden');
                 numDisplayed = 0;
@@ -606,9 +611,9 @@
             const setupWelcomePopup = () => { const o = UIElements.welcomePopupOverlay; if (!o) return; const c = () => { o.classList.remove('show'); localStorage.setItem('estiloChicVisitedBefore', 'true'); }; if (!localStorage.getItem('estiloChicVisitedBefore')) setTimeout(() => o.classList.add('show'), 5000); get('#close-popup').addEventListener('click', c); get('#claim-coupon-btn').addEventListener('click', c); o.addEventListener('click', (e) => { if (e.target === o) c(); }); };
             const hideSearchSuggestions = () => { if (UIElements.searchSuggestions) { UIElements.searchSuggestions.classList.add('hidden'); UIElements.searchSuggestions.innerHTML = ''; } };
             const showSearchSuggestions = (term) => { if (!UIElements.searchSuggestions || term.trim() === '') return hideSearchSuggestions(); const results = fuse.search(term).slice(0, 5); if (results.length === 0) return hideSearchSuggestions(); UIElements.searchSuggestions.innerHTML = results.map(({ item }) => `<div class="suggestion-item" data-name="${item.name}"><span>${item.name}</span></div>`).join(''); UIElements.searchSuggestions.classList.remove('hidden'); };
-            const resetAllFilters = () => { activeFilter = 'all'; UIElements.searchInput.value = ''; getAll('#filter-buttons button').forEach(btn => btn.classList.remove('filter-active')); get('#filter-buttons button[data-category="all"]').classList.add('filter-active'); hideSearchSuggestions(); renderProducts(); checkButtonsVisibility(); };
+            const resetAllFilters = () => { activeFilter = 'all'; UIElements.searchInput.value = ''; getAll('.visual-category-link').forEach(link => link.classList.remove('active')); get('.visual-category-link[data-category="all"]').classList.add('active'); hideSearchSuggestions(); renderProducts(); checkButtonsVisibility(); };
             const checkButtonsVisibility = () => { const hasText = UIElements.searchInput.value.trim() !== ''; if(UIElements.clearSearchBtn) UIElements.clearSearchBtn.classList.toggle('hidden', !hasText); if(UIElements.searchIcon) UIElements.searchIcon.classList.toggle('hidden', hasText); };
-            const setupActivityNotifications = () => { const toast = UIElements.activityToast; if (!toast || allProducts.length === 0) return; const names = ['Ana', 'Mariana', 'Júlia', 'Beatriz', 'Larissa', 'Maria', 'Alice', 'Helena', 'Laura', 'Manuela', 'Valentina', 'Sophia', 'Isabella', 'Lívia', 'Giovanna', 'Yasmin', 'Eloá', 'Clara', 'Cecília', 'Liz', 'Maitê', 'Antonella', 'Elisa', 'Gabriela', 'Luiza', 'Amanda', 'Bruna', 'Camila', 'Fernanda', 'Patrícia', 'Sandra', 'Jéssica', 'Letícia', 'Aline']; const cities = [ 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'Macaé', 'Itaperuna', 'Rio de Janeiro' ]; const actions = [ { verb: 'acabou de comprar', icon: 'ph-fill ph-shopping-cart-simple', color: 'var(--purple-dark)' }, { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' } ]; const showRandom = () => { if (document.hidden || allProducts.length === 0) return; const name = names[Math.floor(Math.random() * names.length)]; const city = cities[Math.floor(Math.random() * cities.length)]; const action = actions[Math.floor(Math.random() * actions.length)]; const product = allProducts[Math.floor(Math.random() * allProducts.length)]; toast.innerHTML = `<div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full animate-icon-pulse" style="background-color: ${action.color};"><i class="${action.icon} text-white text-xl"></i></div><div><p><strong>${name}</strong> de ${city}</p><p class="text-sm" style="color: var(--text-secondary);">${action.verb} um(a) <strong>${product.name}</strong></p></div>`; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 5000); }; const startCycle = () => { const delay = Math.random() * (20000 - 8000) + 8000; setTimeout(() => { showRandom(); startCycle(); }, delay); }; setTimeout(startCycle, 7000); };
+            const setupActivityNotifications = () => { const toast = UIElements.activityToast; if (!toast || allProducts.length === 0) return; const names = ['Ana', 'Mariana', 'Júlia', 'Beatriz', 'Larissa', 'Maria', 'Alice', 'Helena', 'Laura', 'Manuela', 'Valentina', 'Sophia', 'Isabella', 'Lívia', 'Giovanna', 'Yasmin', 'Eloá', 'Clara', 'Cecília', 'Liz', 'Maitê', 'Antonella', 'Elisa', 'Gabriela', 'Luiza', 'Amanda', 'Bruna', 'Camila', 'Fernanda', 'Patrícia', 'Sandra', 'Jéssica', 'Letícia', 'Aline']; const cities = [ 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'Macaé', 'Itaperuna', 'Rio de Janeiro' ]; const actions = [ { verb: 'acabou de comprar', icon: 'ph-fill ph-shopping-cart-simple', color: 'var(--purple-dark)' }, { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' } ]; const showRandom = () => { if (document.hidden || allProducts.length === 0) return; const name = names[Math.floor(Math.random() * names.length)]; const city = cities[Math.floor(Math.random() * cities.length)]; const action = actions[Math.floor(Math.random() * actions.length)]; const product = allProducts[Math.floor(Math.random() * allProducts.length)]; toast.innerHTML = `<div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full animate-icon-pulse" style="background-color: ${action.color};"><i class="${action.icon} text-white text-xl"></i></div><div><p><strong>${name}</strong> de ${city}</p><p class="text-sm" style="color: var(--text-secondary);">${action.verb} um(a) <strong>${product.name}</strong></p></div>`; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 5000); }; const startCycle = () => { const delay = Math.random() * (20000 - 8000) + 8000; setTimeout(() => { showRandom(); startCycle(); }, delay); }; setTimeout(startCycle, 7000); };
             const setupObservers = () => { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { UIElements.floatingButtonsContainer.classList.toggle('hidden', entry.isIntersecting); }); }, { threshold: 0.1 }); if (UIElements.scrollObserverTarget) { observer.observe(UIElements.scrollObserverTarget); } };
             
             function setupEventListeners() {
@@ -653,15 +658,20 @@
                 });
                 
                 const debouncedRender = debounce(() => renderProducts(), 350);
-                UIElements.searchInput.addEventListener('input', () => {
-                    showSearchSuggestions(UIElements.searchInput.value);
-                    debouncedRender();
-                    checkButtonsVisibility();
-                });
+                UIElements.searchInput.addEventListener('input', () => { showSearchSuggestions(UIElements.searchInput.value); debouncedRender(); checkButtonsVisibility(); });
                 UIElements.searchInput.addEventListener('focus', () => showSearchSuggestions(UIElements.searchInput.value));
                 if (UIElements.clearSearchBtn) UIElements.clearSearchBtn.addEventListener('click', resetAllFilters);
                 
-                getAll('#filter-buttons button').forEach(b => b.addEventListener('click', function() { getAll('#filter-buttons button').forEach(btn => btn.classList.remove('filter-active')); this.classList.add('filter-active'); activeFilter = this.dataset.category; renderProducts(); }));
+                // --- MUDANÇA: Adiciona o evento de clique para os novos links de categoria ---
+                UIElements.visualCategoryLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        UIElements.visualCategoryLinks.forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+                        activeFilter = this.dataset.category;
+                        renderProducts();
+                    });
+                });
                 getAll('.sort-option').forEach(o => o.addEventListener('click', (e) => { e.preventDefault(); get('#sort-button-text').textContent = `Ordenar: ${o.textContent}`; activeSort = o.dataset.value; getAll('.sort-option').forEach(opt => opt.classList.remove('font-bold')); o.classList.add('font-bold'); UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); renderProducts(); }));
             }
 
@@ -682,7 +692,8 @@
                 setupEventListeners();
                 setupObservers();
                 
-                get('#filter-buttons button[data-category="all"]').classList.add('filter-active');
+                // --- MUDANÇA: Define o filtro "Todos" como ativo na inicialização ---
+                get('.visual-category-link[data-category="all"]').classList.add('active');
                 get('.sort-option[data-value="default"]').classList.add('font-bold');
                 
                 renderProducts(); 
