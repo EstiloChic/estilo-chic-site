@@ -3,7 +3,7 @@ welcomeCoupon:
   title: Bem-vinda à Estilo Chic!
   description: "**5% de desconto** para sua primeira compra!"
   buttonText: Resgatar Meu Cupom
-  whatsappMessage: Olá! Vim pelo site e quero meu cupom de boas-vindas!
+  whatsappMessage: Olá! Vim pelo site e quero meu desconto de boas-vindas!
 persistentCoupon:
   active: true
   title: 🔥 Oferta do Dia!
