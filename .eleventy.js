@@ -2,23 +2,13 @@
 
 const yaml = require("js-yaml");
 
-// --- INÍCIO DA NOVA CONFIGURAÇÃO ---
-// Importa a biblioteca de Markdown que o Eleventy usa
-const markdownIt = require("markdown-it");
-// --- FIM DA NOVA CONFIGURAÇÃO ---
-
-
 module.exports = function(eleventyConfig) {
-  // --- INÍCIO DA NOVA CONFIGURAÇÃO ---
-  // Configura o Eleventy para permitir o uso de Markdown nos templates
-  eleventyConfig.setLibrary("md", markdownIt({ html: true }));
-  // --- FIM DA NOVA CONFIGURAÇÃO ---
-
   eleventyConfig.addDataExtension("yml", contents => yaml.load(contents));
   eleventyConfig.addPassthroughCopy("admin");
   eleventyConfig.addPassthroughCopy("assets/uploads");
 
   eleventyConfig.addCollection("products", function(collectionApi) {
+    // REMOVEMOS O FILTRO! Agora todos os produtos são enviados para o site.
     return collectionApi.getFilteredByGlob("_products/*.md")
       .sort((a, b) => {
         return new Date(b.data.dateAdded) - new Date(a.data.dateAdded);
@@ -54,6 +44,7 @@ module.exports = function(eleventyConfig) {
         url: product.url,
         description: product.templateContent ? product.templateContent.trim().replace(/<p>|<\/p>/g, "") : "",
         size: product.data.size || null,
+        // PASSANDO A INFORMAÇÃO DE ESTOQUE PARA O JAVASCRIPT DA PÁGINA
         inStock: product.data.inStock
       };
       return cleanProduct;
