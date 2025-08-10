@@ -20,7 +20,9 @@ collections:
               - {label: "Título", name: "title", widget: "string"}
               - {label: "Descrição", name: "description", widget: "markdown"}
               - {label: "Texto do Botão", name: "buttonText", widget: "string"}
-              - {label: "Link do WhatsApp", name: "whatsappLink", widget: "string"}
+              # --- CAMPO ATUALIZADO ---
+              - {label: "Mensagem para o WhatsApp", name: "whatsappMessage", widget: "string", hint: "Escreva a mensagem que o cliente enviará. Ex: Olá! Quero meu cupom de 10%!"}
+
           - label: "Popup de Cupom Geral (Aparece sempre para todos)"
             name: "persistentCoupon"
             widget: "object"
@@ -29,7 +31,6 @@ collections:
               - {label: "Título", name: "title", widget: "string"}
               - {label: "Descrição", name: "description", widget: "markdown"}
               - {label: "Texto do Botão", name: "buttonText", widget: "string"}
-              # --- CAMPO ATUALIZADO ---
               - {label: "Código do Cupom (Ex: PROMO10)", name: "code", widget: "string"}
 
   - name: "products"
@@ -68,3 +69,4 @@ collections:
         fields:
           - {label: "Texto do Badge", name: "text", widget: "string", required: false}
       - {label: "Descrição Completa", name: "body", widget: "markdown"}
+
