@@ -53,7 +53,6 @@
 
     .header-bg-pattern::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url(https://www.transparenttextures.com/patterns/diamond-upholstery.png); opacity: 0.1; z-index: 1; mix-blend-mode: overlay; }
     
-    /* Mostra o ícone apropriado (hambúrguer ou X) baseado no estado do menu */
     #hamburger-button .icon-close { display: none; }
     #hamburger-button.menu-open .icon-menu { display: none; }
     #hamburger-button.menu-open .icon-close { display: block; }
@@ -82,7 +81,7 @@
     .btn { font-family: var(--font-body); font-weight: 600; border-radius: 99px; padding: 0.6rem 1rem; transition: all 0.3s ease; cursor: pointer; text-align: center; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; border: 1.5px solid transparent; width: 100%; }
     .btn-add-default { background-color: var(--purple-faint); color: var(--purple-dark); border-color: var(--purple-light); }
     .btn-add-default:hover { background-color: var(--purple-light); }
-    .btn-add-success { background-color: var(--purple-dark); color: white; cursor: default; }
+    .btn-add-success { background-color: #6a1b9a; color: white; cursor: default; }
     .btn-buy { background-color: var(--green-faint); color: var(--green-dark-text); border-color: #a7f3d0; }
     .btn-buy:hover { background-color: #dcfce7; }
     .btn-outline-purple { background-color: var(--purple-faint); border-color: var(--purple-light); color: var(--purple-dark); }
@@ -185,9 +184,7 @@
                 
                 <!-- Menu Hambúrguer (só aparece em telas pequenas) -->
                 <button id="hamburger-button" class="md:hidden text-white hover:text-purple-200 transition flex-shrink-0 rounded-md p-1">
-                    <!-- Ícone de Menu (Hambúrguer) -->
                     <i class="ph ph-list text-3xl icon-menu"></i>
-                    <!-- Ícone de Fechar (X) -->
                     <i class="ph ph-x text-3xl icon-close"></i>
                 </button>
 
@@ -246,7 +243,7 @@
                 <div id="visual-categories" class="w-full md:w-auto">
                     <div class="flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar pt-2 pb-4 sm:justify-center">
                         <a href="#" class="visual-category-link flex-shrink-0 w-24 text-center group" data-category="all">
-                            <div class="img-container w-20 h-20 rounded-full mx-auto flex items-center justify-center bg-white shadow-sm border-2 border-purple-100 p-1">
+                            <div class="img-container w-20 h-20 rounded-full mx-auto flex items-center justify-center bg-white shadow-sm p-1">
                                 <i class="ph-fill ph-squares-four text-4xl text-purple-500"></i>
                             </div>
                             <span class="mt-2 block text-sm font-medium text-gray-700">Todos</span>
