@@ -130,10 +130,10 @@
     #activity-toast.show { opacity: 1; transform: translateY(0); visibility: visible; }
     .animate-icon-pulse { animation: icon-pulse 0.8s ease-in-out; }
 
-    .welcome-popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 3000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
-    .welcome-popup-overlay.show { opacity: 1; visibility: visible; }
-    .welcome-popup { background: var(--background-card); border-radius: 16px; box-shadow: var(--shadow-medium); width: 90%; max-width: 400px; text-align: center; padding: 2.5rem; transform: scale(0.9); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); position: relative; }
-    .welcome-popup-overlay.show .welcome-popup { transform: scale(1); }
+    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 3000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+    .popup-overlay.show { opacity: 1; visibility: visible; }
+    .popup-content { background: var(--background-card); border-radius: 16px; box-shadow: var(--shadow-medium); width: 90%; max-width: 400px; text-align: center; padding: 2.5rem; transform: scale(0.9); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); position: relative; }
+    .popup-overlay.show .popup-content { transform: scale(1); }
     .close-popup-btn { position: absolute; top: 10px; right: 10px; background: #f1f5f9; color: #64748b; border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
     .close-popup-btn:hover { background: #e2e8f0; transform: scale(1.1); }
     
@@ -384,7 +384,35 @@
     
     <div id="activity-toast"></div>
 
-    <div id="welcome-popup-overlay" class="welcome-popup-overlay"><div class="welcome-popup"><button id="close-popup" class="close-popup-btn"><i class="ph ph-x"></i></button><i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i><h2 class="section-title text-2xl mb-2">Um presente para você!</h2><p class="text-gray-600 mb-6">É sua primeira vez aqui? Ganhe <strong>5% de desconto</strong> no seu primeiro pedido!</p><a href="https://wa.me/5522998802545?text=Olá!%20Vim%20pelo%20site%20e%20quero%20meu%20cupom%20de%205%25%20OFF%20de%20boas-vindas!" target="_blank" id="claim-coupon-btn" class="btn btn-buy py-3"><i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>Resgatar Cupom</a></div></div>
+    <!-- INÍCIO DOS POP-UPS DINÂMICOS -->
+    {% if settings and settings.welcomeCoupon and settings.welcomeCoupon.active %}
+    <div id="welcome-popup-overlay" class="popup-overlay">
+        <div class="popup-content">
+            <button class="close-popup-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
+            <i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i>
+            <h2 class="section-title text-2xl mb-2">{{ settings.welcomeCoupon.title }}</h2>
+            <p class="text-gray-600 mb-6">{{ settings.welcomeCoupon.description | markdown }}</p>
+            <a href="{{ settings.welcomeCoupon.whatsappLink }}" target="_blank" class="btn btn-buy py-3 claim-coupon-btn">
+                <i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>{{ settings.welcomeCoupon.buttonText }}
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if settings and settings.persistentCoupon and settings.persistentCoupon.active %}
+    <div id="persistent-popup-overlay" class="popup-overlay">
+        <div class="popup-content">
+            <button class="close-popup-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
+            <i class="ph-fill ph-fire text-5xl text-amber-500 mb-3"></i>
+            <h2 class="section-title text-2xl mb-2">{{ settings.persistentCoupon.title }}</h2>
+            <p class="text-gray-600 mb-6">{{ settings.persistentCoupon.description | markdown }}</p>
+            <a href="{{ settings.persistentCoupon.whatsappLink }}" target="_blank" class="btn btn-buy py-3 claim-coupon-btn">
+                <i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>{{ settings.persistentCoupon.buttonText }}
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    <!-- FIM DOS POP-UPS -->
     
     <script>
         let allProducts = [];
@@ -476,7 +504,6 @@
                 cartFeedbackToast: get('#cart-feedback-toast'), 
                 favoritesFeedbackToast: get('#favorites-feedback-toast'), 
                 activityToast: get('#activity-toast'), 
-                welcomePopupOverlay: get('#welcome-popup-overlay'), 
                 hamburgerButton: get('#hamburger-button'), 
                 mobileNav: get('#mobile-nav'), 
                 mainHeader: get('#main-header'), 
@@ -612,7 +639,35 @@
             const updateVisuals = () => { allProducts.forEach(p => { const e = get(`#viewing-info-${p.id}`); if (e) { if (Math.random() > 0.7) p.viewing = Math.max(0, (p.viewing || 0) + (Math.floor(Math.random() * 3) - 1)); if (p.viewing > 0) { e.innerHTML = `<div class="flex items-center gap-1 text-white text-xs font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm animate-pulse"><i class="ph-fill ph-eye text-sm"></i><span>${p.viewing}</span></div>`; } else { e.innerHTML = ''; } } }); };
             const showFeedbackToast = (type) => { const t = type === 'cart' ? UIElements.cartFeedbackToast : UIElements.favoritesFeedbackToast; let to = type === 'cart' ? cartToastTimeout : favoritesToastTimeout; clearTimeout(to); t.classList.add('show'); to = setTimeout(() => t.classList.remove('show'), 2000); if (type === 'cart') cartToastTimeout = to; else favoritesToastTimeout = to; };
             const flyToCart = (target) => { const c = target.closest('.product, .favorite-dropdown-item'); if (!c) return; const i = c.querySelector('img'); if(!i) return; const fi = i.cloneNode(true); const r1 = i.getBoundingClientRect(); const r2 = UIElements.floatingCartBtn.getBoundingClientRect(); fi.style.cssText = `position: fixed; z-index: 9999; left: ${r1.left}px; top: ${r1.top}px; width: ${r1.width}px; height: ${r1.height}px; border-radius: 0.5rem; transition: all 0.7s cubic-bezier(0.5, 0, 0.75, 0.2);`; document.body.appendChild(fi); requestAnimationFrame(() => { fi.style.left = `${r2.left + r2.width / 2 - 20}px`; fi.style.top = `${r2.top + r2.height / 2 - 20}px`; fi.style.width = '40px'; fi.style.height = '40px'; fi.style.transform = 'scale(0.2) rotate(180deg)'; fi.style.opacity = '0'; }); setTimeout(() => { fi.remove(); UIElements.floatingCartBtn.classList.add('shake'); setTimeout(() => UIElements.floatingCartBtn.classList.remove('shake'), 500); }, 700); };
-            const setupWelcomePopup = () => { const o = UIElements.welcomePopupOverlay; if (!o) return; const c = () => { o.classList.remove('show'); localStorage.setItem('estiloChicVisitedBefore', 'true'); }; if (!localStorage.getItem('estiloChicVisitedBefore')) setTimeout(() => o.classList.add('show'), 5000); get('#close-popup').addEventListener('click', c); get('#claim-coupon-btn').addEventListener('click', c); o.addEventListener('click', (e) => { if (e.target === o) c(); }); };
+            
+            const setupPopups = () => {
+                const welcomePopup = get('#welcome-popup-overlay');
+                const persistentPopup = get('#persistent-popup-overlay');
+                const visitedBefore = localStorage.getItem('estiloChicVisitedBefore');
+
+                const showPopup = (popupElement) => {
+                    if (!popupElement) return;
+                    popupElement.classList.add('show');
+                    
+                    const close = () => popupElement.classList.remove('show');
+                    
+                    popupElement.querySelector('.close-popup-btn').addEventListener('click', close);
+                    popupElement.querySelector('.claim-coupon-btn').addEventListener('click', close);
+                    popupElement.addEventListener('click', (e) => {
+                        if (e.target === popupElement) close();
+                    });
+                };
+
+                setTimeout(() => {
+                    if (welcomePopup && !visitedBefore) {
+                        showPopup(welcomePopup);
+                        localStorage.setItem('estiloChicVisitedBefore', 'true');
+                    } else if (persistentPopup) {
+                        showPopup(persistentPopup);
+                    }
+                }, 3000);
+            };
+
             const hideSearchSuggestions = () => { if (UIElements.searchSuggestions) { UIElements.searchSuggestions.classList.add('hidden'); UIElements.searchSuggestions.innerHTML = ''; } };
             const showSearchSuggestions = (term) => { if (!UIElements.searchSuggestions || term.trim() === '') return hideSearchSuggestions(); const results = fuse.search(term).slice(0, 5); if (results.length === 0) return hideSearchSuggestions(); UIElements.searchSuggestions.innerHTML = results.map(({ item }) => `<div class="suggestion-item" data-name="${item.name}"><span>${item.name}</span></div>`).join(''); UIElements.searchSuggestions.classList.remove('hidden'); };
             const resetAllFilters = () => { activeFilter = 'all'; UIElements.searchInput.value = ''; getAll('.visual-category-link').forEach(link => link.classList.remove('active')); get('.visual-category-link[data-category="all"]').classList.add('active'); hideSearchSuggestions(); renderProducts(); checkButtonsVisibility(); };
@@ -702,7 +757,7 @@
                 renderProducts(); 
                 updateApp();
                 checkButtonsVisibility();
-                setupWelcomePopup();
+                setupPopups();
                 setupActivityNotifications();
                 
                 setInterval(updateVisuals, 4000);
