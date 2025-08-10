@@ -1,0 +1,17 @@
+# Arquivo de configurações globais do site
+
+# --- Controle do Popup de Boas-Vindas (aparece uma vez) ---
+welcomeCoupon:
+  active: true # Use 'true' para ativar ou 'false' para desativar este popup
+  title: "Bem-vinda à Estilo Chic!"
+  description: "É sua primeira vez aqui? Ganhe <strong>5% de desconto</strong> no seu primeiro pedido!"
+  buttonText: "Resgatar Meu Cupom"
+  whatsappLink: "https://wa.me/5522998802545?text=Olá!%20Vim%20pelo%20site%20e%20quero%20meu%20cupom%20de%20boas-vindas!"
+
+# --- Controle do Popup Geral (aparece sempre que ativo) ---
+persistentCoupon:
+  active: true # Use 'true' para ativar ou 'false' para desativar este popup
+  title: "🔥 Oferta do Dia!"
+  description: "Use o cupom <strong>PROMO15</strong> e ganhe 15% de desconto em todo o site. Não perca!"
+  buttonText: "Copiar e Comprar"
+  whatsappLink: "https://wa.me/5522998802545?text=Olá!%20Quero%20usar%20o%20cupom%20PROMO15."
