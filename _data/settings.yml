@@ -1,14 +1,9 @@
-# Arquivo: _data/settings.yml
-
-# --- Controle do Popup de Boas-Vindas (aparece uma vez) ---
 welcomeCoupon:
   active: true
   title: "Bem-vinda à Estilo Chic!"
   description: "É sua primeira vez aqui? Ganhe <strong>5% de desconto</strong> no seu primeiro pedido!"
   buttonText: "Resgatar Meu Cupom"
   whatsappLink: "https://wa.me/5522998802545?text=Olá!%20Vim%20pelo%20site%20e%20quero%20meu%20cupom%20de%20boas-vindas!"
-
-# --- Controle do Popup Geral (aparece sempre que ativo) ---
 persistentCoupon:
   active: true
   title: "🔥 Oferta do Dia!"
