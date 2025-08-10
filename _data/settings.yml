@@ -7,6 +7,7 @@ welcomeCoupon:
 persistentCoupon:
   active: true
   title: 🔥 Oferta do Dia!
-  description: Use o cupom **PROMO15** e ganhe 15% de desconto em todo o site. Não perca!
-  buttonText: Copiar e Comprar
+  description: Aproveite a **PROMO10** e ganhe 10% de desconto no Batom e
+    Corretivo. Não perca!
+  buttonText: Aproveite
   whatsappLink: https://wa.me/5522998802545?text=Olá!%20Quero%20usar%20o%20cupom%20PROMO15.
