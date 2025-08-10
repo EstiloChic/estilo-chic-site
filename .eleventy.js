@@ -1,14 +1,24 @@
 // .eleventy.js - COMPLETO E ATUALIZADO
 
 const yaml = require("js-yaml");
+const markdownIt = require("markdown-it"); // Adiciona a biblioteca de markdown
 
 module.exports = function(eleventyConfig) {
+  // Configuração para ler arquivos .yml
   eleventyConfig.addDataExtension("yml", contents => yaml.load(contents));
   eleventyConfig.addPassthroughCopy("admin");
   eleventyConfig.addPassthroughCopy("assets/uploads");
 
+  // --- NOVA ADIÇÃO: FILTRO PARA CONVERTER MARKDOWN ---
+  const md = new markdownIt({
+    html: true // Permite que HTML dentro do markdown seja renderizado
+  });
+  eleventyConfig.addFilter("markdown", (content) => {
+    return md.renderInline(content);
+  });
+  // --- FIM DA NOVA ADIÇÃO ---
+
   eleventyConfig.addCollection("products", function(collectionApi) {
-    // REMOVEMOS O FILTRO! Agora todos os produtos são enviados para o site.
     return collectionApi.getFilteredByGlob("_products/*.md")
       .sort((a, b) => {
         return new Date(b.data.dateAdded) - new Date(a.data.dateAdded);
@@ -44,7 +54,6 @@ module.exports = function(eleventyConfig) {
         url: product.url,
         description: product.templateContent ? product.templateContent.trim().replace(/<p>|<\/p>/g, "") : "",
         size: product.data.size || null,
-        // PASSANDO A INFORMAÇÃO DE ESTOQUE PARA O JAVASCRIPT DA PÁGINA
         inStock: product.data.inStock
       };
       return cleanProduct;
