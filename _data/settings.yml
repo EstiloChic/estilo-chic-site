@@ -1,8 +1,8 @@
-# Arquivo de configurações globais do site
+# Arquivo: _data/settings.yml
 
 # --- Controle do Popup de Boas-Vindas (aparece uma vez) ---
 welcomeCoupon:
-  active: true # Use 'true' para ativar ou 'false' para desativar este popup
+  active: true
   title: "Bem-vinda à Estilo Chic!"
   description: "É sua primeira vez aqui? Ganhe <strong>5% de desconto</strong> no seu primeiro pedido!"
   buttonText: "Resgatar Meu Cupom"
@@ -10,7 +10,7 @@ welcomeCoupon:
 
 # --- Controle do Popup Geral (aparece sempre que ativo) ---
 persistentCoupon:
-  active: true # Use 'true' para ativar ou 'false' para desativar este popup
+  active: true
   title: "🔥 Oferta do Dia!"
   description: "Use o cupom <strong>PROMO15</strong> e ganhe 15% de desconto em todo o site. Não perca!"
   buttonText: "Copiar e Comprar"
