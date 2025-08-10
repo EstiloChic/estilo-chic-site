@@ -1,15 +1,36 @@
-# admin/config.yml - COMPLETO E ATUALIZADO (Tradução + Organização)
-
 locale: 'pt'
-
 backend:
   name: git-gateway
   branch: main
-
 media_folder: "assets/uploads"
 public_folder: "/assets/uploads"
-
 collections:
+  - label: "Configurações de Pop-ups"
+    name: "settings"
+    files:
+      - label: "Gerenciar Pop-ups"
+        name: "popups"
+        file: "_data/settings.yml"
+        fields:
+          - label: "Popup de Boas-Vindas (Aparece 1 vez para novos usuários)"
+            name: "welcomeCoupon"
+            widget: "object"
+            fields:
+              - {label: "Ativar este Popup?", name: "active", widget: "boolean", default: true}
+              - {label: "Título", name: "title", widget: "string"}
+              - {label: "Descrição", name: "description", widget: "markdown"}
+              - {label: "Texto do Botão", name: "buttonText", widget: "string"}
+              - {label: "Link do WhatsApp", name: "whatsappLink", widget: "string"}
+          - label: "Popup de Cupom Geral (Aparece sempre para todos)"
+            name: "persistentCoupon"
+            widget: "object"
+            fields:
+              - {label: "Ativar este Popup?", name: "active", widget: "boolean", default: true}
+              - {label: "Título", name: "title", widget: "string"}
+              - {label: "Descrição", name: "description", widget: "markdown"}
+              - {label: "Texto do Botão", name: "buttonText", widget: "string"}
+              - {label: "Link do WhatsApp", name: "whatsappLink", widget: "string"}
+
   - name: "products"
     label: "Produtos"
     folder: "_products"
@@ -18,24 +39,14 @@ collections:
     format: "frontmatter"
     slug: "{{name}}"
     summary: "{{name}} - R$ {{price}} ({{category}})"
-
-    # Agrupa os produtos pela categoria na tela principal
     view_groups:
-      - label: Categoria
-        field: category
-
-    # Define que os produtos podem ser ordenados por nome, data ou preço.
-    # Por padrão, ordena por nome em ordem crescente (A-Z).
+      - {label: Categoria, field: category}
     sortable_fields: ['name', 'dateAdded', 'price']
     sort: "name:asc"
-
     fields:
       - {label: "Layout", name: "layout", widget: "hidden", default: "produto.njk"}
       - {label: "ID", name: "id", widget: "uuid", required: true}
-      - label: "Produto em Estoque?"
-        name: "inStock"
-        widget: "boolean"
-        default: true
+      - {label: "Produto em Estoque?", name: "inStock", widget: "boolean", default: true}
       - {label: "Data de Adição", name: "dateAdded", widget: "datetime"}
       - {label: "Nome do Produto", name: "name", widget: "string"}
       - {label: "Preço Original (Ex: 30.00)", name: "originalPrice", widget: "number", value_type: "float"}
@@ -48,11 +59,11 @@ collections:
           - {label: "Roupas", value: "roupas"}
           - {label: "Maquiagens", value: "maquiagens"}
           - {label: "Acessórios", value: "acessorios"}
-      - {label: "Tamanho (Ex: G, 38, P/M. Deixe em branco se não aplicável)", name: "size", widget: "string", required: false}
+      - {label: "Tamanho", name: "size", widget: "string", required: false}
       - label: "Badge (Opcional)"
         name: "badge"
         widget: "object"
         required: false
         fields:
-          - {label: "Texto do Badge (Ex: NOVIDADE, PROMOÇÃO)", name: "text", widget: "string", required: false}
-      - {label: "Descrição Completa do Produto", name: "body", widget: "markdown"}
+          - {label: "Texto do Badge", name: "text", widget: "string", required: false}
+      - {label: "Descrição Completa", name: "body", widget: "markdown"}
