@@ -1,6 +1,15 @@
+# Arquivo de configuração para o Netlify
+
 [build]
   command = "npx @11ty/eleventy"
   publish = "_site"
+
+# --- ADIÇÃO IMPORTANTE PARA CORRIGIR O ERRO ---
+# Define o ambiente de build, incluindo a versão do Node.js
+[build.environment]
+  # Força o Netlify a usar a versão 18 (LTS) do Node.js, que é estável e compatível.
+  NODE_VERSION = "18"
+# --- FIM DA ADIÇÃO ---
 
 [[redirects]]
   from = "/admin"
