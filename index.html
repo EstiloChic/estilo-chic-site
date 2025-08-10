@@ -368,7 +368,7 @@
             <button class="close-popup-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
             <i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i>
             <h2 class="section-title text-2xl mb-2">{{ settings.welcomeCoupon.title }}</h2>
-            <p class="text-gray-600 mb-6">{{ settings.welcomeCoupon.description }}</p>
+            <p class="text-gray-600 mb-6">{{ settings.welcomeCoupon.description | markdown }}</p>
             <a href="{{ settings.welcomeCoupon.whatsappLink }}" target="_blank" class="btn btn-buy py-3 claim-coupon-btn">
                 <i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>{{ settings.welcomeCoupon.buttonText }}
             </a>
@@ -383,7 +383,7 @@
             <button class="close-popup-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
             <i class="ph-fill ph-fire text-5xl text-amber-500 mb-3"></i>
             <h2 class="section-title text-2xl mb-2">{{ settings.persistentCoupon.title }}</h2>
-            <p class="text-gray-600 mb-6">{{ settings.persistentCoupon.description }}</p>
+            <p class="text-gray-600 mb-6">{{ settings.persistentCoupon.description | markdown }}</p>
             <a href="{{ settings.persistentCoupon.whatsappLink }}" target="_blank" class="btn btn-buy py-3 claim-coupon-btn">
                 <i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>{{ settings.persistentCoupon.buttonText }}
             </a>
