@@ -6,7 +6,7 @@ welcomeCoupon:
   whatsappMessage: Olá! Vim pelo site e quero meu desconto de boas-vindas!
 persistentCoupon:
   active: true
-  title: 🔥 Oferta do Dia!
+  title: Oferta do Dia!
   description: Aproveite a **PROMO10** e ganhe 10% de desconto no Batom matte e
     Corretivo. Não perca!
   buttonText: Aproveitar
