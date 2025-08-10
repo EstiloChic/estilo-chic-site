@@ -1,18 +1,13 @@
-# Arquivo: _data/settings.yml (FINAL E AUTOMATIZADO)
-
-# --- Controle do Popup de Boas-Vindas (aparece uma vez) ---
 welcomeCoupon:
   active: true
-  title: "Bem-vinda à Estilo Chic!"
+  title: Bem-vinda à Estilo Chic!
   description: "**5% de desconto** para sua primeira compra!"
-  buttonText: "Resgatar Meu Cupom"
-  # NOVO CAMPO: Mensagem que será enviada. Edite aqui!
-  whatsappMessage: "Olá! Vim pelo site e quero meu cupom de boas-vindas!"
-
-# --- Controle do Popup Geral (aparece sempre que ativo) ---
+  buttonText: Resgatar Meu Cupom
+  whatsappMessage: Olá! Vim pelo site e quero meu cupom de boas-vindas!
 persistentCoupon:
   active: true
-  title: "🔥 Oferta do Dia!"
-  description: "Use o cupom **PROMO10** e ganhe 10% de desconto em todo o site. Não perca!"
-  buttonText: "Copiar e Comprar"
-  code: "PROMO10"
+  title: 🔥 Oferta do Dia!
+  description: Aproveite a **PROMO10** e ganhe 10% de desconto no Batom matte e
+    Corretivo. Não perca!
+  buttonText: Aproveitar
+  code: PROMO10
