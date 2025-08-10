@@ -362,7 +362,7 @@
     <!-- INÍCIO DOS POP-UPS DINÂMICOS -->
 
     <!-- POP-UP 1: BOAS-VINDAS (lógica de "aparecer uma vez") -->
-    {% if settings.welcomeCoupon.active %}
+    {% if settings and settings.welcomeCoupon and settings.welcomeCoupon.active %}
     <div id="welcome-popup-overlay" class="popup-overlay">
         <div class="popup-content">
             <button class="close-popup-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
@@ -377,7 +377,7 @@
     {% endif %}
 
     <!-- POP-UP 2: GERAL/PERSISTENTE (lógica de "aparecer sempre") -->
-    {% if settings.persistentCoupon.active %}
+    {% if settings and settings.persistentCoupon and settings.persistentCoupon.active %}
     <div id="persistent-popup-overlay" class="popup-overlay">
         <div class="popup-content">
             <button class="close-popup-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
@@ -625,7 +625,7 @@
             const setupActivityNotifications = () => { const toast = UIElements.activityToast; if (!toast || allProducts.length === 0) return; const names = ['Ana', 'Mariana', 'Júlia', 'Beatriz', 'Larissa', 'Maria', 'Alice', 'Helena', 'Laura', 'Manuela', 'Valentina', 'Sophia', 'Isabella', 'Lívia', 'Giovanna', 'Yasmin', 'Eloá', 'Clara', 'Cecília', 'Liz', 'Maitê', 'Antonella', 'Elisa', 'Gabriela', 'Luiza', 'Amanda', 'Bruna', 'Camila', 'Fernanda', 'Patrícia', 'Sandra', 'Jéssica', 'Letícia', 'Aline']; const cities = [ 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'Macaé', 'Itaperuna', 'Rio de Janeiro' ]; const actions = [ { verb: 'acabou de comprar', icon: 'ph-fill ph-shopping-cart-simple', color: 'var(--purple-dark)' }, { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' } ]; const showRandom = () => { if (document.hidden || allProducts.length === 0) return; const name = names[Math.floor(Math.random() * names.length)]; const city = cities[Math.floor(Math.random() * cities.length)]; const action = actions[Math.floor(Math.random() * actions.length)]; const product = allProducts[Math.floor(Math.random() * allProducts.length)]; toast.innerHTML = `<div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full animate-icon-pulse" style="background-color: ${action.color};"><i class="${action.icon} text-white text-xl"></i></div><div><p><strong>${name}</strong> de ${city}</p><p class="text-sm" style="color: var(--text-secondary);">${action.verb} um(a) <strong>${product.name}</strong></p></div>`; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 5000); }; const startCycle = () => { const delay = Math.random() * (20000 - 8000) + 8000; setTimeout(() => { showRandom(); startCycle(); }, delay); }; setTimeout(startCycle, 7000); };
             const setupObservers = () => { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { UIElements.floatingButtonsContainer.classList.toggle('hidden', entry.isIntersecting); }); }, { threshold: 0.1 }); if (UIElements.scrollObserverTarget) { observer.observe(UIElements.scrollObserverTarget); } };
             
-            // LÓGICA ATUALIZADA DOS POP-UPS
+            // LÓGICA ATUALIZADA E CORRETA DOS POP-UPS
             const setupPopups = () => {
                 const welcomePopup = document.getElementById('welcome-popup-overlay');
                 const persistentPopup = document.getElementById('persistent-popup-overlay');
@@ -645,18 +645,14 @@
                 };
 
                 // Lógica de Prioridade:
-                // 1. O pop-up de boas-vindas tem prioridade MÁXIMA.
-                // 2. O pop-up persistente só aparece se o de boas-vindas NÃO for exibido.
                 setTimeout(() => {
                     if (welcomePopup && !visitedBefore) {
-                        // Se o popup de boas-vindas existe E o usuário nunca visitou antes
                         showPopup(welcomePopup);
-                        localStorage.setItem('estiloChicVisitedBefore', 'true'); // Marca como visitado para não mostrar de novo
+                        localStorage.setItem('estiloChicVisitedBefore', 'true');
                     } else if (persistentPopup) {
-                        // Senão, se o popup persistente existe (e o de boas-vindas não foi mostrado nesta sessão)
                         showPopup(persistentPopup);
                     }
-                }, 3000); // Espera 3 segundos antes de mostrar qualquer popup
+                }, 3000);
             };
 
             function setupEventListeners() {
