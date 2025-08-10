@@ -29,7 +29,8 @@ collections:
               - {label: "Título", name: "title", widget: "string"}
               - {label: "Descrição", name: "description", widget: "markdown"}
               - {label: "Texto do Botão", name: "buttonText", widget: "string"}
-              - {label: "Link do WhatsApp", name: "whatsappLink", widget: "string"}
+              # --- CAMPO ATUALIZADO ---
+              - {label: "Código do Cupom (Ex: PROMO10)", name: "code", widget: "string"}
 
   - name: "products"
     label: "Produtos"
