@@ -182,13 +182,11 @@
         <div>
             <div class="max-w-6xl mx-auto flex items-center justify-between p-2 h-14 px-4 gap-3 relative">
                 
-                <!-- Menu Hambúrguer (só aparece em telas pequenas) -->
                 <button id="hamburger-button" class="md:hidden text-white hover:text-purple-200 transition flex-shrink-0 rounded-md p-1">
                     <i class="ph ph-list text-3xl icon-menu"></i>
                     <i class="ph ph-x text-3xl icon-close"></i>
                 </button>
 
-                <!-- Menu de Navegação para Desktop (só aparece em telas grandes) -->
                 <nav class="hidden md:flex items-center gap-6">
                     <a href="#categorias" class="text-sm font-medium text-white hover:text-purple-200 transition">Coleções</a>
                     <a href="#encomendas" class="text-sm font-medium text-white hover:text-purple-200 transition">Encomendas</a>
@@ -196,7 +194,6 @@
                     <a href="#contato" class="text-sm font-medium text-white hover:text-purple-200 transition">Contato</a>
                 </nav>
                 
-                <!-- Barra de Pesquisa -->
                 <div class="search-container relative flex-grow md:flex-grow-0 md:max-w-xs">
                      <input type="text" class="w-full pl-4 pr-11 py-2 bg-white text-purple-800 text-sm border-2 border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition placeholder:text-purple-400 shadow-sm" placeholder="O que você procura?" id="search-input">
                      <i id="search-icon" class="ph ph-magnifying-glass text-lg absolute right-4 top-1/2 -translate-y-1/2 text-purple-400 z-10 pointer-events-none"></i>
@@ -208,7 +205,6 @@
             </div>
         </div>
 
-        <!-- Menu de Navegação para Mobile (agora com a classe md:hidden) -->
         <nav id="mobile-nav" class="md:hidden bg-[#6a1b9a] absolute w-full shadow-lg relative header-bg-pattern">
             <a href="#categorias" class="mobile-nav-link group flex items-center text-white text-sm font-medium px-4 py-3 hover:bg-white/10 transition relative z-10"><i class="ph ph-squares-four mr-3 text-lg transition-transform group-hover:scale-110 group-hover:rotate-3"></i>Coleções</a>
             <a href="#" id="mobile-favorites-menu-link" class="mobile-nav-link group flex items-center text-white text-sm font-medium px-4 py-3 hover:bg-white/10 transition relative z-10"><i class="ph ph-heart mr-3 text-lg transition-transform group-hover:scale-110 group-hover:rotate-3"></i>Favoritos</a>
@@ -283,7 +279,6 @@
                 </div>
             </div>
 
-            <!-- Banner de Frete -->
             <div class="bg-purple-50 border border-purple-200 text-purple-800 rounded-xl p-4 flex items-center gap-4 mb-8 text-sm sm:text-base">
                 <i class="ph-fill ph-truck text-3xl text-purple-600"></i>
                 <p><strong>Frete grátis</strong> para São Francisco e região. Para outras localidades, frete a combinar!</p>
@@ -292,11 +287,9 @@
         </section>
 
         <section class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4" id="product-grid">
-            <!-- Os cards dos produtos serão inseridos aqui pelo JavaScript -->
         </section>
         
         <div id="load-more-container" class="text-center mt-8">
-            <!-- O botão será inserido aqui dinamicamente pelo JavaScript -->
         </div>
 
         <div id="no-products-message" class="text-center py-16 text-gray-600 hidden"></div>
@@ -384,7 +377,43 @@
     
     <div id="activity-toast"></div>
 
-    <div id="welcome-popup-overlay" class="welcome-popup-overlay"><div class="welcome-popup"><button id="close-popup" class="close-popup-btn"><i class="ph ph-x"></i></button><i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i><h2 class="section-title text-2xl mb-2">Um presente para você!</h2><p class="text-gray-600 mb-6">É sua primeira vez aqui? Ganhe <strong>5% de desconto</strong> no seu primeiro pedido!</p><a href="https://wa.me/5522998802545?text=Olá!%20Vim%20pelo%20site%20e%20quero%20meu%20cupom%20de%205%25%20OFF%20de%20boas-vindas!" target="_blank" id="claim-coupon-btn" class="btn btn-buy py-3"><i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>Resgatar Cupom</a></div></div>
+    <!-- =================================================================== -->
+    <!-- INÍCIO DOS NOVOS BLOCOS DE POPUP -->
+    <!-- =================================================================== -->
+    
+    <!-- POPUP DE BOAS-VINDAS (PARA NOVOS USUÁRIOS) -->
+    {% if popups.new_user_popup.active %}
+    <div id="welcome-popup-overlay" class="welcome-popup-overlay">
+        <div class="welcome-popup">
+            <button id="close-popup" class="close-popup-btn"><i class="ph ph-x"></i></button>
+            <i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i>
+            <h2 class="section-title text-2xl mb-2">{{ popups.new_user_popup.title }}</h2>
+            <div class="text-gray-600 mb-6">{{ popups.new_user_popup.description | safe }}</div>
+            <a href="https://wa.me/5522998802545?text={{ popups.new_user_popup.whatsapp_text | url_encode }}" target="_blank" id="claim-coupon-btn" class="btn btn-buy py-3">
+                <i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>{{ popups.new_user_popup.button_text }}
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- POPUP PROMOCIONAL (COMPORTAMENTO EDITÁVEL) -->
+    {% if popups.promo_popup.active %}
+    <div id="promo-popup-overlay" class="welcome-popup-overlay" data-behavior="{{ popups.promo_popup.display_behavior | default: 'always' }}">
+        <div class="welcome-popup">
+            <button id="close-promo-popup" class="close-popup-btn"><i class="ph ph-x"></i></button>
+            <i class="ph-fill ph-megaphone text-5xl text-purple-500 mb-3"></i>
+            <h2 class="section-title text-2xl mb-2">{{ popups.promo_popup.title }}</h2>
+            <div class="text-gray-600 mb-6">{{ popups.promo_popup.description | safe }}</div>
+            <a href="{{ popups.promo_popup.button_link }}" id="promo-action-btn" class="btn btn-buy py-3">
+                <i class="ph-fill ph-arrow-right text-xl mr-2"></i>{{ popups.promo_popup.button_text }}
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- =================================================================== -->
+    <!-- FIM DOS NOVOS BLOCOS DE POPUP -->
+    <!-- =================================================================== -->
     
     <script>
         let allProducts = [];
@@ -408,7 +437,6 @@
                     <div class="p-4 sm:p-6 text-left">
                         <h3 class="text-2xl font-bold font-display text-gray-800 mb-2">${product.name}</h3>
                         <p class="text-sm text-gray-600 mb-4">${product.description || ''}</p>
-                        
                         <div class="mt-4 p-3 bg-green-50/80 rounded-lg text-sm text-green-800 flex items-center gap-3">
                             <i class="ph-fill ph-truck text-2xl"></i>
                             <div>
@@ -417,9 +445,7 @@
                             </div>
                             <i class="ph-fill ph-info text-xl ml-auto info-icon open-shipping-info-modal" title="Saiba mais sobre a entrega"></i>
                         </div>
-
                         <div class="border-t border-purple-100 my-4"></div>
-
                         <div class="flex justify-between items-center mt-4">
                             <div class="flex flex-col items-start">
                                 <p class="text-3xl font-bold text-purple-700">R$ ${Number(product.price).toFixed(2).replace('.', ',')}</p>
@@ -445,7 +471,6 @@
             
             function debounce(func, delay = 300) { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => { func.apply(this, args); }, delay); }; }
 
-            // A linha abaixo é preenchida pelo Eleventy durante o build do site.
             allProducts = {{ collections.products | getProductList }};
 
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
@@ -456,34 +481,7 @@
             let loadMoreBtn;
 
             const UIElements = { 
-                productGrid: get('#product-grid'), 
-                cartDropdown: get('#cart-dropdown'), 
-                favoritesDropdown: get('#favorites-dropdown'), 
-                floatingCartBtn: get('#floating-cart-btn'), 
-                floatingFavoritesBtn: get('#floating-favorites-btn'), 
-                productDetailModal: get('#product-detail-modal'), 
-                shippingInfoModal: get('#shipping-info-modal'), 
-                modalOverlay: get('#modal-overlay'), 
-                searchInput: get('#search-input'), 
-                clearSearchBtn: get('#clear-search-btn'), 
-                searchIcon: get('#search-icon'), 
-                searchSuggestions: get('#search-suggestions'), 
-                noProductsMessage: get('#no-products-message'), 
-                loadingOverlay: get('.loading-overlay'), 
-                sortDropdownContainer: get('#sort-dropdown-container'), 
-                sortOptions: get('#sort-options'), 
-                sortCaret: get('#sort-caret'), 
-                cartFeedbackToast: get('#cart-feedback-toast'), 
-                favoritesFeedbackToast: get('#favorites-feedback-toast'), 
-                activityToast: get('#activity-toast'), 
-                welcomePopupOverlay: get('#welcome-popup-overlay'), 
-                hamburgerButton: get('#hamburger-button'), 
-                mobileNav: get('#mobile-nav'), 
-                mainHeader: get('#main-header'), 
-                floatingButtonsContainer: get('#floating-buttons-container'), 
-                scrollObserverTarget: get('#contato'),
-                loadMoreContainer: get('#load-more-container'),
-                visualCategoryLinks: getAll('.visual-category-link') 
+                productGrid: get('#product-grid'), cartDropdown: get('#cart-dropdown'), favoritesDropdown: get('#favorites-dropdown'), floatingCartBtn: get('#floating-cart-btn'), floatingFavoritesBtn: get('#floating-favorites-btn'), productDetailModal: get('#product-detail-modal'), shippingInfoModal: get('#shipping-info-modal'), modalOverlay: get('#modal-overlay'), searchInput: get('#search-input'), clearSearchBtn: get('#clear-search-btn'), searchIcon: get('#search-icon'), searchSuggestions: get('#search-suggestions'), noProductsMessage: get('#no-products-message'), loadingOverlay: get('.loading-overlay'), sortDropdownContainer: get('#sort-dropdown-container'), sortOptions: get('#sort-options'), sortCaret: get('#sort-caret'), cartFeedbackToast: get('#cart-feedback-toast'), favoritesFeedbackToast: get('#favorites-feedback-toast'), activityToast: get('#activity-toast'), floatingButtonsContainer: get('#floating-buttons-container'), scrollObserverTarget: get('#contato'), loadMoreContainer: get('#load-more-container'), visualCategoryLinks: getAll('.visual-category-link') 
             };
 
             const saveState = () => { localStorage.setItem('estiloChicCart', JSON.stringify(cart)); localStorage.setItem('estiloChicFavorites', JSON.stringify(favorites)); };
@@ -506,58 +504,22 @@
                 const isNew = lastVisit && (new Date(product.dateAdded).getTime() > lastVisit);
                 const isOutOfStock = product.inStock === false;
 
-                const priceHTML = `
-                    <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
-                        <span class="text-gray-500 line-through whitespace-nowrap">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
-                        <span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ ${Number(product.price).toFixed(2).replace('.',',')}</span>
-                    </div>`;
+                const priceHTML = `<div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2"><span class="text-gray-500 line-through whitespace-nowrap">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span><span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ ${Number(product.price).toFixed(2).replace('.',',')}</span></div>`;
                 const paymentHTML = `<div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>`;
 
-                const buttonsHTML = isOutOfStock
-                  ? `<div class="mt-auto pt-4">
-                       <button class="btn btn-sold-out" disabled><i class="ph ph-x-circle mr-2"></i>Esgotado</button>
-                     </div>`
-                  : `<div class="mt-auto">
-                       ${priceHTML}
-                       ${paymentHTML}
-                       <div class="flex flex-col gap-2 text-sm">
-                           <button class="btn ${isInCart ? 'btn-add-success' : 'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
-                               ${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado' : 'Adicionar'}
-                           </button>
-                           <a href="${whatsAppURL}" target="_blank" class="btn btn-buy">Comprar</a>
-                       </div>
-                     </div>`;
+                const buttonsHTML = isOutOfStock ? `<div class="mt-auto pt-4"><button class="btn btn-sold-out" disabled><i class="ph ph-x-circle mr-2"></i>Esgotado</button></div>` : `<div class="mt-auto">${priceHTML}${paymentHTML}<div class="flex flex-col gap-2 text-sm"><button class="btn ${isInCart ? 'btn-add-success' : 'btn-add-default'} add-to-cart-btn" data-id="${product.id}">${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado' : 'Adicionar'}</button><a href="${whatsAppURL}" target="_blank" class="btn btn-buy">Comprar</a></div></div>`;
                 
-                return `
-                <div class="product flex flex-col group ${isOutOfStock ? 'out-of-stock' : ''} ${isNew ? 'new-since-last-visit' : ''}" data-id="${product.id}" data-category="${product.category}" tabindex="0">
-                    <div class="relative overflow-hidden">
-                        <img loading="lazy" src="${product.image}" alt="${product.name}" class="product-image w-full h-48 sm:h-64 object-cover" ${!isOutOfStock ? `onclick="showProductDetailModal('${product.id}')"` : ''}>
-                        ${product.badge ? `<div class="product-badge">${product.badge.text}</div>` : ''}
-                        <div class="absolute top-3 right-3">
-                            <button class="toggle-favorite-btn w-10 h-10 rounded-full flex items-center justify-center" data-id="${product.id}">
-                                <i class="heart-icon ph-fill ph-heart text-2xl pointer-events-none"></i>
-                            </button>
-                        </div>
-                        ${!isOutOfStock ? `<div id="viewing-info-${product.id}" class="absolute bottom-2 left-2 h-5"></div>` : ''}
-                    </div>
-                    <div class="p-3 flex flex-col flex-grow text-center">
-                        <h3 class="text-base font-semibold text-gray-800 truncate mb-1">${product.name}</h3>
-                        <p class="text-xs text-gray-500 min-h-[16px] mb-3">${product.size ? `Tamanho: ${product.size}` : '&nbsp;'}</p>
-                        ${buttonsHTML}
-                    </div>
-                </div>`;
+                return `<div class="product flex flex-col group ${isOutOfStock ? 'out-of-stock' : ''} ${isNew ? 'new-since-last-visit' : ''}" data-id="${product.id}" data-category="${product.category}" tabindex="0"><div class="relative overflow-hidden"><img loading="lazy" src="${product.image}" alt="${product.name}" class="product-image w-full h-48 sm:h-64 object-cover" ${!isOutOfStock ? `onclick="showProductDetailModal('${product.id}')"` : ''}>${product.badge ? `<div class="product-badge">${product.badge.text}</div>` : ''}<div class="absolute top-3 right-3"><button class="toggle-favorite-btn w-10 h-10 rounded-full flex items-center justify-center" data-id="${product.id}"><i class="heart-icon ph-fill ph-heart text-2xl pointer-events-none"></i></button></div>${!isOutOfStock ? `<div id="viewing-info-${product.id}" class="absolute bottom-2 left-2 h-5"></div>` : ''}</div><div class="p-3 flex flex-col flex-grow text-center"><h3 class="text-base font-semibold text-gray-800 truncate mb-1">${product.name}</h3><p class="text-xs text-gray-500 min-h-[16px] mb-3">${product.size ? `Tamanho: ${product.size}` : '&nbsp;'}</p>${buttonsHTML}</div></div>`;
             };
             
             function displayMoreProducts() {
                 const productsToDisplay = currentlyFilteredProducts.slice(numDisplayed, numDisplayed + productsPerPage);
-
                 if (productsToDisplay.length === 0 && numDisplayed === 0) {
                     UIElements.noProductsMessage.classList.remove('hidden');
                     UIElements.noProductsMessage.innerHTML = `<i class="ph ph-flower-lotus text-5xl text-purple-300 mb-4"></i><p class="font-semibold text-xl font-display">Nenhum tesouro encontrado</p><p class="text-gray-500">Tente buscar por outro termo ou alterar os filtros.</p>`;
                     if (loadMoreBtn) loadMoreBtn.classList.add('hidden');
                     return;
                 }
-
                 const productsHTML = productsToDisplay.map((product, index) => {
                     const cardHTML = createProductCardHTML(product);
                     const tempDiv = document.createElement('div');
@@ -566,17 +528,14 @@
                     productElement.style.animationDelay = `${(numDisplayed + index) * 60}ms`;
                     return productElement.outerHTML;
                 }).join('');
-
                 UIElements.productGrid.insertAdjacentHTML('beforeend', productsHTML);
                 numDisplayed += productsToDisplay.length;
                 updateProductCardStates();
-
                 if (!loadMoreBtn) {
                     UIElements.loadMoreContainer.innerHTML = `<button id="load-more-btn" class="btn btn-outline-purple px-8 py-3" style="width: auto;">Ver mais</button>`;
                     loadMoreBtn = get('#load-more-btn');
                     loadMoreBtn.addEventListener('click', displayMoreProducts);
                 }
-
                 if (numDisplayed >= currentlyFilteredProducts.length) {
                     loadMoreBtn.classList.add('hidden');
                 } else {
@@ -587,7 +546,6 @@
             const renderProducts = () => {
                 const searchTerm = UIElements.searchInput.value.trim();
                 let filteredProducts = [...allProducts];
-
                 if (activeFilter !== 'all') {
                     filteredProducts = filteredProducts.filter(p => p.category === activeFilter);
                 }
@@ -596,23 +554,19 @@
                     const resultIds = new Set(results.map(r => r.item.id));
                     filteredProducts = filteredProducts.filter(p => resultIds.has(p.id));
                 }
-
                 if (activeSort === 'price-asc') filteredProducts.sort((a, b) => a.price - b.price);
                 else if (activeSort === 'price-desc') filteredProducts.sort((a, b) => b.price - a.price);
                 else if (activeSort === 'name-asc') filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
-
                 UIElements.productGrid.innerHTML = '';
                 UIElements.noProductsMessage.classList.add('hidden');
                 numDisplayed = 0;
                 currentlyFilteredProducts = filteredProducts;
-                
                 displayMoreProducts();
             };
 
             const updateVisuals = () => { allProducts.forEach(p => { const e = get(`#viewing-info-${p.id}`); if (e) { if (Math.random() > 0.7) p.viewing = Math.max(0, (p.viewing || 0) + (Math.floor(Math.random() * 3) - 1)); if (p.viewing > 0) { e.innerHTML = `<div class="flex items-center gap-1 text-white text-xs font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm animate-pulse"><i class="ph-fill ph-eye text-sm"></i><span>${p.viewing}</span></div>`; } else { e.innerHTML = ''; } } }); };
             const showFeedbackToast = (type) => { const t = type === 'cart' ? UIElements.cartFeedbackToast : UIElements.favoritesFeedbackToast; let to = type === 'cart' ? cartToastTimeout : favoritesToastTimeout; clearTimeout(to); t.classList.add('show'); to = setTimeout(() => t.classList.remove('show'), 2000); if (type === 'cart') cartToastTimeout = to; else favoritesToastTimeout = to; };
             const flyToCart = (target) => { const c = target.closest('.product, .favorite-dropdown-item'); if (!c) return; const i = c.querySelector('img'); if(!i) return; const fi = i.cloneNode(true); const r1 = i.getBoundingClientRect(); const r2 = UIElements.floatingCartBtn.getBoundingClientRect(); fi.style.cssText = `position: fixed; z-index: 9999; left: ${r1.left}px; top: ${r1.top}px; width: ${r1.width}px; height: ${r1.height}px; border-radius: 0.5rem; transition: all 0.7s cubic-bezier(0.5, 0, 0.75, 0.2);`; document.body.appendChild(fi); requestAnimationFrame(() => { fi.style.left = `${r2.left + r2.width / 2 - 20}px`; fi.style.top = `${r2.top + r2.height / 2 - 20}px`; fi.style.width = '40px'; fi.style.height = '40px'; fi.style.transform = 'scale(0.2) rotate(180deg)'; fi.style.opacity = '0'; }); setTimeout(() => { fi.remove(); UIElements.floatingCartBtn.classList.add('shake'); setTimeout(() => UIElements.floatingCartBtn.classList.remove('shake'), 500); }, 700); };
-            const setupWelcomePopup = () => { const o = UIElements.welcomePopupOverlay; if (!o) return; const c = () => { o.classList.remove('show'); localStorage.setItem('estiloChicVisitedBefore', 'true'); }; if (!localStorage.getItem('estiloChicVisitedBefore')) setTimeout(() => o.classList.add('show'), 5000); get('#close-popup').addEventListener('click', c); get('#claim-coupon-btn').addEventListener('click', c); o.addEventListener('click', (e) => { if (e.target === o) c(); }); };
             const hideSearchSuggestions = () => { if (UIElements.searchSuggestions) { UIElements.searchSuggestions.classList.add('hidden'); UIElements.searchSuggestions.innerHTML = ''; } };
             const showSearchSuggestions = (term) => { if (!UIElements.searchSuggestions || term.trim() === '') return hideSearchSuggestions(); const results = fuse.search(term).slice(0, 5); if (results.length === 0) return hideSearchSuggestions(); UIElements.searchSuggestions.innerHTML = results.map(({ item }) => `<div class="suggestion-item" data-name="${item.name}"><span>${item.name}</span></div>`).join(''); UIElements.searchSuggestions.classList.remove('hidden'); };
             const resetAllFilters = () => { activeFilter = 'all'; UIElements.searchInput.value = ''; getAll('.visual-category-link').forEach(link => link.classList.remove('active')); get('.visual-category-link[data-category="all"]').classList.add('active'); hideSearchSuggestions(); renderProducts(); checkButtonsVisibility(); };
@@ -620,6 +574,61 @@
             const setupActivityNotifications = () => { const toast = UIElements.activityToast; if (!toast || allProducts.length === 0) return; const names = ['Ana', 'Mariana', 'Júlia', 'Beatriz', 'Larissa', 'Maria', 'Alice', 'Helena', 'Laura', 'Manuela', 'Valentina', 'Sophia', 'Isabella', 'Lívia', 'Giovanna', 'Yasmin', 'Eloá', 'Clara', 'Cecília', 'Liz', 'Maitê', 'Antonella', 'Elisa', 'Gabriela', 'Luiza', 'Amanda', 'Bruna', 'Camila', 'Fernanda', 'Patrícia', 'Sandra', 'Jéssica', 'Letícia', 'Aline']; const cities = [ 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'Macaé', 'Itaperuna', 'Rio de Janeiro' ]; const actions = [ { verb: 'acabou de comprar', icon: 'ph-fill ph-handbag-simple', color: 'var(--purple-dark)' }, { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' } ]; const showRandom = () => { if (document.hidden || allProducts.length === 0) return; const name = names[Math.floor(Math.random() * names.length)]; const city = cities[Math.floor(Math.random() * cities.length)]; const action = actions[Math.floor(Math.random() * actions.length)]; const product = allProducts[Math.floor(Math.random() * allProducts.length)]; toast.innerHTML = `<div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full animate-icon-pulse" style="background-color: ${action.color};"><i class="${action.icon} text-white text-xl"></i></div><div><p><strong>${name}</strong> de ${city}</p><p class="text-sm" style="color: var(--text-secondary);">${action.verb} um(a) <strong>${product.name}</strong></p></div>`; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 5000); }; const startCycle = () => { const delay = Math.random() * (20000 - 8000) + 8000; setTimeout(() => { showRandom(); startCycle(); }, delay); }; setTimeout(startCycle, 7000); };
             const setupObservers = () => { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { UIElements.floatingButtonsContainer.classList.toggle('hidden', entry.isIntersecting); }); }, { threshold: 0.1 }); if (UIElements.scrollObserverTarget) { observer.observe(UIElements.scrollObserverTarget); } };
             
+            // --- INÍCIO DA NOVA LÓGICA DE POPUPS ---
+            const setupNewUserPopup = () => {
+                const overlay = get('#welcome-popup-overlay');
+                if (!overlay) return;
+                
+                const closePopup = () => {
+                    overlay.classList.remove('show');
+                    localStorage.setItem('estiloChicVisitedBefore', 'true');
+                };
+
+                if (!localStorage.getItem('estiloChicVisitedBefore')) {
+                    setTimeout(() => overlay.classList.add('show'), 5000);
+                }
+
+                get('#close-popup').addEventListener('click', closePopup);
+                get('#claim-coupon-btn').addEventListener('click', closePopup);
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) closePopup();
+                });
+            };
+            
+            const setupPromoPopup = () => {
+                const overlay = get('#promo-popup-overlay');
+                if (!overlay) return;
+                
+                const behavior = overlay.dataset.behavior;
+                const popupId = 'promoPopupShown';
+                
+                const closePopup = () => overlay.classList.remove('show');
+
+                const showPopup = () => {
+                    setTimeout(() => overlay.classList.add('show'), 2500);
+                    if (behavior === 'once') {
+                        localStorage.setItem(popupId, 'true');
+                    }
+                };
+
+                if (behavior === 'always') {
+                    showPopup();
+                } else if (behavior === 'once' && !localStorage.getItem(popupId)) {
+                    showPopup();
+                }
+
+                get('#close-promo-popup').addEventListener('click', closePopup);
+                get('#promo-action-btn').addEventListener('click', () => {
+                    if(get('#promo-action-btn').getAttribute('href').startsWith('#')) {
+                        closePopup();
+                    }
+                });
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) closePopup();
+                });
+            };
+            // --- FIM DA NOVA LÓGICA DE POPUPS ---
+
             function setupEventListeners() {
                 UIElements.hamburgerButton.addEventListener('click', () => { UIElements.hamburgerButton.classList.toggle('menu-open'); UIElements.mobileNav.classList.toggle('menu-open'); });
                 UIElements.modalOverlay.addEventListener('click', (e) => { if (e.target === UIElements.modalOverlay) closeAllModals(); });
@@ -702,7 +711,10 @@
                 renderProducts(); 
                 updateApp();
                 checkButtonsVisibility();
-                setupWelcomePopup();
+                
+                setupNewUserPopup(); 
+                setupPromoPopup();
+                
                 setupActivityNotifications();
                 
                 setInterval(updateVisuals, 4000);
