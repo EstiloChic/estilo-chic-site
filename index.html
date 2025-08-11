@@ -483,7 +483,11 @@
         // Função global para o onclick do modal de detalhes.
         function showProductDetailModal(productId) {
             const get = (selector) => document.querySelector(selector);
-            const UIElements = { productDetailModal: get('#product-detail-modal'), modalOverlay: get('#modal-overlay') };
+            const UIElements = { 
+                productDetailModal: get('#product-detail-modal'), 
+                modalOverlay: get('#modal-overlay'),
+                floatingButtonsContainer: get('#floating-buttons-container')
+            };
             const cart = JSON.parse(localStorage.getItem('estiloChicCart') || '{}');
 
             const product = allProducts.find(p => p.id === productId);
@@ -528,6 +532,9 @@
             
             UIElements.modalOverlay.classList.add('visible');
             UIElements.productDetailModal.classList.remove('hidden');
+            // *** A CORREÇÃO FINAL ESTÁ AQUI ***
+            // Rebaixa o container dos botões flutuantes para que eles sejam desfocados.
+            UIElements.floatingButtonsContainer.classList.add('is-demoted');
         };
 
         // O script principal da página, que agora tem a garantia de ser executado.
