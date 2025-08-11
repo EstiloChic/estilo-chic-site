@@ -13,5 +13,4 @@ tags: products
 image: https://i.postimg.cc/YCfbdcqT/Whats-App-Image-2025-07-22-at-12-56-51.jpg
 category: acessorios
 ---
-
-Óculos de sol com armação metálica dourada e design moderno. Lentes com proteção UV400.
+Óculos de sol com armação metálica dourada e design moderno.
