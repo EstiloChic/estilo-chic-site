@@ -106,6 +106,7 @@
     .close-modal-btn:hover { background: rgba(0, 0, 0, 0.6); transform: scale(1.1); }
 
     .floating-buttons-container { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; align-items: end; gap: 1rem; z-index: 1950; transition: all 0.4s ease; }
+    .floating-buttons-container.is-demoted { z-index: 1899; }
     .floating-buttons-container.hidden { opacity: 0; visibility: hidden; transform: translateY(20px); }
     .floating-cart, .floating-favorites { width: 55px; height: 55px; background: var(--purple-dark); box-shadow: var(--shadow-medium); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: all 0.3s ease; }
     .floating-cart:hover, .floating-favorites:hover { background: #4a0e6b; transform: scale(1.1); }
@@ -572,6 +573,7 @@
             const UIElements = { 
                 productDetailModal: get('#product-detail-modal'), 
                 modalOverlay: get('#modal-overlay'),
+                floatingButtonsContainer: get('#floating-buttons-container')
             };
             const cart = JSON.parse(localStorage.getItem('estiloChicCart') || '{}');
 
@@ -616,6 +618,7 @@
             
             UIElements.modalOverlay.classList.add('visible');
             UIElements.productDetailModal.classList.remove('hidden');
+            UIElements.floatingButtonsContainer.classList.add('is-demoted');
         };
 
         // O script principal da página, que agora tem a garantia de ser executado.
@@ -671,6 +674,7 @@
                 UIElements.productDetailModal.classList.add('hidden');
                 UIElements.shippingInfoModal.classList.add('hidden');
                 UIElements.productDetailModal.classList.remove('is-covered');
+                UIElements.floatingButtonsContainer.classList.remove('is-demoted');
                 if (cartOpen) closeCart();
                 if (favoritesOpen) closeFavorites();
             };
@@ -679,15 +683,18 @@
                 UIElements.shippingInfoModal.classList.add('hidden');
                 UIElements.productDetailModal.classList.remove('is-covered');
                 
-                if (UIElements.productDetailModal.classList.contains('hidden') && !cartOpen && !favoritesOpen) {
-                    UIElements.modalOverlay.classList.remove('visible');
+                if (UIElements.productDetailModal.classList.contains('hidden')) {
+                    UIElements.floatingButtonsContainer.classList.remove('is-demoted');
+                    if (!cartOpen && !favoritesOpen) {
+                       UIElements.modalOverlay.classList.remove('visible');
+                    }
                 }
             };
 
-            const closeCart = (isChaining = false) => { if (!isChaining && UIElements.shippingInfoModal.classList.contains('hidden')) UIElements.modalOverlay.classList.remove('visible'); cartOpen = false; UIElements.cartDropdown.classList.remove('show'); UIElements.floatingCartBtn.classList.remove('active'); };
-            const closeFavorites = (isChaining = false) => { if (!isChaining && UIElements.shippingInfoModal.classList.contains('hidden')) UIElements.modalOverlay.classList.remove('visible'); favoritesOpen = false; UIElements.favoritesDropdown.classList.remove('show'); UIElements.floatingFavoritesBtn.classList.remove('active'); };
-            const openCart = () => { if (favoritesOpen) closeFavorites(true); UIElements.modalOverlay.classList.add('visible'); cartOpen = true; UIElements.cartDropdown.classList.add('show'); UIElements.floatingCartBtn.classList.add('active'); };
-            const openFavorites = () => { if (cartOpen) closeCart(true); UIElements.modalOverlay.classList.add('visible'); favoritesOpen = true; UIElements.favoritesDropdown.classList.add('show'); UIElements.floatingFavoritesBtn.classList.add('active'); };
+            const closeCart = (isChaining = false) => { if (!isChaining && UIElements.shippingInfoModal.classList.contains('hidden') && UIElements.productDetailModal.classList.contains('hidden')) { UIElements.modalOverlay.classList.remove('visible'); UIElements.floatingButtonsContainer.classList.remove('is-demoted'); } cartOpen = false; UIElements.cartDropdown.classList.remove('show'); UIElements.floatingCartBtn.classList.remove('active'); };
+            const closeFavorites = (isChaining = false) => { if (!isChaining && UIElements.shippingInfoModal.classList.contains('hidden') && UIElements.productDetailModal.classList.contains('hidden')) { UIElements.modalOverlay.classList.remove('visible'); UIElements.floatingButtonsContainer.classList.remove('is-demoted'); } favoritesOpen = false; UIElements.favoritesDropdown.classList.remove('show'); UIElements.floatingFavoritesBtn.classList.remove('active'); };
+            const openCart = () => { if (favoritesOpen) closeFavorites(true); UIElements.modalOverlay.classList.add('visible'); UIElements.floatingButtonsContainer.classList.add('is-demoted'); cartOpen = true; UIElements.cartDropdown.classList.add('show'); UIElements.floatingCartBtn.classList.add('active'); };
+            const openFavorites = () => { if (cartOpen) closeCart(true); UIElements.modalOverlay.classList.add('visible'); UIElements.floatingButtonsContainer.classList.add('is-demoted'); favoritesOpen = true; UIElements.favoritesDropdown.classList.add('show'); UIElements.floatingFavoritesBtn.classList.add('active'); };
             const updateCounters = () => { const c1 = UIElements.floatingCartBtn.querySelector('.cart-count'); const c2 = UIElements.floatingFavoritesBtn.querySelector('.cart-count'); const t = Object.values(cart).reduce((s, q) => s + q, 0); c1.textContent = t; c1.style.display = t > 0 ? 'flex' : 'none'; c2.textContent = favorites.length; c2.style.display = favorites.length > 0 ? 'flex' : 'none'; };
             const renderCart = () => { if (Object.keys(cart).length === 0) { UIElements.cartDropdown.innerHTML = `<div class="text-center p-4"><i class="ph ph-handbag text-4xl text-gray-300 mb-2"></i><p class="font-semibold text-gray-700">Sua sacola está vazia</p></div>`; return; } let h = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-purple-800">Minha Sacola</h3><button class="clear-cart-btn text-xs bg-red-100 text-red-600 font-semibold hover:bg-red-200 px-3 py-1 rounded-full">Limpar</button></div>`; let t = 0; let w = "Olá! Gostaria de encomendar:\n\n"; for (const [i, q] of Object.entries(cart)) { const p = allProducts.find(pr => pr.id === i); if (!p) continue; t += p.price * q; w += `- ${q}x ${p.name}\n`; h += `<div class="cart-item flex items-center gap-3 py-3"><img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-grow"><p class="font-semibold text-sm text-gray-800">${p.name}</p><div class="flex items-center bg-purple-50 rounded-full mt-1.5 border border-purple-200" style="width: fit-content; height: 34px;"><button class="decrease-quantity-btn h-full px-3 text-purple-700 hover:text-purple-900 transition-colors" data-id="${i}"><i class="ph ph-minus pointer-events-none"></i></button><span class="font-semibold text-purple-900 text-sm h-full flex items-center px-3">${q}</span><button class="increase-quantity-btn h-full px-3 text-purple-700 hover:text-purple-900 transition-colors" data-id="${i}"><i class="ph ph-plus pointer-events-none"></i></button></div></div><div class="flex flex-col items-end justify-between self-stretch py-1"><p class="text-base font-semibold text-purple-700 whitespace-nowrap">R$ ${(p.price*q).toFixed(2).replace('.',',')}</p><button class="remove-item-btn icon-btn-circle" data-id="${i}"><i class="ph ph-trash text-base pointer-events-none"></i></button></div></div>`; } w += `\n*Total: R$ ${t.toFixed(2).replace('.',',')}*`; h += `<div class="mt-4 pt-4 border-t"><div class="flex justify-between items-center font-bold text-lg"><span>Total:</span><span class="text-purple-800">R$ ${t.toFixed(2).replace('.',',')}</span></div><div class="flex items-center justify-center text-xs text-gray-500 mt-3 gap-1"><span>Frete grátis para São Francisco e região.</span></div><div class="mt-4 flex flex-col gap-2"><a href="https://wa.me/5522998802545?text=${encodeURIComponent(w)}" target="_blank" class="btn btn-buy py-3"><i class="ph-fill ph-whatsapp-logo mr-2"></i> Finalizar Pedido</a><button class="btn btn-outline-purple py-3 close-cart-btn"><i class="ph ph-arrow-left mr-2"></i>Continuar Comprando</button></div></div>`; UIElements.cartDropdown.innerHTML = h; };
             const renderFavorites = () => { if (favorites.length === 0) { UIElements.favoritesDropdown.innerHTML = `<div class="text-center p-4"><i class="ph ph-heart text-4xl text-gray-300 mb-2"></i><p class="font-semibold text-gray-700">Lista de favoritos vazia.</p></div>`; return; } let h = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-purple-800">Meus Favoritos</h3><button class="clear-favorites-btn text-xs bg-red-100 text-red-600 font-semibold hover:bg-red-200 px-3 py-1 rounded-full">Limpar</button></div>`; favorites.forEach(id => { const p = allProducts.find(pr => pr.id === id); if (!p) return; h += `<div class="favorite-dropdown-item flex items-center gap-4 py-3"><img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-grow"><p class="font-semibold text-sm">${p.name}</p><p class="text-xs text-purple-600 font-medium">R$ ${Number(p.price).toFixed(2).replace('.',',')}</p></div><div class="flex items-center gap-2"><button class="add-to-cart-from-fav-btn icon-btn-circle bg-purple-100 text-purple-700 hover:bg-purple-600" data-id="${id}"><i class="ph ph-handbag-simple pointer-events-none"></i></button><button class="remove-from-favorites-btn icon-btn-circle" data-id="${id}"><i class="ph ph-trash text-base pointer-events-none"></i></button></div></div>`; }); UIElements.favoritesDropdown.innerHTML = h; };
@@ -699,7 +706,6 @@
                 const isNew = lastVisit && (new Date(product.dateAdded).getTime() > lastVisit);
                 const isOutOfStock = product.inStock === false;
 
-                // Mensagem e URL para o botão "Avise-me" do WhatsApp
                 const notifyMessage = `Olá! Gostaria de ser avisado(a) quando o produto "${product.name}" voltar ao estoque.`;
                 const notifyWhatsAppURL = `https://wa.me/5522998802545?text=${encodeURIComponent(notifyMessage)}`;
 
@@ -710,7 +716,6 @@
                     </div>`;
                 const paymentHTML = `<div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>`;
 
-                // ** AQUI ESTÁ A LÓGICA ATUALIZADA **
                 const buttonsHTML = isOutOfStock
                   ? `<div class="mt-auto pt-4 flex flex-col gap-2">
                        <a href="${notifyWhatsAppURL}" target="_blank" rel="noopener noreferrer" class="btn btn-notify">
@@ -861,6 +866,7 @@
                         if (!UIElements.productDetailModal.classList.contains('hidden')) {
                             UIElements.productDetailModal.classList.add('is-covered');
                         }
+                        UIElements.floatingButtonsContainer.classList.add('is-demoted');
                         UIElements.modalOverlay.classList.add('visible');
                         UIElements.shippingInfoModal.classList.remove('hidden');
                         return;
