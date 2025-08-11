@@ -280,9 +280,52 @@
         animation: pulse-skeleton 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         margin-top: auto;
     }
+    
+    #theme-toggle-btn.active #theme-toggle-indicator {
+        transform: translateX(24px);
+    }
+    #theme-toggle-btn.active {
+        background-color: var(--accent-pink);
+    }
+    
+    /* =========================================== */
+    /* ============== TEMA ESCURO ============== */
+    /* =========================================== */
+    body.dark-theme {
+        --purple-dark: #a855f7;
+        --purple-medium: #9333ea;
+        --purple-light: #581c87;
+        --purple-faint: #2b1d3d; 
+        --green-faint: #14532d;
+        --green-dark-text: #dcfce7;
+        --background-main: #1c1921;
+        --background-card: #2d2a33;
+        --text-primary: #f3e8ff;
+        --text-secondary: #d1c4e9;
+    }
+
+    body.dark-theme .btn-buy {
+        border-color: #34d399;
+    }
+    body.dark-theme .btn-buy:hover {
+        background-color: #15803d;
+    }
+    body.dark-theme .btn-outline-purple {
+        border-color: #581c87;
+    }
+    body.dark-theme .btn-outline-purple:hover {
+        background-color: #581c87;
+    }
     </style>
 </head>
 <body>
+    <script>
+        (function() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-theme');
+            }
+        })();
+    </script>
     <div class="loading-overlay"><div class="spinner"></div></div>
     
     <div class="bg-[#6a1b9a] relative header-bg-pattern flex items-center justify-center h-[120px]">
@@ -326,6 +369,19 @@
             <a href="#encomendas" class="mobile-nav-link group flex items-center text-white text-sm font-medium px-4 py-3 hover:bg-white/10 transition relative z-10"><i class="ph ph-magic-wand mr-3 text-lg transition-transform group-hover:scale-110 group-hover:rotate-3"></i>Pedidos Especiais</a>
             <a href="#contato" class="mobile-nav-link group flex items-center text-white text-sm font-medium px-4 py-3 hover:bg-white/10 transition relative z-10"><i class="ph ph-chat-circle-dots mr-3 text-lg transition-transform group-hover:scale-110 group-hover:rotate-3"></i>Contato</a>
             <a href="#sobre" class="mobile-nav-link group flex items-center text-white text-sm font-medium px-4 py-3 hover:bg-white/10 transition relative z-10"><i class="ph ph-info mr-3 text-lg transition-transform group-hover:scale-110 group-hover:rotate-3"></i>Sobre</a>
+            
+            <div class="px-4 py-3 border-t border-purple-500/50 relative z-10">
+                <div class="flex justify-between items-center text-white text-sm font-medium">
+                    <div class="flex items-center gap-3">
+                        <i class="ph ph-moon text-lg"></i>
+                        <span>Modo Escuro</span>
+                    </div>
+                    <button id="theme-toggle-btn" class="relative w-12 h-6 rounded-full bg-white/20 transition-colors">
+                        <span id="theme-toggle-indicator" class="absolute top-1 left-1 w-4 h-4 rounded-full bg-white transform transition-transform"></span>
+                    </button>
+                </div>
+            </div>
+
             <div class="px-4 py-4 border-t border-purple-500/50 relative z-10">
                 <div class="flex justify-center gap-6">
                     <a href="https://www.instagram.com/estilochicccc" target="_blank" rel="noopener noreferrer" class="mobile-social-link instagram" aria-label="Instagram">
@@ -545,7 +601,7 @@
 
     <div id="floating-buttons-container" class="floating-buttons-container">
         <div id="favorites-container" class="relative"><div id="floating-favorites-btn" class="floating-favorites"><i class="ph-fill ph-heart text-2xl"></i><div class="cart-count" style="display: none;"></div></div><div id="favorites-dropdown" class="favorites-dropdown md:absolute md:bottom-full md:right-0 md:mb-2 md:w-80"></div></div>
-        <div id="cart-container" class="relative"><div id="floating-cart-btn" class="floating-cart"><i class="ph-fill ph-handbag text-2xl"></i><div class="cart-count" style="display: none;"></div></div><div id="cart-dropdown" class="cart-dropdown md:absolute md:bottom-full md:right-0 md:mb-2 md:w-96"></div></div>
+        <div id="cart-container" class="relative"><div id="floating-cart-btn" class="floating-cart"><i class="ph ph-handbag text-2xl"></i><div class="cart-count" style="display: none;"></div></div><div id="cart-dropdown" class="cart-dropdown md:absolute md:bottom-full md:right-0 md:mb-2 md:w-96"></div></div>
     </div>
     
     <div id="cart-feedback-toast" class="feedback-toast">Adicionado à sacola!</div>
@@ -705,6 +761,7 @@
                 scrollObserverTarget: get('#contato'),
                 loadMoreContainer: get('#load-more-container'),
                 visualCategoryLinks: getAll('.visual-category-link'),
+                themeToggleBtn: get('#theme-toggle-btn'),
             };
 
             const saveState = () => { localStorage.setItem('estiloChicCart', JSON.stringify(cart)); localStorage.setItem('estiloChicFavorites', JSON.stringify(favorites)); };
@@ -997,6 +1054,22 @@
                     });
                 });
                 getAll('.sort-option').forEach(o => o.addEventListener('click', (e) => { e.preventDefault(); get('#sort-button-text').textContent = `Ordenar: ${o.textContent}`; activeSort = o.dataset.value; getAll('.sort-option').forEach(opt => opt.classList.remove('font-bold')); o.classList.add('font-bold'); UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); renderProducts(); }));
+            
+                const applyTheme = (theme) => {
+                    if (theme === 'dark') {
+                        document.body.classList.add('dark-theme');
+                        UIElements.themeToggleBtn.classList.add('active');
+                    } else {
+                        document.body.classList.remove('dark-theme');
+                        UIElements.themeToggleBtn.classList.remove('active');
+                    }
+                    localStorage.setItem('theme', theme);
+                };
+
+                UIElements.themeToggleBtn.addEventListener('click', () => {
+                    const isDark = document.body.classList.contains('dark-theme');
+                    applyTheme(isDark ? 'light' : 'dark');
+                });
             }
 
             function init() {
@@ -1015,6 +1088,10 @@
                 setupEventListeners();
                 setupObservers();
                 
+                if (localStorage.getItem('theme') === 'dark') {
+                    UIElements.themeToggleBtn.classList.add('active');
+                }
+
                 get('.visual-category-link[data-category="all"]').classList.add('active');
                 get('.sort-option[data-value="default"]').classList.add('font-bold');
                 
