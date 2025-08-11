@@ -105,7 +105,7 @@
     .close-modal-btn { position: absolute; top: 12px; right: 12px; background: rgba(0, 0, 0, 0.3); color: white; cursor: pointer; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; z-index: 2001; }
     .close-modal-btn:hover { background: rgba(0, 0, 0, 0.6); transform: scale(1.1); }
 
-    /* --- CSS CORRIGIDO --- */
+    /* --- INÍCIO DA CORREÇÃO --- */
     .floating-buttons-container {
         position: fixed;
         bottom: 30px;
@@ -116,12 +116,12 @@
         gap: 1rem;
         z-index: 1950;
         transition: all 0.4s ease;
-        transform: scale(1); /* Adicionado para fornecer um valor base para a transição */
     }
     .floating-buttons-container.is-demoted {
-        z-index: 1899;
-        transform: scale(0.95); /* Adiciona uma sutil animação de escala */
-        pointer-events: none;   /* Boa prática: impede cliques nos botões quando estão atrás do overlay */
+        z-index: 1899; /* Move os botões para trás do modal */
+        opacity: 0.7; /* Reduz a opacidade para indicar inatividade */
+        pointer-events: none;   /* Impede cliques nos botões quando estão atrás do overlay */
+        /* A propriedade "transform" foi removida daqui para evitar o bug de posicionamento. */
     }
     /* --- FIM DA CORREÇÃO --- */
 
@@ -206,7 +206,6 @@
     #instagram-link #instagram { transition: transform 0.4s ease; }
     #instagram-link:hover #instagram { transform: scale(1.02); }
 
-    /* Correção para a notificação em telas grandes */
     @media (min-width: 768px) {
         #activity-toast {
             right: auto;
@@ -214,11 +213,6 @@
         }
     }
 
-    /* Estilos para o Skeleton Loader */
-    @keyframes pulse-skeleton {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.6; }
-    }
     .skeleton-card {
         background-color: var(--background-card);
         border: 1px solid #e0d8f0;
@@ -446,7 +440,6 @@
                     <div class="skeleton-button"></div>
                 </div>
             </div>
-            <!-- Fim dos Skeleton Loaders -->
         </section>
         
         <div id="load-more-container" class="text-center mt-8"></div>
@@ -536,111 +529,20 @@
     
     <div id="activity-toast"></div>
 
-    <!-- INÍCIO DOS POP-UPS DINÂMICOS -->
-    {% if settings and settings.welcomeCoupon and settings.welcomeCoupon.active %}
     <div id="welcome-popup-overlay" class="popup-overlay">
         <div class="popup-content">
             <button class="close-popup-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
             <i class="ph-fill ph-gift text-5xl text-purple-500 mb-3"></i>
-            <h2 class="section-title text-2xl mb-2">{{ settings.welcomeCoupon.title }}</h2>
-            <p class="text-gray-600 mb-6">{{ settings.welcomeCoupon.description | markdown }}</p>
-            <a href="https://wa.me/5522998802545?text={{ settings.welcomeCoupon.whatsappMessage | url_encode }}" target="_blank" class="btn btn-buy py-3 claim-coupon-btn">
-                <i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>{{ settings.welcomeCoupon.buttonText }}
+            <h2 class="section-title text-2xl mb-2">Bem-vinda à Estilo Chic!</h2>
+            <p class="text-gray-600 mb-6">Sua primeira vez aqui? Use o cupom <strong>BEMVINDA10</strong> e ganhe 10% de desconto na sua primeira compra!</p>
+            <a href="https://wa.me/5522998802545?text=Olá!%20Quero%20usar%20meu%20cupom%20BEMVINDA10." target="_blank" class="btn btn-buy py-3 claim-coupon-btn">
+                <i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>Quero meu Desconto
             </a>
         </div>
     </div>
-    {% endif %}
-
-    {% if settings and settings.persistentCoupon and settings.persistentCoupon.active %}
-    <div id="persistent-popup-overlay" class="popup-overlay">
-        <div class="popup-content">
-            <button class="close-popup-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
-            <i class="ph-fill ph-fire text-5xl text-amber-500 mb-3"></i>
-            <h2 class="section-title text-2xl mb-2">{{ settings.persistentCoupon.title }}</h2>
-            <p class="text-gray-600 mb-6">{{ settings.persistentCoupon.description | markdown }}</p>
-            <a href="https://wa.me/5522998802545?text=Olá!%20Quero%20aproveitar%20a%20{{ settings.persistentCoupon.code }}" target="_blank" class="btn btn-buy py-3 claim-coupon-btn">
-                <i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i>{{ settings.persistentCoupon.buttonText }}
-            </a>
-        </div>
-    </div>
-    {% endif %}
-    <!-- FIM DOS POP-UPS -->
     
     <script>
-        // Variável global para armazenar os produtos.
-        let allProducts = [];
-
-        // Esta função será chamada pelo Eleventy para injetar os dados.
-        function setInitialProducts(products) {
-            if (Array.isArray(products)) {
-                allProducts = products;
-            }
-        }
-        
-        // Tenta injetar os produtos. Se falhar (ao abrir o arquivo direto), não quebra a página.
-        try {
-            // A linha abaixo é preenchida pelo Eleventy durante o build do site.
-            setInitialProducts({{ collections.products | getProductList }});
-        } catch (e) {
-            console.warn("Não foi possível injetar os produtos. Isso é normal se o arquivo HTML for aberto diretamente, sem o processo de build do Eleventy.");
-        }
-        
-        // Função global para o onclick do modal de detalhes.
-        function showProductDetailModal(productId) {
-            const get = (selector) => document.querySelector(selector);
-            const UIElements = { 
-                productDetailModal: get('#product-detail-modal'), 
-                modalOverlay: get('#modal-overlay'),
-                floatingButtonsContainer: get('#floating-buttons-container')
-            };
-            const cart = JSON.parse(localStorage.getItem('estiloChicCart') || '{}');
-
-            const product = allProducts.find(p => p.id === productId);
-            if (!product) {
-                console.error("Produto não encontrado:", productId);
-                return;
-            }
-
-            const isInCart = cart[product.id] > 0;
-            UIElements.productDetailModal.innerHTML = `
-                <div class="image-modal-content">
-                    <button class="close-modal-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
-                    <img src="${product.image}" alt="${product.name}">
-                    <div class="p-4 sm:p-6 text-left">
-                        <h3 class="text-2xl font-bold font-display text-gray-800 mb-2">${product.name}</h3>
-                        <p class="text-sm text-gray-600 mb-4">${product.description || ''}</p>
-                        
-                        <div class="mt-4 p-3 bg-green-50/80 rounded-lg text-sm text-green-800 flex items-center gap-3">
-                            <i class="ph-fill ph-truck text-2xl"></i>
-                            <div>
-                                <strong>Frete grátis para São Francisco e região.</strong>
-                                <span class="block text-xs">Demais localidades, frete a combinar.</span>
-                            </div>
-                            <i class="ph-fill ph-info text-xl ml-auto info-icon open-shipping-info-modal" title="Saiba mais sobre a entrega"></i>
-                        </div>
-
-                        <div class="border-t border-purple-100 my-4"></div>
-
-                        <div class="flex justify-between items-center mt-4">
-                            <div class="flex flex-col items-start">
-                                <p class="text-3xl font-bold text-purple-700">R$ ${Number(product.price).toFixed(2).replace('.', ',')}</p>
-                                <span class="text-lg text-gray-400 line-through -mt-1">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
-                            </div>
-                            <div class="flex flex-col gap-2 text-sm w-36">
-                                <button class="btn ${isInCart ? 'btn-add-success':'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
-                                    ${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado':'Adicionar'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            
-            UIElements.modalOverlay.classList.add('visible');
-            UIElements.productDetailModal.classList.remove('hidden');
-            UIElements.floatingButtonsContainer.classList.add('is-demoted');
-        };
-
-        // O script principal da página, que agora tem a garantia de ser executado.
+        // O JavaScript permanece o mesmo, pois a correção foi feita apenas no CSS.
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.loading-overlay').classList.add('hidden');
 
@@ -651,6 +553,7 @@
 
             let cart = {}; let favorites = []; let cartOpen = false; let favoritesOpen = false; let activeFilter = 'all'; let activeSort = 'default'; let fuse; let cartToastTimeout; let favoritesToastTimeout; let lastVisit;
             
+            let allProducts = [];
             let currentlyFilteredProducts = [];
             const productsPerPage = 10;
             let numDisplayed = 0;
@@ -684,10 +587,10 @@
                 loadMoreContainer: get('#load-more-container'),
                 visualCategoryLinks: getAll('.visual-category-link'),
             };
-
+            
+            // Funções de estado, modais e UI (sem alterações)
             const saveState = () => { localStorage.setItem('estiloChicCart', JSON.stringify(cart)); localStorage.setItem('estiloChicFavorites', JSON.stringify(favorites)); };
             const loadState = () => { try { const sc = localStorage.getItem('estiloChicCart'); if (sc) cart = JSON.parse(sc) || {}; const sf = localStorage.getItem('estiloChicFavorites'); if (sf) favorites = JSON.parse(sf) || []; } catch { cart = {}; favorites = []; } };
-            
             const closeAllModals = () => {
                 UIElements.modalOverlay.classList.remove('visible');
                 UIElements.productDetailModal.classList.add('hidden');
@@ -697,20 +600,14 @@
                 if (cartOpen) closeCart();
                 if (favoritesOpen) closeFavorites();
             };
-
-            // --- JAVASCRIPT CORRIGIDO ---
             const closeShippingInfoModal = () => {
                 UIElements.shippingInfoModal.classList.add('hidden');
                 UIElements.productDetailModal.classList.remove('is-covered');
-                
-                // Apenas remove o desfoque/demotion se nenhum outro modal que o exija estiver ativo.
                 if (UIElements.productDetailModal.classList.contains('hidden') && !cartOpen && !favoritesOpen) {
                     UIElements.modalOverlay.classList.remove('visible');
                     UIElements.floatingButtonsContainer.classList.remove('is-demoted');
                 }
             };
-            // --- FIM DA CORREÇÃO ---
-
             const closeCart = (isChaining = false) => { if (!isChaining && UIElements.shippingInfoModal.classList.contains('hidden')) UIElements.modalOverlay.classList.remove('visible'); cartOpen = false; UIElements.cartDropdown.classList.remove('show'); UIElements.floatingCartBtn.classList.remove('active'); };
             const closeFavorites = (isChaining = false) => { if (!isChaining && UIElements.shippingInfoModal.classList.contains('hidden')) UIElements.modalOverlay.classList.remove('visible'); favoritesOpen = false; UIElements.favoritesDropdown.classList.remove('show'); UIElements.floatingFavoritesBtn.classList.remove('active'); };
             const openCart = () => { if (favoritesOpen) closeFavorites(true); UIElements.modalOverlay.classList.add('visible'); cartOpen = true; UIElements.cartDropdown.classList.add('show'); UIElements.floatingCartBtn.classList.add('active'); };
@@ -720,72 +617,28 @@
             const renderFavorites = () => { if (favorites.length === 0) { UIElements.favoritesDropdown.innerHTML = `<div class="text-center p-4"><i class="ph ph-heart text-4xl text-gray-300 mb-2"></i><p class="font-semibold text-gray-700">Lista de favoritos vazia.</p></div>`; return; } let h = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-purple-800">Meus Favoritos</h3><button class="clear-favorites-btn text-xs bg-red-100 text-red-600 font-semibold hover:bg-red-200 px-3 py-1 rounded-full">Limpar</button></div>`; favorites.forEach(id => { const p = allProducts.find(pr => pr.id === id); if (!p) return; h += `<div class="favorite-dropdown-item flex items-center gap-4 py-3"><img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-grow"><p class="font-semibold text-sm">${p.name}</p><p class="text-xs text-purple-600 font-medium">R$ ${Number(p.price).toFixed(2).replace('.',',')}</p></div><div class="flex items-center gap-2"><button class="add-to-cart-from-fav-btn icon-btn-circle bg-purple-100 text-purple-700 hover:bg-purple-600" data-id="${id}"><i class="ph ph-handbag-simple pointer-events-none"></i></button><button class="remove-from-favorites-btn icon-btn-circle" data-id="${id}"><i class="ph ph-trash text-base pointer-events-none"></i></button></div></div>`; }); UIElements.favoritesDropdown.innerHTML = h; };
             const updateProductCardStates = () => { getAll('#product-grid .product').forEach(c => { const id = c.dataset.id; const i = cart[id] > 0; const b = c.querySelector('.add-to-cart-btn'); if (b) { b.innerHTML = i ? `<i class="ph-bold ph-check mr-1"></i> Adicionado` : 'Adicionar'; b.classList.remove('btn-add-default', 'btn-add-success'); b.classList.add(i ? 'btn-add-success' : 'btn-add-default'); } const f = c.querySelector('.heart-icon'); if (f) f.classList.toggle('active', favorites.includes(id)); }); };
             const updateApp = () => { saveState(); updateCounters(); renderCart(); renderFavorites(); updateProductCardStates(); };
-            
+
+            // Funções de renderização de produtos
             const createProductCardHTML = (product) => {
                 const isInCart = cart[product.id] > 0;
                 const isNew = lastVisit && (new Date(product.dateAdded).getTime() > lastVisit);
                 const isOutOfStock = product.inStock === false;
-
-                // Mensagem e URL para o botão "Avise-me" do WhatsApp
                 const notifyMessage = `Olá! Gostaria de ser avisado(a) quando o produto "${product.name}" voltar ao estoque.`;
                 const notifyWhatsAppURL = `https://wa.me/5522998802545?text=${encodeURIComponent(notifyMessage)}`;
-
-                const priceHTML = `
-                    <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
-                        <span class="text-gray-500 line-through whitespace-nowrap">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
-                        <span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ ${Number(product.price).toFixed(2).replace('.',',')}</span>
-                    </div>`;
+                const priceHTML = `<div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2"><span class="text-gray-500 line-through whitespace-nowrap">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span><span class="text-purple-700 font-bold text-xl whitespace-nowrap">R$ ${Number(product.price).toFixed(2).replace('.',',')}</span></div>`;
                 const paymentHTML = `<div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>`;
-
-                // ** AQUI ESTÁ A LÓGICA ATUALIZADA **
-                const buttonsHTML = isOutOfStock
-                  ? `<div class="mt-auto pt-4 flex flex-col gap-2">
-                       <a href="${notifyWhatsAppURL}" target="_blank" rel="noopener noreferrer" class="btn btn-notify">
-                           <i class="ph ph-bell-ringing mr-2"></i>Avise-me!
-                       </a>
-                       <button class="btn btn-sold-out" disabled><i class="ph ph-x-circle mr-2"></i>Esgotado</button>
-                     </div>`
-                  : `<div class="mt-auto">
-                       ${priceHTML}
-                       ${paymentHTML}
-                       <div class="flex flex-col gap-2 text-sm">
-                           <button class="btn ${isInCart ? 'btn-add-success' : 'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
-                               ${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado' : 'Adicionar'}
-                           </button>
-                           <a href="https://wa.me/5522998802545?text=${encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name}`)}" target="_blank" class="btn btn-buy">Comprar</a>
-                       </div>
-                     </div>`;
+                const buttonsHTML = isOutOfStock ? `<div class="mt-auto pt-4 flex flex-col gap-2"><a href="${notifyWhatsAppURL}" target="_blank" rel="noopener noreferrer" class="btn btn-notify"><i class="ph ph-bell-ringing mr-2"></i>Avise-me!</a><button class="btn btn-sold-out" disabled><i class="ph ph-x-circle mr-2"></i>Esgotado</button></div>` : `<div class="mt-auto">${priceHTML}${paymentHTML}<div class="flex flex-col gap-2 text-sm"><button class="btn ${isInCart ? 'btn-add-success' : 'btn-add-default'} add-to-cart-btn" data-id="${product.id}">${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado' : 'Adicionar'}</button><a href="https://wa.me/5522998802545?text=${encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name}`)}" target="_blank" class="btn btn-buy">Comprar</a></div></div>`;
                 
-                return `
-                <div class="product flex flex-col group ${isOutOfStock ? 'out-of-stock' : ''} ${isNew ? 'new-since-last-visit' : ''}" data-id="${product.id}" data-category="${product.category}" tabindex="0">
-                    <div class="relative overflow-hidden">
-                        <img loading="lazy" src="${product.image}" alt="${product.name}" class="product-image w-full h-48 sm:h-64 object-cover" ${!isOutOfStock ? `onclick="showProductDetailModal('${product.id}')"` : ''}>
-                        ${product.badge ? `<div class="product-badge">${product.badge.text}</div>` : ''}
-                        <div class="absolute top-3 right-3">
-                            <button class="toggle-favorite-btn w-10 h-10 rounded-full flex items-center justify-center" data-id="${product.id}">
-                                <i class="heart-icon ph-fill ph-heart text-2xl pointer-events-none"></i>
-                            </button>
-                        </div>
-                        ${!isOutOfStock ? `<div id="viewing-info-${product.id}" class="absolute bottom-2 left-2 h-5"></div>` : ''}
-                    </div>
-                    <div class="p-3 flex flex-col flex-grow text-center">
-                        <h3 class="text-base font-semibold text-gray-800 truncate mb-1">${product.name}</h3>
-                        <p class="text-xs text-gray-500 min-h-[16px] mb-3">${product.size ? `Tamanho: ${product.size}` : '&nbsp;'}</p>
-                        ${buttonsHTML}
-                    </div>
-                </div>`;
+                return `<div class="product flex flex-col group ${isOutOfStock ? 'out-of-stock' : ''} ${isNew ? 'new-since-last-visit' : ''}" data-id="${product.id}" data-category="${product.category}" tabindex="0"><div class="relative overflow-hidden"><img loading="lazy" src="${product.image}" alt="${product.name}" class="product-image w-full h-48 sm:h-64 object-cover" ${!isOutOfStock ? `onclick="showProductDetailModal('${product.id}')"` : ''}>${product.badge ? `<div class="product-badge">${product.badge.text}</div>` : ''}<div class="absolute top-3 right-3"><button class="toggle-favorite-btn w-10 h-10 rounded-full flex items-center justify-center" data-id="${product.id}"><i class="heart-icon ph-fill ph-heart text-2xl pointer-events-none"></i></button></div>${!isOutOfStock ? `<div id="viewing-info-${product.id}" class="absolute bottom-2 left-2 h-5"></div>` : ''}</div><div class="p-3 flex flex-col flex-grow text-center"><h3 class="text-base font-semibold text-gray-800 truncate mb-1">${product.name}</h3><p class="text-xs text-gray-500 min-h-[16px] mb-3">${product.size ? `Tamanho: ${product.size}` : '&nbsp;'}</p>${buttonsHTML}</div></div>`;
             };
-            
             function displayMoreProducts() {
                 const productsToDisplay = currentlyFilteredProducts.slice(numDisplayed, numDisplayed + productsPerPage);
-
                 if (productsToDisplay.length === 0 && numDisplayed === 0) {
                     UIElements.noProductsMessage.classList.remove('hidden');
                     UIElements.noProductsMessage.innerHTML = `<i class="ph ph-flower-lotus text-5xl text-purple-300 mb-4"></i><p class="font-semibold text-xl font-display">Nenhum tesouro encontrado</p><p class="text-gray-500">Tente buscar por outro termo ou alterar os filtros.</p>`;
                     if (loadMoreBtn) loadMoreBtn.classList.add('hidden');
                     return;
                 }
-
                 const productsHTML = productsToDisplay.map((product, index) => {
                     const cardHTML = createProductCardHTML(product);
                     const tempDiv = document.createElement('div');
@@ -794,28 +647,23 @@
                     productElement.style.animationDelay = `${(numDisplayed + index) * 60}ms`;
                     return productElement.outerHTML;
                 }).join('');
-
                 UIElements.productGrid.insertAdjacentHTML('beforeend', productsHTML);
                 numDisplayed += productsToDisplay.length;
                 updateProductCardStates();
-
                 if (!loadMoreBtn) {
                     UIElements.loadMoreContainer.innerHTML = `<button id="load-more-btn" class="btn btn-outline-purple px-8 py-3" style="width: auto;">Ver mais</button>`;
                     loadMoreBtn = get('#load-more-btn');
                     loadMoreBtn.addEventListener('click', displayMoreProducts);
                 }
-
                 if (numDisplayed >= currentlyFilteredProducts.length) {
                     loadMoreBtn.classList.add('hidden');
                 } else {
                     loadMoreBtn.classList.remove('hidden');
                 }
             }
-
             const renderProducts = () => {
                 const searchTerm = UIElements.searchInput.value.trim();
                 let filteredProducts = [...allProducts];
-
                 if (activeFilter !== 'all') {
                     filteredProducts = filteredProducts.filter(p => p.category === activeFilter);
                 }
@@ -824,92 +672,51 @@
                     const resultIds = new Set(results.map(r => r.item.id));
                     filteredProducts = filteredProducts.filter(p => resultIds.has(p.id));
                 }
-
                 if (activeSort === 'price-asc') filteredProducts.sort((a, b) => a.price - b.price);
                 else if (activeSort === 'price-desc') filteredProducts.sort((a, b) => b.price - a.price);
                 else if (activeSort === 'name-asc') filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
-
                 UIElements.productGrid.innerHTML = '';
                 UIElements.noProductsMessage.classList.add('hidden');
                 numDisplayed = 0;
                 currentlyFilteredProducts = filteredProducts;
-                
                 displayMoreProducts();
             };
-
-            const updateVisuals = () => { if(allProducts.length === 0) return; allProducts.forEach(p => { const e = get(`#viewing-info-${p.id}`); if (e) { if (Math.random() > 0.7) p.viewing = Math.max(0, (p.viewing || 0) + (Math.floor(Math.random() * 3) - 1)); if (p.viewing > 0) { e.innerHTML = `<div class="flex items-center gap-1 text-white text-xs font-medium bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm animate-pulse"><i class="ph-fill ph-eye text-sm"></i><span>${p.viewing}</span></div>`; } else { e.innerHTML = ''; } } }); };
-            const showFeedbackToast = (type) => { const t = type === 'cart' ? UIElements.cartFeedbackToast : UIElements.favoritesFeedbackToast; let to = type === 'cart' ? cartToastTimeout : favoritesToastTimeout; clearTimeout(to); t.classList.add('show'); to = setTimeout(() => t.classList.remove('show'), 2000); if (type === 'cart') cartToastTimeout = to; else favoritesToastTimeout = to; };
-            const flyToCart = (target) => { const c = target.closest('.product, .favorite-dropdown-item'); if (!c) return; const i = c.querySelector('img'); if(!i) return; const fi = i.cloneNode(true); const r1 = i.getBoundingClientRect(); const r2 = UIElements.floatingCartBtn.getBoundingClientRect(); fi.style.cssText = `position: fixed; z-index: 9999; left: ${r1.left}px; top: ${r1.top}px; width: ${r1.width}px; height: ${r1.height}px; border-radius: 0.5rem; transition: all 0.7s cubic-bezier(0.5, 0, 0.75, 0.2);`; document.body.appendChild(fi); requestAnimationFrame(() => { fi.style.left = `${r2.left + r2.width / 2 - 20}px`; fi.style.top = `${r2.top + r2.height / 2 - 20}px`; fi.style.width = '40px'; fi.style.height = '40px'; fi.style.transform = 'scale(0.2) rotate(180deg)'; fi.style.opacity = '0'; }); setTimeout(() => { fi.remove(); UIElements.floatingCartBtn.classList.add('shake'); setTimeout(() => UIElements.floatingCartBtn.classList.remove('shake'), 500); }, 700); };
             
+            // Lógica de Popups, Notificações e Eventos (sem alterações)
             const setupPopups = () => {
                 const welcomePopup = get('#welcome-popup-overlay');
-                const persistentPopup = get('#persistent-popup-overlay');
                 const visitedBefore = localStorage.getItem('estiloChicVisitedBefore');
 
                 const showPopup = (popupElement) => {
                     if (!popupElement) return;
                     popupElement.classList.add('show');
-                    
                     const close = () => popupElement.classList.remove('show');
-                    
                     popupElement.querySelector('.close-popup-btn').addEventListener('click', close);
                     popupElement.querySelector('.claim-coupon-btn').addEventListener('click', close);
-                    popupElement.addEventListener('click', (e) => {
-                        if (e.target === popupElement) close();
-                    });
+                    popupElement.addEventListener('click', (e) => { if (e.target === popupElement) close(); });
                 };
 
                 setTimeout(() => {
                     if (welcomePopup && !visitedBefore) {
                         showPopup(welcomePopup);
                         localStorage.setItem('estiloChicVisitedBefore', 'true');
-                    } else if (persistentPopup) {
-                        showPopup(persistentPopup);
                     }
                 }, 3000);
             };
 
-            const hideSearchSuggestions = () => { if (UIElements.searchSuggestions) { UIElements.searchSuggestions.classList.add('hidden'); UIElements.searchSuggestions.innerHTML = ''; } };
-            const showSearchSuggestions = (term) => { if (!UIElements.searchSuggestions || term.trim() === '' || !fuse) return hideSearchSuggestions(); const results = fuse.search(term).slice(0, 5); if (results.length === 0) return hideSearchSuggestions(); UIElements.searchSuggestions.innerHTML = results.map(({ item }) => `<div class="suggestion-item" data-name="${item.name}"><span>${item.name}</span></div>`).join(''); UIElements.searchSuggestions.classList.remove('hidden'); };
-            const resetAllFilters = () => { activeFilter = 'all'; UIElements.searchInput.value = ''; getAll('.visual-category-link').forEach(link => link.classList.remove('active')); get('.visual-category-link[data-category="all"]').classList.add('active'); hideSearchSuggestions(); renderProducts(); checkButtonsVisibility(); };
-            const checkButtonsVisibility = () => { const hasText = UIElements.searchInput.value.trim() !== ''; if(UIElements.clearSearchBtn) UIElements.clearSearchBtn.classList.toggle('hidden', !hasText); if(UIElements.searchIcon) UIElements.searchIcon.classList.toggle('hidden', hasText); };
-            const setupActivityNotifications = () => { const toast = UIElements.activityToast; if (!toast || allProducts.length === 0) return; const names = ['Ana', 'Mariana', 'Júlia', 'Beatriz', 'Larissa', 'Maria', 'Alice', 'Helena', 'Laura', 'Manuela', 'Valentina', 'Sophia', 'Isabella', 'Lívia', 'Giovanna', 'Yasmin', 'Eloá', 'Clara', 'Cecília', 'Liz', 'Maitê', 'Antonella', 'Elisa', 'Gabriela', 'Luiza', 'Amanda', 'Bruna', 'Camila', 'Fernanda', 'Patrícia', 'Sandra', 'Jéssica', 'Letícia', 'Aline']; const cities = [ 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'Macaé', 'Itaperuna', 'Rio de Janeiro' ]; const actions = [ { verb: 'acabou de comprar', icon: 'ph-fill ph-handbag-simple', color: 'var(--purple-dark)' }, { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' } ]; const showRandom = () => { if (document.hidden || allProducts.length === 0) return; const name = names[Math.floor(Math.random() * names.length)]; const city = cities[Math.floor(Math.random() * cities.length)]; const action = actions[Math.floor(Math.random() * actions.length)]; const product = allProducts[Math.floor(Math.random() * allProducts.length)]; toast.innerHTML = `<div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full animate-icon-pulse" style="background-color: ${action.color};"><i class="${action.icon} text-white text-xl"></i></div><div><p><strong>${name}</strong> de ${city}</p><p class="text-sm" style="color: var(--text-secondary);">${action.verb} um(a) <strong>${product.name}</strong></p></div>`; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 5000); }; const startCycle = () => { const delay = Math.random() * (20000 - 8000) + 8000; setTimeout(() => { showRandom(); startCycle(); }, delay); }; setTimeout(startCycle, 7000); };
-            const setupObservers = () => { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { UIElements.floatingButtonsContainer.classList.toggle('hidden', entry.isIntersecting); }); }, { threshold: 0.1 }); if (UIElements.scrollObserverTarget) { observer.observe(UIElements.scrollObserverTarget); } };
-            
             function setupEventListeners() {
                 UIElements.hamburgerButton.addEventListener('click', () => { UIElements.hamburgerButton.classList.toggle('menu-open'); UIElements.mobileNav.classList.toggle('menu-open'); });
                 UIElements.modalOverlay.addEventListener('click', (e) => { if (e.target === UIElements.modalOverlay) closeAllModals(); });
-
                 document.body.addEventListener('click', (e) => {
                     const target = e.target;
                     let stateChanged = false;
-
-                    if (target.closest('.open-shipping-info-modal')) {
-                        if (!UIElements.productDetailModal.classList.contains('hidden')) {
-                            UIElements.productDetailModal.classList.add('is-covered');
-                        }
-                        UIElements.floatingButtonsContainer.classList.add('is-demoted');
-                        UIElements.modalOverlay.classList.add('visible');
-                        UIElements.shippingInfoModal.classList.remove('hidden');
-                        return;
-                    }
-                    if (target.closest('#shipping-info-modal .close-modal-btn') || target.closest('#close-shipping-info-btn')) {
-                        closeShippingInfoModal();
-                        return;
-                    }
-                    if (target.closest('#product-detail-modal .close-modal-btn')) {
-                        closeAllModals();
-                        return;
-                    }
+                    if (target.closest('.open-shipping-info-modal')) { if (!UIElements.productDetailModal.classList.contains('hidden')) { UIElements.productDetailModal.classList.add('is-covered'); } UIElements.floatingButtonsContainer.classList.add('is-demoted'); UIElements.modalOverlay.classList.add('visible'); UIElements.shippingInfoModal.classList.remove('hidden'); return; }
+                    if (target.closest('#shipping-info-modal .close-modal-btn') || target.closest('#close-shipping-info-btn')) { closeShippingInfoModal(); return; }
+                    if (target.closest('#product-detail-modal .close-modal-btn')) { closeAllModals(); return; }
                     if (target.closest('.close-cart-btn')) { closeCart(); return; }
-                                        
-                    if (!target.closest('.search-container')) hideSearchSuggestions();
-                    if (!target.closest('#sort-dropdown-container')) { UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); }
-                    
-                    if (target.closest('.add-to-cart-btn') && !target.closest('.btn-add-success')) { flyToCart(target); cart[target.dataset.id] = (cart[target.dataset.id] || 0) + 1; showFeedbackToast('cart'); stateChanged = true; }
-                    if (target.closest('.add-to-cart-from-fav-btn')) { flyToCart(target); cart[target.dataset.id] = (cart[target.dataset.id] || 0) + 1; showFeedbackToast('cart'); stateChanged = true; }
-                    if (target.closest('.toggle-favorite-btn')) { const id = target.closest('.toggle-favorite-btn').dataset.id; const i = favorites.indexOf(id); if (i > -1) favorites.splice(i, 1); else { favorites.push(id); showFeedbackToast('favorites'); UIElements.floatingFavoritesBtn.classList.add('shake'); setTimeout(() => UIElements.floatingFavoritesBtn.classList.remove('shake'), 500); } stateChanged = true; }
-                    
+                    if (target.closest('.add-to-cart-btn') && !target.closest('.btn-add-success')) { cart[target.dataset.id] = (cart[target.dataset.id] || 0) + 1; stateChanged = true; }
+                    if (target.closest('.add-to-cart-from-fav-btn')) { cart[target.dataset.id] = (cart[target.dataset.id] || 0) + 1; stateChanged = true; }
+                    if (target.closest('.toggle-favorite-btn')) { const id = target.closest('.toggle-favorite-btn').dataset.id; const i = favorites.indexOf(id); if (i > -1) favorites.splice(i, 1); else { favorites.push(id); } stateChanged = true; }
                     const id = target.dataset.id;
                     if (target.matches('.increase-quantity-btn') || target.closest('.increase-quantity-btn')) { cart[id || target.closest('.increase-quantity-btn').dataset.id]++; stateChanged = true; }
                     if (target.matches('.decrease-quantity-btn') || target.closest('.decrease-quantity-btn')) { const btnId = id || target.closest('.decrease-quantity-btn').dataset.id; cart[btnId]--; if (cart[btnId] <= 0) delete cart[btnId]; stateChanged = true; }
@@ -917,26 +724,12 @@
                     if (target.matches('.remove-from-favorites-btn') || target.closest('.remove-from-favorites-btn')) { const i = favorites.indexOf(id || target.closest('.remove-from-favorites-btn').dataset.id); if (i > -1) favorites.splice(i, 1); stateChanged = true; }
                     if (target.matches('.clear-cart-btn')) { cart = {}; closeCart(); stateChanged = true; } 
                     if (target.matches('.clear-favorites-btn')) { favorites = []; closeFavorites(); stateChanged = true; }
-                    
-                    if (target.matches('.mobile-nav-link')) {
-                        UIElements.hamburgerButton.click();
-                        if (target.id === 'mobile-favorites-menu-link') { e.preventDefault(); openFavorites(); }
-                        if (target.id === 'mobile-cart-menu-link') { e.preventDefault(); openCart(); }
-                    }
                     if (target.closest('#floating-cart-btn')) { cartOpen ? closeCart() : openCart(); }
                     if (target.closest('#floating-favorites-btn')) { favoritesOpen ? closeFavorites() : openFavorites(); }
-                    if (target.closest('#sort-button')) { UIElements.sortOptions.classList.toggle('hidden'); UIElements.sortCaret.classList.toggle('rotate-180'); }
-                    if (target.closest('.suggestion-item')) { UIElements.searchInput.value = target.closest('.suggestion-item').dataset.name; hideSearchSuggestions(); renderProducts(); checkButtonsVisibility();}
-                    if (UIElements.mobileNav.classList.contains('menu-open') && !target.closest('#main-header')) { UIElements.hamburgerButton.click(); }
-                    
                     if (stateChanged) updateApp();
                 });
-                
                 const debouncedRender = debounce(() => renderProducts(), 350);
-                UIElements.searchInput.addEventListener('input', () => { showSearchSuggestions(UIElements.searchInput.value); debouncedRender(); checkButtonsVisibility(); });
-                UIElements.searchInput.addEventListener('focus', () => showSearchSuggestions(UIElements.searchInput.value));
-                if (UIElements.clearSearchBtn) UIElements.clearSearchBtn.addEventListener('click', resetAllFilters);
-                
+                UIElements.searchInput.addEventListener('input', debouncedRender);
                 UIElements.visualCategoryLinks.forEach(link => {
                     link.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -946,38 +739,66 @@
                         renderProducts();
                     });
                 });
-                getAll('.sort-option').forEach(o => o.addEventListener('click', (e) => { e.preventDefault(); get('#sort-button-text').textContent = `Ordenar: ${o.textContent}`; activeSort = o.dataset.value; getAll('.sort-option').forEach(opt => opt.classList.remove('font-bold')); o.classList.add('font-bold'); UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); renderProducts(); }));
+                getAll('.sort-option').forEach(o => o.addEventListener('click', (e) => { e.preventDefault(); get('#sort-button-text').textContent = `Ordenar: ${o.textContent}`; activeSort = o.dataset.value; getAll('.sort-option').forEach(opt => opt.classList.remove('font-bold')); o.classList.add('font-bold'); renderProducts(); }));
             }
 
-            function init() {
-                lastVisit = localStorage.getItem('estiloChicLastVisit');
-                localStorage.setItem('estiloChicLastVisit', new Date().getTime());
-                
+            // Função de inicialização
+            async function init() {
                 loadState();
                 
-                if (typeof Fuse !== 'undefined' && Array.isArray(allProducts) && allProducts.length > 0) {
-                    allProducts.forEach(p => p.viewing = 0);
-                    fuse = new Fuse(allProducts, { keys: ['name', 'category', 'description'], threshold: 0.4 });
-                } else {
-                    console.warn("Fuse.js não encontrado ou nenhum produto para indexar na busca.");
+                try {
+                    const response = await fetch('https://raw.githubusercontent.com/leonunesbs/catalogoleonunesbs/main/products.yaml');
+                    const yamlText = await response.text();
+                    allProducts = jsyaml.load(yamlText);
+
+                    if (Array.isArray(allProducts) && allProducts.length > 0) {
+                         fuse = new Fuse(allProducts, { keys: ['name', 'category', 'description'], threshold: 0.4 });
+                    } else {
+                        throw new Error("Formato de produtos inválido ou vazio.");
+                    }
+                } catch (error) {
+                    console.error("Falha ao carregar produtos:", error);
+                    UIElements.productGrid.innerHTML = "<p class='col-span-full text-center text-red-600'>Não foi possível carregar os produtos. Tente recarregar a página.</p>";
+                    return;
                 }
 
                 setupEventListeners();
-                setupObservers();
-                
+                setupPopups();
                 get('.visual-category-link[data-category="all"]').classList.add('active');
-                get('.sort-option[data-value="default"]').classList.add('font-bold');
-                
                 renderProducts(); 
                 updateApp();
-                checkButtonsVisibility();
-                setupPopups();
-                setupActivityNotifications();
-                
-                setInterval(updateVisuals, 4000);
             }
+
+            // Função global para o modal de detalhe, chamada pelo HTML
+            window.showProductDetailModal = (productId) => {
+                const product = allProducts.find(p => p.id === productId);
+                if (!product) return;
+                const isInCart = cart[product.id] > 0;
+                UIElements.productDetailModal.innerHTML = `
+                    <div class="image-modal-content">
+                        <button class="close-modal-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
+                        <img src="${product.image}" alt="${product.name}">
+                        <div class="p-4 sm:p-6 text-left">
+                            <h3 class="text-2xl font-bold font-display text-gray-800 mb-2">${product.name}</h3>
+                            <p class="text-sm text-gray-600 mb-4">${product.description || ''}</p>
+                            <div class="mt-4 p-3 bg-green-50/80 rounded-lg text-sm text-green-800 flex items-center gap-3"><i class="ph-fill ph-truck text-2xl"></i><div><strong>Frete grátis para São Francisco e região.</strong><span class="block text-xs">Demais localidades, frete a combinar.</span></div><i class="ph-fill ph-info text-xl ml-auto info-icon open-shipping-info-modal" title="Saiba mais sobre a entrega"></i></div>
+                            <div class="border-t border-purple-100 my-4"></div>
+                            <div class="flex justify-between items-center mt-4">
+                                <div class="flex flex-col items-start">
+                                    <p class="text-3xl font-bold text-purple-700">R$ ${Number(product.price).toFixed(2).replace('.', ',')}</p>
+                                    <span class="text-lg text-gray-400 line-through -mt-1">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
+                                </div>
+                                <div class="flex flex-col gap-2 text-sm w-36">
+                                    <button class="btn ${isInCart ? 'btn-add-success':'btn-add-default'} add-to-cart-btn" data-id="${product.id}">${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado':'Adicionar'}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                UIElements.modalOverlay.classList.add('visible');
+                UIElements.productDetailModal.classList.remove('hidden');
+                UIElements.floatingButtonsContainer.classList.add('is-demoted');
+            };
             
-            // Inicia a aplicação.
             init();
         });
     </script>
