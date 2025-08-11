@@ -98,7 +98,6 @@
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(58, 45, 70, 0.5); backdrop-filter: blur(10px); z-index: 1900; opacity: 0; visibility: hidden; transition: opacity 0.4s ease; }
     .modal-overlay.visible { opacity: 1; visibility: visible; }
     .image-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1999; pointer-events: none; }
-    .image-modal.is-covered { z-index: 1899; }
     .image-modal-content { background: var(--background-card); border-radius: 16px; box-shadow: var(--shadow-medium); width: 90%; max-width: 500px; pointer-events: auto; overflow: hidden; transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
     .modal-overlay.visible .image-modal-content { transform: scale(1); }
     .image-modal-content img { display: block; width: 100%; height: auto; max-height: 70vh; object-fit: contain; margin: 0 auto; }
@@ -114,7 +113,7 @@
     .cart-count { position: absolute; top: -2px; right: -2px; background: var(--accent-pink); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid var(--purple-dark); }
     .floating-cart.shake, .floating-favorites.shake { animation: shake 0.5s ease; }
 
-    .cart-dropdown, .favorites-dropdown { position: fixed; top: 50%; left: 50%; background: var(--background-card); border-radius: 16px; box-shadow: 0 15px 40px rgba(58, 45, 70, 0.2); width: 90%; max-width: 380px; max-height: 80vh; overflow-y: auto; padding: 20px; opacity: 0; transform: translate(-50%, -48%) scale(0.95); transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); border: 1px solid #e0d8f0; visibility: hidden; }
+    .cart-dropdown, .favorites-dropdown { position: fixed; top: 50%; left: 50%; background: var(--background-card); border-radius: 16px; box-shadow: 0 15px 40px rgba(58, 45, 70, 0.2); width: 90%; max-width: 380px; max-height: 80vh; overflow-y: auto; padding: 20px; opacity: 0; transform: translate(-50%, -48%) scale(0.95); transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); border: 1px solid #e0d8f0; visibility: hidden; z-index: 1951; }
     .cart-dropdown.show, .favorites-dropdown.show { opacity: 1; transform: translate(-50%, -50%) scale(1); visibility: visible; }
     @media (min-width: 768px) { .cart-dropdown, .favorites-dropdown { position: absolute; top: auto; left: auto; transform: translateY(10px) scale(0.95); transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s; } .cart-dropdown.show, .favorites-dropdown.show { transform: translateY(0) scale(1); } }
     .cart-item, .favorite-dropdown-item { border-bottom: 1px solid var(--background-main); }
@@ -669,32 +668,67 @@
             const saveState = () => { localStorage.setItem('estiloChicCart', JSON.stringify(cart)); localStorage.setItem('estiloChicFavorites', JSON.stringify(favorites)); };
             const loadState = () => { try { const sc = localStorage.getItem('estiloChicCart'); if (sc) cart = JSON.parse(sc) || {}; const sf = localStorage.getItem('estiloChicFavorites'); if (sf) favorites = JSON.parse(sf) || []; } catch { cart = {}; favorites = []; } };
             
+            const updateOverlayState = () => {
+                const isProductModalVisible = !UIElements.productDetailModal.classList.contains('hidden');
+                const isShippingModalVisible = !UIElements.shippingInfoModal.classList.contains('hidden');
+                const isOverlayRequired = isProductModalVisible || isShippingModalVisible || cartOpen || favoritesOpen;
+                const shouldButtonsBeDemoted = isProductModalVisible || isShippingModalVisible;
+
+                UIElements.modalOverlay.classList.toggle('visible', isOverlayRequired);
+                UIElements.floatingButtonsContainer.classList.toggle('is-demoted', shouldButtonsBeDemoted);
+            };
+            
             const closeAllModals = () => {
-                UIElements.modalOverlay.classList.remove('visible');
                 UIElements.productDetailModal.classList.add('hidden');
                 UIElements.shippingInfoModal.classList.add('hidden');
-                UIElements.productDetailModal.classList.remove('is-covered');
-                UIElements.floatingButtonsContainer.classList.remove('is-demoted');
                 if (cartOpen) closeCart();
                 if (favoritesOpen) closeFavorites();
+                updateOverlayState();
+            };
+            
+            const openShippingInfoModal = () => {
+                UIElements.shippingInfoModal.classList.remove('hidden');
+                updateOverlayState();
             };
 
             const closeShippingInfoModal = () => {
                 UIElements.shippingInfoModal.classList.add('hidden');
-                UIElements.productDetailModal.classList.remove('is-covered');
-                
-                if (UIElements.productDetailModal.classList.contains('hidden')) {
-                    UIElements.floatingButtonsContainer.classList.remove('is-demoted');
-                    if (!cartOpen && !favoritesOpen) {
-                       UIElements.modalOverlay.classList.remove('visible');
-                    }
-                }
+                updateOverlayState();
             };
 
-            const closeCart = (isChaining = false) => { if (!isChaining && UIElements.shippingInfoModal.classList.contains('hidden') && UIElements.productDetailModal.classList.contains('hidden')) { UIElements.modalOverlay.classList.remove('visible'); UIElements.floatingButtonsContainer.classList.remove('is-demoted'); } cartOpen = false; UIElements.cartDropdown.classList.remove('show'); UIElements.floatingCartBtn.classList.remove('active'); };
-            const closeFavorites = (isChaining = false) => { if (!isChaining && UIElements.shippingInfoModal.classList.contains('hidden') && UIElements.productDetailModal.classList.contains('hidden')) { UIElements.modalOverlay.classList.remove('visible'); UIElements.floatingButtonsContainer.classList.remove('is-demoted'); } favoritesOpen = false; UIElements.favoritesDropdown.classList.remove('show'); UIElements.floatingFavoritesBtn.classList.remove('active'); };
-            const openCart = () => { if (favoritesOpen) closeFavorites(true); UIElements.modalOverlay.classList.add('visible'); UIElements.floatingButtonsContainer.classList.add('is-demoted'); cartOpen = true; UIElements.cartDropdown.classList.add('show'); UIElements.floatingCartBtn.classList.add('active'); };
-            const openFavorites = () => { if (cartOpen) closeCart(true); UIElements.modalOverlay.classList.add('visible'); UIElements.floatingButtonsContainer.classList.add('is-demoted'); favoritesOpen = true; UIElements.favoritesDropdown.classList.add('show'); UIElements.floatingFavoritesBtn.classList.add('active'); };
+            const toggleCart = () => { cartOpen ? closeCart() : openCart(); };
+            const toggleFavorites = () => { favoritesOpen ? closeFavorites() : openFavorites(); };
+
+            const openCart = (isChaining = false) => {
+                if (favoritesOpen) closeFavorites(true);
+                cartOpen = true;
+                UIElements.cartDropdown.classList.add('show');
+                UIElements.floatingCartBtn.classList.add('active');
+                if (!isChaining) updateOverlayState();
+            };
+
+            const closeCart = (isChaining = false) => {
+                cartOpen = false;
+                UIElements.cartDropdown.classList.remove('show');
+                UIElements.floatingCartBtn.classList.remove('active');
+                if (!isChaining) updateOverlayState();
+            };
+
+            const openFavorites = (isChaining = false) => {
+                if (cartOpen) closeCart(true);
+                favoritesOpen = true;
+                UIElements.favoritesDropdown.classList.add('show');
+                UIElements.floatingFavoritesBtn.classList.add('active');
+                if (!isChaining) updateOverlayState();
+            };
+
+            const closeFavorites = (isChaining = false) => {
+                favoritesOpen = false;
+                UIElements.favoritesDropdown.classList.remove('show');
+                UIElements.floatingFavoritesBtn.classList.remove('active');
+                if (!isChaining) updateOverlayState();
+            };
+
             const updateCounters = () => { const c1 = UIElements.floatingCartBtn.querySelector('.cart-count'); const c2 = UIElements.floatingFavoritesBtn.querySelector('.cart-count'); const t = Object.values(cart).reduce((s, q) => s + q, 0); c1.textContent = t; c1.style.display = t > 0 ? 'flex' : 'none'; c2.textContent = favorites.length; c2.style.display = favorites.length > 0 ? 'flex' : 'none'; };
             const renderCart = () => { if (Object.keys(cart).length === 0) { UIElements.cartDropdown.innerHTML = `<div class="text-center p-4"><i class="ph ph-handbag text-4xl text-gray-300 mb-2"></i><p class="font-semibold text-gray-700">Sua sacola está vazia</p></div>`; return; } let h = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-purple-800">Minha Sacola</h3><button class="clear-cart-btn text-xs bg-red-100 text-red-600 font-semibold hover:bg-red-200 px-3 py-1 rounded-full">Limpar</button></div>`; let t = 0; let w = "Olá! Gostaria de encomendar:\n\n"; for (const [i, q] of Object.entries(cart)) { const p = allProducts.find(pr => pr.id === i); if (!p) continue; t += p.price * q; w += `- ${q}x ${p.name}\n`; h += `<div class="cart-item flex items-center gap-3 py-3"><img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-grow"><p class="font-semibold text-sm text-gray-800">${p.name}</p><div class="flex items-center bg-purple-50 rounded-full mt-1.5 border border-purple-200" style="width: fit-content; height: 34px;"><button class="decrease-quantity-btn h-full px-3 text-purple-700 hover:text-purple-900 transition-colors" data-id="${i}"><i class="ph ph-minus pointer-events-none"></i></button><span class="font-semibold text-purple-900 text-sm h-full flex items-center px-3">${q}</span><button class="increase-quantity-btn h-full px-3 text-purple-700 hover:text-purple-900 transition-colors" data-id="${i}"><i class="ph ph-plus pointer-events-none"></i></button></div></div><div class="flex flex-col items-end justify-between self-stretch py-1"><p class="text-base font-semibold text-purple-700 whitespace-nowrap">R$ ${(p.price*q).toFixed(2).replace('.',',')}</p><button class="remove-item-btn icon-btn-circle" data-id="${i}"><i class="ph ph-trash text-base pointer-events-none"></i></button></div></div>`; } w += `\n*Total: R$ ${t.toFixed(2).replace('.',',')}*`; h += `<div class="mt-4 pt-4 border-t"><div class="flex justify-between items-center font-bold text-lg"><span>Total:</span><span class="text-purple-800">R$ ${t.toFixed(2).replace('.',',')}</span></div><div class="flex items-center justify-center text-xs text-gray-500 mt-3 gap-1"><span>Frete grátis para São Francisco e região.</span></div><div class="mt-4 flex flex-col gap-2"><a href="https://wa.me/5522998802545?text=${encodeURIComponent(w)}" target="_blank" class="btn btn-buy py-3"><i class="ph-fill ph-whatsapp-logo mr-2"></i> Finalizar Pedido</a><button class="btn btn-outline-purple py-3 close-cart-btn"><i class="ph ph-arrow-left mr-2"></i>Continuar Comprando</button></div></div>`; UIElements.cartDropdown.innerHTML = h; };
             const renderFavorites = () => { if (favorites.length === 0) { UIElements.favoritesDropdown.innerHTML = `<div class="text-center p-4"><i class="ph ph-heart text-4xl text-gray-300 mb-2"></i><p class="font-semibold text-gray-700">Lista de favoritos vazia.</p></div>`; return; } let h = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-purple-800">Meus Favoritos</h3><button class="clear-favorites-btn text-xs bg-red-100 text-red-600 font-semibold hover:bg-red-200 px-3 py-1 rounded-full">Limpar</button></div>`; favorites.forEach(id => { const p = allProducts.find(pr => pr.id === id); if (!p) return; h += `<div class="favorite-dropdown-item flex items-center gap-4 py-3"><img src="${p.image}" alt="${p.name}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-grow"><p class="font-semibold text-sm">${p.name}</p><p class="text-xs text-purple-600 font-medium">R$ ${Number(p.price).toFixed(2).replace('.',',')}</p></div><div class="flex items-center gap-2"><button class="add-to-cart-from-fav-btn icon-btn-circle bg-purple-100 text-purple-700 hover:bg-purple-600" data-id="${id}"><i class="ph ph-handbag-simple pointer-events-none"></i></button><button class="remove-from-favorites-btn icon-btn-circle" data-id="${id}"><i class="ph ph-trash text-base pointer-events-none"></i></button></div></div>`; }); UIElements.favoritesDropdown.innerHTML = h; };
@@ -863,12 +897,7 @@
                     let stateChanged = false;
 
                     if (target.closest('.open-shipping-info-modal')) {
-                        if (!UIElements.productDetailModal.classList.contains('hidden')) {
-                            UIElements.productDetailModal.classList.add('is-covered');
-                        }
-                        UIElements.floatingButtonsContainer.classList.add('is-demoted');
-                        UIElements.modalOverlay.classList.add('visible');
-                        UIElements.shippingInfoModal.classList.remove('hidden');
+                        openShippingInfoModal();
                         return;
                     }
                     if (target.closest('#shipping-info-modal .close-modal-btn') || target.closest('#close-shipping-info-btn')) {
@@ -880,6 +909,7 @@
                         return;
                     }
                     if (target.closest('.close-cart-btn')) { closeCart(); return; }
+                    if (target.closest('.close-favorites-btn')) { closeFavorites(); return; }
                                         
                     if (!target.closest('.search-container')) hideSearchSuggestions();
                     if (!target.closest('#sort-dropdown-container')) { UIElements.sortOptions.classList.add('hidden'); UIElements.sortCaret.classList.remove('rotate-180'); }
@@ -898,11 +928,11 @@
                     
                     if (target.matches('.mobile-nav-link')) {
                         UIElements.hamburgerButton.click();
-                        if (target.id === 'mobile-favorites-menu-link') { e.preventDefault(); openFavorites(); }
-                        if (target.id === 'mobile-cart-menu-link') { e.preventDefault(); openCart(); }
+                        if (target.id === 'mobile-favorites-menu-link') { e.preventDefault(); toggleFavorites(); }
+                        if (target.id === 'mobile-cart-menu-link') { e.preventDefault(); toggleCart(); }
                     }
-                    if (target.closest('#floating-cart-btn')) { cartOpen ? closeCart() : openCart(); }
-                    if (target.closest('#floating-favorites-btn')) { favoritesOpen ? closeFavorites() : openFavorites(); }
+                    if (target.closest('#floating-cart-btn')) { toggleCart(); }
+                    if (target.closest('#floating-favorites-btn')) { toggleFavorites(); }
                     if (target.closest('#sort-button')) { UIElements.sortOptions.classList.toggle('hidden'); UIElements.sortCaret.classList.toggle('rotate-180'); }
                     if (target.closest('.suggestion-item')) { UIElements.searchInput.value = target.closest('.suggestion-item').dataset.name; hideSearchSuggestions(); renderProducts(); checkButtonsVisibility();}
                     if (UIElements.mobileNav.classList.contains('menu-open') && !target.closest('#main-header')) { UIElements.hamburgerButton.click(); }
