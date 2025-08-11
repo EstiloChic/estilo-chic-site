@@ -58,6 +58,11 @@
         0%, 100% { transform: scale(1); box-shadow: var(--shadow-medium); }
         50% { transform: scale(1.04); box-shadow: 0 10px 30px rgba(106, 27, 154, 0.2); }
     }
+    @keyframes icon-breathe {
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(106, 27, 154, 0.2)); }
+        50% { transform: scale(1.15); filter: drop-shadow(0 0 6px rgba(106, 27, 154, 0.5)); }
+    }
+
 
     .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--purple-dark); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.8s ease-out, visibility 0.8s; }
     .loading-overlay.hidden { opacity: 0; visibility: hidden; }
@@ -172,6 +177,7 @@
 
     .info-icon { cursor: pointer; color: var(--purple-medium); transition: all 0.2s ease; }
     .info-icon:hover { transform: scale(1.2); color: var(--purple-dark); }
+    .info-icon-animated { animation: icon-breathe 2s ease-in-out infinite; }
     .info-modal-content { background: var(--background-card); border-radius: 16px; box-shadow: var(--shadow-medium); width: 90%; max-width: 450px; pointer-events: auto; transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); text-align: left; }
     .modal-overlay.visible .info-modal-content { transform: scale(1); }
 
@@ -373,7 +379,7 @@
             <div class="bg-purple-50 border border-purple-200 text-purple-800 rounded-xl p-4 flex items-center gap-4 mb-8 text-sm sm:text-base">
                 <i class="ph-fill ph-truck text-3xl text-purple-600"></i>
                 <p><strong>Frete grátis</strong> para São Francisco e região. Para outras localidades, frete a combinar!</p>
-                <i class="ph-fill ph-info text-xl ml-auto info-icon open-shipping-info-modal" title="Saiba mais sobre a entrega"></i>
+                <i class="ph-fill ph-info text-xl ml-auto info-icon info-icon-animated open-shipping-info-modal" title="Saiba mais sobre a entrega"></i>
             </div>
         </section>
 
