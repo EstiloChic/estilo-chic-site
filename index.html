@@ -103,17 +103,27 @@
     .btn-buy:hover { background-color: #dcfce7; }
     .btn-outline-purple { background-color: var(--purple-faint); border-color: var(--purple-light); color: var(--purple-dark); }
     .btn-outline-purple:hover { background-color: var(--purple-light); }
-    .btn-load-more {
+    .btn-cta-primary {
         background-color: var(--purple-dark);
         color: white;
         padding: 0.6rem 1.5rem;
         font-size: 0.85rem;
-        animation: breathe 2.5s ease-in-out infinite;
         border-color: var(--purple-dark);
+        box-shadow: var(--shadow-medium);
+        transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .btn-load-more:hover {
+    .btn-cta-primary:hover {
         background-color: #4a0e6b;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(106, 27, 154, 0.15);
+    }
+    .animate-breathe {
+        animation: breathe 2.5s ease-in-out infinite;
+    }
+    .animate-breathe:hover {
         animation-play-state: paused;
+        transform: scale(1.04);
+        box-shadow: 0 10px 30px rgba(106, 27, 154, 0.2);
     }
     
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(58, 45, 70, 0.5); backdrop-filter: blur(10px); z-index: 1900; opacity: 0; visibility: hidden; transition: opacity 0.4s ease; }
@@ -459,8 +469,8 @@
         <section id="meus-pedidos" class="bg-white/60 p-6 md:p-8 rounded-2xl shadow-lg mt-16 text-center">
             <h2 class="section-title text-3xl md:text-4xl mb-3">Acompanhe seus Pedidos</h2>
             <p class="section-subtitle text-sm md:text-base mb-8">Fale conosco para saber o status da sua compra.</p>
-            <a href="https://wa.me/5522998802545?text=Olá!%20Gostaria%20de%20saber%20sobre%20o%20status%20do%20meu%20pedido." target="_blank" class="btn btn-buy py-3 px-8 text-base" style="width: auto;">
-                 <i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i> Consultar Pedido
+            <a href="https://wa.me/5522998802545?text=Olá!%20Gostaria%20de%20saber%20sobre%20o%20status%20do%20meu%20pedido." target="_blank" class="btn btn-buy py-2.5 px-6 text-sm" style="width: auto;">
+                 <i class="ph-fill ph-whatsapp-logo text-lg mr-2"></i> Consultar Pedido
             </a>
         </section>
         
@@ -472,15 +482,15 @@
                 <div class="step-item"><div class="step-icon"><i class="ph-fill ph-paint-brush text-2xl"></i></div><div><h4 class="font-bold text-base text-gray-800">2. Descreva sua Ideia</h4><p class="text-xs text-gray-600">Envie detalhes e referências.</p></div></div>
                 <div class="step-item"><div class="step-icon"><i class="ph-fill ph-package text-2xl"></i></div><div><h4 class="font-bold text-base text-gray-800">3. Receba seu Pedido</h4><p class="text-xs text-gray-600">Produzimos e enviamos.</p></div></div>
             </div>
-            <a href="https://wa.me/5522998802545?text=Olá!%20Gostaria%20de%20fazer%20um%20orçamento%20para%20um%20pedido%20sob%20encomenda." target="_blank" class="btn btn-buy py-3 px-8 text-base" style="width: auto;">
-                 <i class="ph-fill ph-whatsapp-logo text-xl mr-2"></i> Pedido Especial
+            <a href="https://wa.me/5522998802545?text=Olá!%20Gostaria%20de%20fazer%20um%20orçamento%20para%20um%20pedido%20sob%20encomenda." target="_blank" class="btn btn-buy py-2.5 px-6 text-sm" style="width: auto;">
+                 <i class="ph-fill ph-whatsapp-logo text-lg mr-2"></i> Pedido Especial
             </a>
         </section>
 
         <section id="instagram" class="bg-white/60 p-6 md:p-10 rounded-2xl shadow-lg mt-12 text-center overflow-hidden">
             <h2 class="section-title text-3xl md:text-4xl mb-2">Siga nosso Estilo</h2>
             <p class="section-subtitle text-sm md:text-base !mb-6">Inspirações, novidades e os bastidores do nosso mundo.</p>
-            <a href="https://www.instagram.com/estilochicccc" target="_blank" rel="noopener noreferrer" class="btn btn-load-more" style="width: auto;">
+            <a href="https://www.instagram.com/estilochicccc" target="_blank" rel="noopener noreferrer" class="btn btn-cta-primary animate-breathe" style="width: auto;">
                 <i class="ph-fill ph-instagram-logo text-lg mr-2"></i> @estilochicccc
             </a>
         </section>
@@ -832,7 +842,7 @@
                 updateProductCardStates();
 
                 if (!loadMoreBtn) {
-                    UIElements.loadMoreContainer.innerHTML = `<button id="load-more-btn" class="btn btn-load-more" style="width: auto;"><i class="ph-fill ph-plus-circle text-lg mr-2"></i>Ver mais produtos</button>`;
+                    UIElements.loadMoreContainer.innerHTML = `<button id="load-more-btn" class="btn btn-cta-primary animate-breathe" style="width: auto;"><i class="ph-fill ph-plus-circle text-lg mr-2"></i>Ver mais produtos</button>`;
                     loadMoreBtn = get('#load-more-btn');
                     loadMoreBtn.addEventListener('click', displayMoreProducts);
                 }
