@@ -163,6 +163,16 @@
     .product.out-of-stock { opacity: 0.7; }
     .product.out-of-stock .product-image { filter: grayscale(80%); cursor: default; }
     .btn-sold-out { background-color: #e2e8f0; color: #718096; border-color: #cbd5e0; cursor: not-allowed !important; width: 100%; }
+    .btn-notify {
+        background-color: var(--purple-faint); 
+        color: var(--purple-dark); 
+        border-color: var(--purple-light);
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    .btn-notify:hover {
+        background-color: var(--purple-light);
+    }
 
     .visual-category-link { transition: transform 0.3s ease; }
     .visual-category-link:hover { transform: translateY(-4px); }
@@ -233,57 +243,6 @@
         animation: pulse-skeleton 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         margin-top: auto;
     }
-
-    /* INÍCIO DOS NOVOS ESTILOS PARA "NOTIFIQUE-ME" */
-    #notify-me-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(58, 45, 70, 0.5);
-        backdrop-filter: blur(10px);
-        z-index: 2500; /* Z-index alto para ficar sobre tudo */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.4s ease;
-    }
-    #notify-me-overlay.visible {
-        opacity: 1;
-        visibility: visible;
-    }
-    #notify-me-modal {
-        background: var(--background-card);
-        border-radius: 16px;
-        box-shadow: var(--shadow-medium);
-        width: 90%;
-        max-width: 400px;
-        text-align: center;
-        padding: 2.5rem;
-        transform: scale(0.95);
-        transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        position: relative;
-    }
-    #notify-me-overlay.visible #notify-me-modal {
-        transform: scale(1);
-    }
-    .notify-success-message {
-        display: none; /* Começa escondido */
-    }
-    .btn-notify {
-        background-color: var(--purple-faint); 
-        color: var(--purple-dark); 
-        border-color: var(--purple-light);
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
-    }
-    .btn-notify:hover {
-        background-color: var(--purple-light);
-    }
-    /* FIM DOS NOVOS ESTILOS */
     </style>
 </head>
 <body>
@@ -549,36 +508,6 @@
         </div>
     </div>
 
-    <!-- INÍCIO DO NOVO MODAL "NOTIFIQUE-ME" -->
-    <div id="notify-me-overlay">
-        <div id="notify-me-modal">
-            <button class="close-popup-btn close-notify-modal-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
-            <div class="notify-form-content">
-                <i class="ph-fill ph-bell-ringing text-5xl text-purple-500 mb-3"></i>
-                <h2 class="section-title text-2xl mb-2">Avise-me quando chegar!</h2>
-                <p class="text-gray-600 mb-4">Deixe seu WhatsApp que te avisaremos assim que o produto <strong id="notify-product-display-name" class="text-purple-700"></strong> estiver disponível novamente.</p>
-                <form id="notify-me-form" name="notify-me" method="POST" data-netlify="true">
-                    <input type="hidden" name="form-name" value="notify-me">
-                    <input type="hidden" name="product" id="notify-product-name">
-                    <input 
-                        type="tel" 
-                        name="whatsapp" 
-                        class="w-full px-4 py-3 bg-gray-100 text-gray-800 text-sm border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition placeholder:text-gray-400 mb-4" 
-                        placeholder="(22) 99999-9999" 
-                        required>
-                    <button type="submit" class="btn btn-buy w-full py-3">Quero ser notificado!</button>
-                </form>
-            </div>
-            <div class="notify-success-message">
-                <i class="ph-fill ph-check-circle text-5xl text-green-500 mb-3"></i>
-                <h2 class="section-title text-2xl mb-2">Tudo certo!</h2>
-                <p class="text-gray-600 mb-6">Já salvamos seu interesse. Assim que o produto voltar ao estoque, você será a primeira a saber. Obrigado!</p>
-                <button class="btn btn-outline-purple w-full py-3 close-notify-modal-btn">Fechar</button>
-            </div>
-        </div>
-    </div>
-    <!-- FIM DO NOVO MODAL "NOTIFIQUE-ME" -->
-
     <div id="floating-buttons-container" class="floating-buttons-container">
         <div id="favorites-container" class="relative"><div id="floating-favorites-btn" class="floating-favorites"><i class="ph-fill ph-heart text-2xl"></i><div class="cart-count" style="display: none;"></div></div><div id="favorites-dropdown" class="favorites-dropdown md:absolute md:bottom-full md:right-0 md:mb-2 md:w-80"></div></div>
         <div id="cart-container" class="relative"><div id="floating-cart-btn" class="floating-cart"><i class="ph-fill ph-handbag text-2xl"></i><div class="cart-count" style="display: none;"></div></div><div id="cart-dropdown" class="cart-dropdown md:absolute md:bottom-full md:right-0 md:mb-2 md:w-96"></div></div>
@@ -736,14 +665,6 @@
                 scrollObserverTarget: get('#contato'),
                 loadMoreContainer: get('#load-more-container'),
                 visualCategoryLinks: getAll('.visual-category-link'),
-                // NOVOS ELEMENTOS PARA O MODAL "NOTIFIQUE-ME"
-                notifyMeOverlay: get('#notify-me-overlay'),
-                notifyMeModal: get('#notify-me-modal'),
-                notifyMeForm: get('#notify-me-form'),
-                notifyProductDisplayName: get('#notify-product-display-name'),
-                notifyProductNameInput: get('#notify-product-name'),
-                notifyFormContent: get('#notify-me-modal .notify-form-content'),
-                notifySuccessMessage: get('#notify-me-modal .notify-success-message')
             };
 
             const saveState = () => { localStorage.setItem('estiloChicCart', JSON.stringify(cart)); localStorage.setItem('estiloChicFavorites', JSON.stringify(favorites)); };
@@ -781,9 +702,12 @@
             
             const createProductCardHTML = (product) => {
                 const isInCart = cart[product.id] > 0;
-                const whatsAppURL = `https://wa.me/5522998802545?text=${encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name}`)}`;
                 const isNew = lastVisit && (new Date(product.dateAdded).getTime() > lastVisit);
                 const isOutOfStock = product.inStock === false;
+
+                // Mensagem e URL para o botão "Avise-me" do WhatsApp
+                const notifyMessage = `Olá! Gostaria de ser avisado(a) quando o produto "${product.name}" voltar ao estoque.`;
+                const notifyWhatsAppURL = `https://wa.me/5522998802545?text=${encodeURIComponent(notifyMessage)}`;
 
                 const priceHTML = `
                     <div class="flex items-baseline justify-center flex-nowrap gap-2 mb-2">
@@ -792,11 +716,13 @@
                     </div>`;
                 const paymentHTML = `<div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>`;
 
-                // BOTÕES ATUALIZADOS PARA PRODUTOS ESGOTADOS
+                // ** AQUI ESTÁ A LÓGICA ATUALIZADA **
                 const buttonsHTML = isOutOfStock
                   ? `<div class="mt-auto pt-4 flex flex-col gap-2">
+                       <a href="${notifyWhatsAppURL}" target="_blank" rel="noopener noreferrer" class="btn btn-notify">
+                           <i class="ph ph-bell-ringing mr-2"></i>Avise-me!
+                       </a>
                        <button class="btn btn-sold-out" disabled><i class="ph ph-x-circle mr-2"></i>Esgotado</button>
-                       <button class="btn btn-notify open-notify-modal-btn" data-id="${product.id}" data-name="${product.name}"><i class="ph ph-bell-ringing mr-2"></i>Avise-me!</button>
                      </div>`
                   : `<div class="mt-auto">
                        ${priceHTML}
@@ -805,7 +731,7 @@
                            <button class="btn ${isInCart ? 'btn-add-success' : 'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
                                ${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado' : 'Adicionar'}
                            </button>
-                           <a href="${whatsAppURL}" target="_blank" class="btn btn-buy">Comprar</a>
+                           <a href="https://wa.me/5522998802545?text=${encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name}`)}" target="_blank" class="btn btn-buy">Comprar</a>
                        </div>
                      </div>`;
                 
@@ -932,51 +858,10 @@
             function setupEventListeners() {
                 UIElements.hamburgerButton.addEventListener('click', () => { UIElements.hamburgerButton.classList.toggle('menu-open'); UIElements.mobileNav.classList.toggle('menu-open'); });
                 UIElements.modalOverlay.addEventListener('click', (e) => { if (e.target === UIElements.modalOverlay) closeAllModals(); });
-                
-                // NOVO: LÓGICA PARA O MODAL "NOTIFIQUE-ME"
-                const closeNotifyModal = () => {
-                    UIElements.notifyMeOverlay.classList.remove('visible');
-                };
-
-                UIElements.notifyMeForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const formData = new FormData(UIElements.notifyMeForm);
-                    fetch("/", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                        body: new URLSearchParams(formData).toString(),
-                    })
-                    .then(() => {
-                        UIElements.notifyFormContent.style.display = 'none';
-                        UIElements.notifySuccessMessage.style.display = 'block';
-                    })
-                    .catch((error) => alert("Ocorreu um erro. Tente novamente."));
-                });
 
                 document.body.addEventListener('click', (e) => {
                     const target = e.target;
                     let stateChanged = false;
-
-                    // Gatilho para abrir o modal de notificação
-                    if (target.closest('.open-notify-modal-btn')) {
-                        const btn = target.closest('.open-notify-modal-btn');
-                        const productName = btn.dataset.name;
-                        UIElements.notifyProductDisplayName.textContent = productName;
-                        UIElements.notifyProductNameInput.value = productName;
-
-                        // Reseta o modal para o estado inicial
-                        UIElements.notifyFormContent.style.display = 'block';
-                        UIElements.notifySuccessMessage.style.display = 'none';
-                        UIElements.notifyMeForm.reset();
-
-                        UIElements.notifyMeOverlay.classList.add('visible');
-                        return;
-                    }
-                    // Gatilho para fechar o modal de notificação
-                    if (target.closest('.close-notify-modal-btn') || e.target === UIElements.notifyMeOverlay) {
-                        closeNotifyModal();
-                        return;
-                    }
 
                     if (target.closest('.open-shipping-info-modal')) {
                         if (!UIElements.productDetailModal.classList.contains('hidden')) {
