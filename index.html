@@ -280,6 +280,40 @@
         animation: pulse-skeleton 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         margin-top: auto;
     }
+
+    /* =========================================== */
+    /* ============== TEMA ESCURO ============== */
+    /* =========================================== */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --purple-dark: #a855f7;
+        --purple-medium: #9333ea;
+        --purple-light: #581c87;
+        --purple-faint: #2b1d3d; 
+        --green-faint: #14532d;
+        --green-dark-text: #dcfce7;
+        --background-main: #1c1921;
+        --background-card: #2d2a33;
+        --text-primary: #f3e8ff;
+        --text-secondary: #d1c4e9;
+        --accent-pink: #ec4899;
+        --shadow-subtle: 0 4px 15px rgba(0, 0, 0, 0.1);
+        --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-buy {
+        border-color: #34d399;
+      }
+      .btn-buy:hover {
+        background-color: #15803d;
+      }
+      .btn-outline-purple {
+        border-color: #581c87;
+      }
+      .btn-outline-purple:hover {
+        background-color: #581c87;
+      }
+    }
     </style>
 </head>
 <body>
