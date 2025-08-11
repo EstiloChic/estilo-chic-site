@@ -11,5 +11,4 @@ tags: products
 image: https://i.postimg.cc/rp70Ws2T/Whats-App-Image-2025-07-22-at-12-57-12.jpg
 category: acessorios
 ---
-
-Óculos de sol clássico com armação preta robusta. Um acessório versátil.
+Óculos de sol clássico com armação preta. Um acessório versátil.
