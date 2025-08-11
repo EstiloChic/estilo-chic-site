@@ -95,18 +95,20 @@
     .btn-outline-purple { background-color: var(--purple-faint); border-color: var(--purple-light); color: var(--purple-dark); }
     .btn-outline-purple:hover { background-color: var(--purple-light); }
     
+    /* Z-Index e Lógica de Modais Atualizada */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(58, 45, 70, 0.5); backdrop-filter: blur(10px); z-index: 1900; opacity: 0; visibility: hidden; transition: opacity 0.4s ease; }
     .modal-overlay.visible { opacity: 1; visibility: visible; }
-    .image-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1999; pointer-events: none; }
-    .image-modal.is-covered { z-index: 1899; }
+
+    .image-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1950; pointer-events: none; }
+    #shipping-info-modal { z-index: 2050; } /* Modal de frete fica por cima de tudo */
+
     .image-modal-content { background: var(--background-card); border-radius: 16px; box-shadow: var(--shadow-medium); width: 90%; max-width: 500px; pointer-events: auto; overflow: hidden; transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
     .modal-overlay.visible .image-modal-content { transform: scale(1); }
     .image-modal-content img { display: block; width: 100%; height: auto; max-height: 70vh; object-fit: contain; margin: 0 auto; }
     .close-modal-btn { position: absolute; top: 12px; right: 12px; background: rgba(0, 0, 0, 0.3); color: white; cursor: pointer; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; z-index: 2001; }
     .close-modal-btn:hover { background: rgba(0, 0, 0, 0.6); transform: scale(1.1); }
 
-    .floating-buttons-container { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; align-items: end; gap: 1rem; z-index: 1950; transition: all 0.4s ease; }
-    .floating-buttons-container.is-demoted { z-index: 1899; }
+    .floating-buttons-container { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; align-items: end; gap: 1rem; z-index: 2000; transition: all 0.4s ease; }
     .floating-buttons-container.hidden { opacity: 0; visibility: hidden; transform: translateY(20px); }
     .floating-cart, .floating-favorites { width: 55px; height: 55px; background: var(--purple-dark); box-shadow: var(--shadow-medium); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: all 0.3s ease; }
     .floating-cart:hover, .floating-favorites:hover { background: #4a0e6b; transform: scale(1.1); }
@@ -573,7 +575,6 @@
             const UIElements = { 
                 productDetailModal: get('#product-detail-modal'), 
                 modalOverlay: get('#modal-overlay'),
-                floatingButtonsContainer: get('#floating-buttons-container')
             };
             const cart = JSON.parse(localStorage.getItem('estiloChicCart') || '{}');
 
@@ -619,7 +620,6 @@
             
             UIElements.modalOverlay.classList.add('visible');
             UIElements.productDetailModal.classList.remove('hidden');
-            UIElements.floatingButtonsContainer.classList.add('is-demoted');
         };
 
         // O script principal da página, que agora tem a garantia de ser executado.
@@ -674,20 +674,31 @@
                 UIElements.modalOverlay.classList.remove('visible');
                 UIElements.productDetailModal.classList.add('hidden');
                 UIElements.shippingInfoModal.classList.add('hidden');
-                UIElements.productDetailModal.classList.remove('is-covered');
-                UIElements.floatingButtonsContainer.classList.remove('is-demoted');
+                
+                // Garante que os botões voltem ao normal (se não estiverem ocultos pelo observer)
+                const isFooterVisible = UIElements.floatingButtonsContainer.dataset.footerVisible === 'true';
+                if (!isFooterVisible) {
+                    UIElements.floatingButtonsContainer.classList.remove('hidden');
+                }
+                
                 if (cartOpen) closeCart();
                 if (favoritesOpen) closeFavorites();
             };
 
             const closeShippingInfoModal = () => {
                 UIElements.shippingInfoModal.classList.add('hidden');
-                UIElements.productDetailModal.classList.remove('is-covered');
-                UIElements.floatingButtonsContainer.classList.remove('is-demoted');
+                UIElements.floatingButtonsContainer.classList.remove('hidden'); // MOSTRA os botões novamente
                 
-                if (UIElements.productDetailModal.classList.contains('hidden') && !cartOpen && !favoritesOpen) {
+                // Se o modal de produto não estiver visível, podemos fechar o overlay
+                if (UIElements.productDetailModal.classList.contains('hidden')) {
                     UIElements.modalOverlay.classList.remove('visible');
                 }
+            };
+            
+            const openShippingInfoModal = () => {
+                UIElements.floatingButtonsContainer.classList.add('hidden'); // OCULTA os botões
+                UIElements.modalOverlay.classList.add('visible');
+                UIElements.shippingInfoModal.classList.remove('hidden');
             };
 
             const closeCart = (isChaining = false) => { if (!isChaining && UIElements.shippingInfoModal.classList.contains('hidden')) UIElements.modalOverlay.classList.remove('visible'); cartOpen = false; UIElements.cartDropdown.classList.remove('show'); UIElements.floatingCartBtn.classList.remove('active'); };
@@ -705,7 +716,6 @@
                 const isNew = lastVisit && (new Date(product.dateAdded).getTime() > lastVisit);
                 const isOutOfStock = product.inStock === false;
 
-                // Mensagem e URL para o botão "Avise-me" do WhatsApp
                 const notifyMessage = `Olá! Gostaria de ser avisado(a) quando o produto "${product.name}" voltar ao estoque.`;
                 const notifyWhatsAppURL = `https://wa.me/5522998802545?text=${encodeURIComponent(notifyMessage)}`;
 
@@ -716,7 +726,6 @@
                     </div>`;
                 const paymentHTML = `<div class="text-[11px] text-gray-500 mb-3"><span>Dinheiro e Pix</span></div>`;
 
-                // ** AQUI ESTÁ A LÓGICA ATUALIZADA **
                 const buttonsHTML = isOutOfStock
                   ? `<div class="mt-auto pt-4 flex flex-col gap-2">
                        <a href="${notifyWhatsAppURL}" target="_blank" rel="noopener noreferrer" class="btn btn-notify">
@@ -853,7 +862,7 @@
             const resetAllFilters = () => { activeFilter = 'all'; UIElements.searchInput.value = ''; getAll('.visual-category-link').forEach(link => link.classList.remove('active')); get('.visual-category-link[data-category="all"]').classList.add('active'); hideSearchSuggestions(); renderProducts(); checkButtonsVisibility(); };
             const checkButtonsVisibility = () => { const hasText = UIElements.searchInput.value.trim() !== ''; if(UIElements.clearSearchBtn) UIElements.clearSearchBtn.classList.toggle('hidden', !hasText); if(UIElements.searchIcon) UIElements.searchIcon.classList.toggle('hidden', hasText); };
             const setupActivityNotifications = () => { const toast = UIElements.activityToast; if (!toast || allProducts.length === 0) return; const names = ['Ana', 'Mariana', 'Júlia', 'Beatriz', 'Larissa', 'Maria', 'Alice', 'Helena', 'Laura', 'Manuela', 'Valentina', 'Sophia', 'Isabella', 'Lívia', 'Giovanna', 'Yasmin', 'Eloá', 'Clara', 'Cecília', 'Liz', 'Maitê', 'Antonella', 'Elisa', 'Gabriela', 'Luiza', 'Amanda', 'Bruna', 'Camila', 'Fernanda', 'Patrícia', 'Sandra', 'Jéssica', 'Letícia', 'Aline']; const cities = [ 'São Francisco de Itabapoana', 'Campos dos Goytacazes', 'Macaé', 'Itaperuna', 'Rio de Janeiro' ]; const actions = [ { verb: 'acabou de comprar', icon: 'ph-fill ph-handbag-simple', color: 'var(--purple-dark)' }, { verb: 'salvou nos favoritos', icon: 'ph-fill ph-heart', color: 'var(--accent-pink)' } ]; const showRandom = () => { if (document.hidden || allProducts.length === 0) return; const name = names[Math.floor(Math.random() * names.length)]; const city = cities[Math.floor(Math.random() * cities.length)]; const action = actions[Math.floor(Math.random() * actions.length)]; const product = allProducts[Math.floor(Math.random() * allProducts.length)]; toast.innerHTML = `<div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full animate-icon-pulse" style="background-color: ${action.color};"><i class="${action.icon} text-white text-xl"></i></div><div><p><strong>${name}</strong> de ${city}</p><p class="text-sm" style="color: var(--text-secondary);">${action.verb} um(a) <strong>${product.name}</strong></p></div>`; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 5000); }; const startCycle = () => { const delay = Math.random() * (20000 - 8000) + 8000; setTimeout(() => { showRandom(); startCycle(); }, delay); }; setTimeout(startCycle, 7000); };
-            const setupObservers = () => { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { UIElements.floatingButtonsContainer.classList.toggle('hidden', entry.isIntersecting); }); }, { threshold: 0.1 }); if (UIElements.scrollObserverTarget) { observer.observe(UIElements.scrollObserverTarget); } };
+            const setupObservers = () => { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { UIElements.floatingButtonsContainer.classList.toggle('hidden', entry.isIntersecting); UIElements.floatingButtonsContainer.dataset.footerVisible = entry.isIntersecting; }); }, { threshold: 0.1 }); if (UIElements.scrollObserverTarget) { observer.observe(UIElements.scrollObserverTarget); } };
             
             function setupEventListeners() {
                 UIElements.hamburgerButton.addEventListener('click', () => { UIElements.hamburgerButton.classList.toggle('menu-open'); UIElements.mobileNav.classList.toggle('menu-open'); });
@@ -864,12 +873,7 @@
                     let stateChanged = false;
 
                     if (target.closest('.open-shipping-info-modal')) {
-                        if (!UIElements.productDetailModal.classList.contains('hidden')) {
-                            UIElements.productDetailModal.classList.add('is-covered');
-                        }
-                        UIElements.floatingButtonsContainer.classList.add('is-demoted');
-                        UIElements.modalOverlay.classList.add('visible');
-                        UIElements.shippingInfoModal.classList.remove('hidden');
+                        openShippingInfoModal();
                         return;
                     }
                     if (target.closest('#shipping-info-modal .close-modal-btn') || target.closest('#close-shipping-info-btn')) {
