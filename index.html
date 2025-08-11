@@ -619,6 +619,9 @@
             }
 
             const isInCart = cart[product.id] > 0;
+            const buyNowMessage = `Olá! Tenho interesse no produto: ${product.name}`;
+            const buyNowURL = `https://wa.me/5522998802545?text=${encodeURIComponent(buyNowMessage)}`;
+
             UIElements.productDetailModal.innerHTML = `
                 <div class="image-modal-content">
                     <button class="close-modal-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
@@ -642,10 +645,13 @@
                                 <p class="text-3xl font-bold text-purple-700">R$ ${Number(product.price).toFixed(2).replace('.', ',')}</p>
                                 <span class="text-lg text-gray-400 line-through -mt-1">R$ ${Number(product.originalPrice).toFixed(2).replace('.',',')}</span>
                             </div>
-                            <div class="flex flex-col gap-2 text-sm w-36">
+                            <div class="flex flex-col gap-2 text-sm w-40">
                                 <button class="btn ${isInCart ? 'btn-add-success' : 'btn-add-default'} add-to-cart-btn" data-id="${product.id}">
-                                    ${isInCart ? '<i class="ph-bold ph-check mr-1"></i> Adicionado' : 'Adicionar'}
+                                    ${isInCart ? '<i class="ph-bold ph-check mr-2"></i>Na Sacola' : '<i class="ph ph-handbag mr-2"></i>Adicionar'}
                                 </button>
+                                <a href="${buyNowURL}" target="_blank" class="btn btn-buy">
+                                    <i class="ph ph-whatsapp-logo mr-2"></i>Comprar Agora
+                                </a>
                             </div>
                         </div>
                     </div>
