@@ -7,6 +7,6 @@ originalPrice: 30
 price: 20
 image: /assets/uploads/img_9058.jpeg
 category: roupas
-size: "Tamanho único "
+size: "único "
 ---
 Fina efeito transparente
