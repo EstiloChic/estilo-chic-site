@@ -2,7 +2,7 @@
 layout: produto.njk
 inStock: true
 dateAdded: 2025-08-22T13:20:00.000-03:00
-name: Corrente dourado
+name: Cinto dourado
 originalPrice: 30
 price: 20
 image: /assets/uploads/img_9163.jpeg
