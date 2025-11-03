@@ -137,7 +137,16 @@
     .image-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1999; pointer-events: none; }
     .image-modal-content { background: var(--background-card); border-radius: 16px; box-shadow: var(--shadow-medium); width: 90%; max-width: 500px; pointer-events: auto; overflow: hidden; transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
     .modal-overlay.visible .image-modal-content { transform: scale(1); }
-    .image-modal-content img { display: block; width: 100%; height: auto; max-height: 70vh; object-fit: contain; margin: 0 auto; }
+    
+    /* --- CÓDIGO CORRIGIDO ABAIXO --- */
+    .image-modal-content img {
+        display: block;
+        width: 100%;
+        height: 400px; /* Altura fixa para garantir consistência */
+        object-fit: cover; /* Faz a imagem cobrir a área sem distorcer */
+        margin: 0 auto;
+    }
+    
     .close-modal-btn { position: absolute; top: 12px; right: 12px; background: rgba(0, 0, 0, 0.3); color: white; cursor: pointer; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; z-index: 2001; }
     .close-modal-btn:hover { background: rgba(0, 0, 0, 0.6); transform: scale(1.1); }
 
